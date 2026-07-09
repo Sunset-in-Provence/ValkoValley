@@ -8,7 +8,7 @@ import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/context/AuthContext'
 import toast from 'react-hot-toast'
 
-export default function CommentForm({ postId, parentId = null, replyToId = null, depth = 0, onSuccess, onCancel }) {
+export default function CommentForm({ postId = null, creationId = null, parentId = null, replyToId = null, depth = 0, onSuccess, onCancel }) {
   const { user } = useAuth()
   const [content, setContent] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -20,6 +20,7 @@ export default function CommentForm({ postId, parentId = null, replyToId = null,
     setSubmitting(true)
     const { error } = await supabase.from('comments').insert({
       post_id: postId,
+      creation_id: creationId,
       parent_id: parentId,
       reply_to_id: replyToId,
       author_id: user.id,

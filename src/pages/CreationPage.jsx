@@ -9,7 +9,7 @@ import { supabase } from '@/lib/supabaseClient'
 import CreationCard from '@/components/creation/CreationCard'
 import EmptyState from '@/components/shared/EmptyState'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
-import { Palette, Plus, Search } from 'lucide-react'
+import { Palette, Plus, Search, Flame } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const RATING_FILTERS = [
@@ -22,6 +22,8 @@ const RATING_FILTERS = [
 const SORT_OPTIONS = [
   { key: 'latest', label: '最新' },
   { key: 'views', label: '最多浏览' },
+  { key: 'likes', label: '最多赞' },
+  { key: 'hot', label: '最热' },
 ]
 
 export default function CreationPage() {
@@ -46,12 +48,36 @@ export default function CreationPage() {
     else query = query.order('view_count', { ascending: false })
 
     const { data } = await query
-    setCreations(data || [])
+    let enriched = data || []
+
+    // 获取点赞数
+    if (enriched.length > 0) {
+      const ids = enriched.map((c) => c.id)
+      const { data: likes } = await supabase
+        .from('likes')
+        .select('target_id')
+        .eq('target_type', 'creation')
+        .in('target_id', ids)
+      const likeMap = {}
+      likes?.forEach((l) => { likeMap[l.target_id] = (likeMap[l.target_id] || 0) + 1 })
+
+      enriched = enriched.map((c) => {
+        const l = likeMap[c.id] || 0
+        const age = (Date.now() - new Date(c.created_at).getTime()) / 3600000
+        const hotness = age > 0 ? (l * 2 + (c.view_count || 0) * 0.5) / Math.pow(age + 1, 1.2) : l * 2
+        return { ...c, like_count: l, hotness }
+      })
+
+      if (sort === 'likes') enriched.sort((a, b) => b.like_count - a.like_count)
+      else if (sort === 'hot') enriched.sort((a, b) => b.hotness - a.hotness)
+    }
+
+    setCreations(enriched)
     setLoading(false)
 
     // 聚合标签云
     const tagCount = {}
-    data?.forEach((c) => {
+    enriched.forEach((c) => {
       (c.tags || []).forEach((t) => {
         if (!['原创', '二创'].includes(t)) tagCount[t] = (tagCount[t] || 0) + 1
       })

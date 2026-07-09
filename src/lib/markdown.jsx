@@ -16,6 +16,7 @@ export function renderMarkdown(content) {
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
+      breaks={true}
       components={{
         // 链接在新窗口打开
         a: ({ href, children, ...props }) => (

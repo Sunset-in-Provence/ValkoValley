@@ -12,6 +12,7 @@ import { renderMarkdown } from '@/lib/markdown'
 import CommentItem from '@/components/discussion/CommentItem'
 import CommentForm from '@/components/discussion/CommentForm'
 import ReportButton from '@/components/report/ReportButton'
+import LikeButton from '@/components/shared/LikeButton'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import EmptyState from '@/components/shared/EmptyState'
 import toast from 'react-hot-toast'
@@ -72,13 +73,10 @@ export default function DiscussionDetailPage() {
 
   async function handleDeletePost() {
     if (!confirm('确定删除此帖子？')) return
-    const { error } = await supabase
-      .from('posts')
-      .update({ is_deleted: true })
-      .eq('id', id)
-      .eq('author_id', user.id)
+    const { data, error } = await supabase.rpc('delete_own_post', { post_id: id })
 
-    if (error) { toast.error('删除失败') }
+    if (error) { toast.error('删除失败: ' + error.message) }
+    else if (!data) { toast.error('无权限删除此帖子') }
     else {
       toast.success('帖子已删除')
       navigate('/discussion')
@@ -107,7 +105,7 @@ export default function DiscussionDetailPage() {
     )
   }
 
-  const isOwn = user?.id === post.author_id
+  const isOwn = user?.id === post.author_id || isAdmin
 
   return (
     <div>
@@ -147,8 +145,19 @@ export default function DiscussionDetailPage() {
             {renderMarkdown(post.content)}
           </div>
 
+          {/* 附图 */}
+          {post.image_urls?.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-4">
+              {post.image_urls.map((url, i) => (
+                <img key={i} src={url} alt={`附图 ${i + 1}`}
+                  className="max-w-xs max-h-48 object-cover rounded-card" loading="lazy" />
+              ))}
+            </div>
+          )}
+
           {/* 操作按钮 */}
           <div className="flex items-center gap-3 mt-6 pt-4 border-t border-border">
+            <LikeButton targetType="post" targetId={id} size="lg" />
             {isOwn && (
               <>
                 <button
@@ -199,6 +208,7 @@ export default function DiscussionDetailPage() {
                 key={comment.id}
                 comment={comment}
                 postId={id}
+                postAuthorId={post.author_id}
                 allComments={comments}
                 onRefresh={fetchData}
               />

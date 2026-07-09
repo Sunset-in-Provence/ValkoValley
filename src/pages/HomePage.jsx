@@ -11,9 +11,6 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import GuestbookBanner from '@/components/shared/GuestbookBanner'
 import GuestbookCard from '@/components/shared/GuestbookCard'
-import AdminReviewPanel from '@/components/admin/AdminReviewPanel'
-
-const ADMIN_EMAILS = (import.meta.env.VITE_ADMIN_EMAIL || '').split(',').map((e) => e.trim())
 
 const WELCOMED_KEY = 'valkovalley-welcomed'
 
@@ -32,22 +29,23 @@ export default function HomePage() {
     }
   }, [user])
 
-  const isPageAdmin = user?.email && ADMIN_EMAILS.includes(user.email)
-
   return (
     <div className="min-h-screen bg-primary">
       <GuestbookBanner />
       <GuestbookCard />
       {/* Hero 区域 */}
       <section className="max-w-4xl mx-auto px-4 pt-24 pb-16 text-center relative z-10">
-        <h1 className="font-display text-accent text-5xl mb-4">
+        <h1 className="font-display text-7xl mb-4"
+          style={{ color: '#2D5A3A', textShadow: '0 4px 8px rgba(46,139,87,0.35), 0 2px 4px rgba(34,139,34,0.25)' }}>
           ValkoValley
         </h1>
-        <p className="font-display text-secondary text-2xl mb-2">
+        <p className="font-display text-3xl mb-2"
+          style={{ color: '#2D5A3A', textShadow: '0 3px 6px rgba(46,139,87,0.35), 0 2px 3px rgba(34,139,34,0.25)' }}>
           狼和铃兰的幸福归来
         </p>
-        <p className="text-muted text-lg mb-8 max-w-xl mx-auto">
-          敖尹 CP 同人创作与讨论的专属社区。通过入站考试，与同好一起守护这份美好。
+        <p className="text-muted text-xl mb-8 max-w-xl mx-auto"
+          style={{ textShadow: '0 2px 4px rgba(46,139,87,0.4), 0 1px 2px rgba(34,139,34,0.3)' }}>
+          「敖尹×你」的专属社区
         </p>
 
         <div className="flex items-center justify-center">
@@ -59,18 +57,23 @@ export default function HomePage() {
               {greeting}
             </Link>
           ) : (
-            <Link
-              to="/register"
-              className="bg-accent text-text-inverse px-8 py-3 rounded-button font-display text-lg no-underline hover:opacity-90 transition-opacity"
-            >
-              加入社区
-            </Link>
+            <div className="inline-flex items-center gap-4 bg-surface/80 backdrop-blur-sm rounded-card px-6 py-3 shadow-card">
+              <Link
+                to="/login"
+                className="border border-accent text-accent px-6 py-2.5 rounded-button font-display text-base no-underline hover:bg-hover transition-colors"
+              >
+                登录
+              </Link>
+              <Link
+                to="/register"
+                className="bg-accent text-text-inverse px-6 py-2.5 rounded-button font-display text-base no-underline hover:opacity-90 transition-opacity"
+              >
+                注册
+              </Link>
+            </div>
           )}
         </div>
       </section>
-
-      {/* 管理员审核面板 */}
-      {isPageAdmin && <AdminReviewPanel />}
 
       {/* 特色介绍区域（管理员可编辑） */}
       <section className="max-w-4xl mx-auto px-4 pb-16 relative z-10">

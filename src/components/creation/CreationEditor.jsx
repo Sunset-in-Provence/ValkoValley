@@ -110,7 +110,6 @@ export default function CreationEditor() {
 
       {/* 图片上传 */}
       <div>
-        <label className="text-secondary text-sm font-medium mb-2 block">附图</label>
         <MediaUploader images={imageUrls} onImagesChange={setImageUrls} />
       </div>
 

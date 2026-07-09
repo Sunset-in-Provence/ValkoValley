@@ -114,7 +114,7 @@ export default function GuestbookBanner() {
 
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden"
-      style={{ opacity: 0.18 }}>
+      style={{ opacity: 0.30 }}>
       {danmaku.map((d) => (
         <div
           key={d.id}

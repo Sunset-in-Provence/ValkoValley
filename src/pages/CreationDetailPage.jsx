@@ -1,7 +1,5 @@
 /**
- * 创作详情页 — 展示作品内容 + 图片 + 视频
- * UI 变量映射：bg-surface, text-primary, text-secondary, text-muted, text-accent, text-danger,
- *   rounded-card, rounded-button, rounded-full, shadow-card, font-display, font-body, border-border
+ * 创作详情页 — 展示作品 + 评论区 + 点赞
  */
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
@@ -9,11 +7,14 @@ import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/context/AuthContext'
 import { renderMarkdown } from '@/lib/markdown'
 import VideoEmbed from '@/components/creation/VideoEmbed'
+import CommentItem from '@/components/discussion/CommentItem'
+import CommentForm from '@/components/discussion/CommentForm'
+import LikeButton from '@/components/shared/LikeButton'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import EmptyState from '@/components/shared/EmptyState'
 import toast from 'react-hot-toast'
 import ReportButton from '@/components/report/ReportButton'
-import { ArrowLeft, User, Clock, Eye, Edit3, Trash2 } from 'lucide-react'
+import { ArrowLeft, User, Clock, Eye, Edit3, Trash2, MessageSquare } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const ratingLabels = { general: '全年龄', '15plus': '15+', '18plus': '18+' }
@@ -25,9 +26,10 @@ const ratingColors = {
 
 export default function CreationDetailPage() {
   const { id } = useParams()
-  const { user } = useAuth()
+  const { user, isAdmin } = useAuth()
   const navigate = useNavigate()
   const [creation, setCreation] = useState(null)
+  const [comments, setComments] = useState([])
   const [loading, setLoading] = useState(true)
 
   const fetchData = useCallback(async () => {
@@ -37,19 +39,38 @@ export default function CreationDetailPage() {
       .select('*, author:profiles!creations_author_id_fkey(username, display_name, avatar_url)')
       .eq('id', id).eq('is_deleted', false).single()
     setCreation(data || null)
-    setLoading(false)
-    // 增加阅读量
+
     if (data) {
+      // 增加阅读量
       supabase.from('creations').update({ view_count: (data.view_count || 0) + 1 }).eq('id', id).then()
+      // 加载评论
+      const { data: commentData } = await supabase
+        .from('comments')
+        .select('*, author:profiles!comments_author_id_fkey(username, display_name, avatar_url)')
+        .eq('creation_id', id)
+        .eq('is_deleted', false)
+        .order('created_at', { ascending: true })
+      if (commentData) {
+        const enriched = commentData.map((c) => {
+          if (c.reply_to_id) {
+            const target = commentData.find((x) => x.id === c.reply_to_id)
+            c.reply_to = target?.author || null
+          }
+          return c
+        })
+        setComments(enriched)
+      }
     }
+    setLoading(false)
   }, [id])
 
   useEffect(() => { fetchData() }, [fetchData])
 
   async function handleDelete() {
     if (!confirm('确定删除此创作？')) return
-    const { error } = await supabase.from('creations').update({ is_deleted: true }).eq('id', id).eq('author_id', user.id)
-    if (error) { toast.error('删除失败') }
+    const { data, error } = await supabase.rpc('delete_own_creation', { creation_id: id })
+    if (error) { toast.error('删除失败: ' + error.message) }
+    else if (!data) { toast.error('无权限删除此创作') }
     else { toast.success('创作已删除'); navigate('/creation') }
   }
 
@@ -68,9 +89,10 @@ export default function CreationDetailPage() {
     )
   }
 
-  const isOwn = user?.id === creation.author_id
+  const isOwn = user?.id === creation.author_id || isAdmin
   const typeTag = creation.tags?.find((t) => ['原创', '二创'].includes(t))
   const customTags = creation.tags?.filter((t) => !['原创', '二创'].includes(t)) || []
+  const topLevelComments = comments.filter((c) => !c.parent_id)
 
   return (
     <div>
@@ -78,7 +100,7 @@ export default function CreationDetailPage() {
         <ArrowLeft size={14} /> 返回创作区
       </Link>
 
-      <article className="bg-surface rounded-card shadow-card">
+      <article className="bg-surface rounded-card shadow-card mb-6">
         <div className="p-6 md:p-8">
           {/* 元信息 */}
           <div className="flex flex-wrap items-center gap-2 text-xs mb-4">
@@ -111,7 +133,6 @@ export default function CreationDetailPage() {
           {/* 图片 */}
           {creation.image_urls?.length > 0 && (
             <div className="mb-8">
-              <h3 className="text-secondary text-sm font-medium mb-3">📷 附图</h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {creation.image_urls.map((url, i) => (
                   <img key={i} src={url} alt={`附图 ${i + 1}`}
@@ -125,13 +146,13 @@ export default function CreationDetailPage() {
           {/* 视频 */}
           {creation.video_urls?.length > 0 && (
             <div className="mb-8">
-              <h3 className="text-secondary text-sm font-medium mb-3">🎬 视频</h3>
               <VideoEmbed urls={creation.video_urls} />
             </div>
           )}
 
           {/* 操作栏 */}
           <div className="flex items-center gap-3 pt-4 border-t border-border">
+            <LikeButton targetType="creation" targetId={id} size="lg" />
             {isOwn && (
               <>
                 <button onClick={() => navigate(`/creation/${id}/edit`)}
@@ -146,6 +167,25 @@ export default function CreationDetailPage() {
           </div>
         </div>
       </article>
+
+      {/* 评论区 */}
+      <section className="bg-surface rounded-card shadow-card p-6">
+        <h2 className="font-display text-accent text-lg mb-4 flex items-center gap-2">
+          <MessageSquare size={18} /> 评论 ({comments.length})
+        </h2>
+        <div className="mb-6 pb-6 border-b border-border">
+          <CommentForm creationId={id} onSuccess={fetchData} />
+        </div>
+        {topLevelComments.length === 0 ? (
+          <p className="text-muted text-sm text-center py-8">暂无评论，来发表第一条评论吧</p>
+        ) : (
+          <div>
+            {topLevelComments.map((comment) => (
+              <CommentItem key={comment.id} comment={comment} creationId={id} allComments={comments} onRefresh={fetchData} />
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   )
 }

@@ -8,17 +8,19 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/context/AuthContext'
 import MarkdownPreview from './MarkdownPreview'
+import MediaUploader from '@/components/creation/MediaUploader'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import toast from 'react-hot-toast'
 
 export default function PostEditor() {
   const { user } = useAuth()
   const navigate = useNavigate()
-  const { id } = useParams() // 编辑模式下有 id
+  const { id } = useParams()
   const isEditing = !!id
 
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
+  const [imageUrls, setImageUrls] = useState([])
   const [submitting, setSubmitting] = useState(false)
   const [loadingPost, setLoadingPost] = useState(isEditing)
 
@@ -35,6 +37,7 @@ export default function PostEditor() {
       if (data) {
         setTitle(data.title)
         setContent(data.content)
+        setImageUrls(data.image_urls || [])
       } else {
         toast.error('帖子不存在或无权限编辑')
         navigate('/discussion')
@@ -54,7 +57,7 @@ export default function PostEditor() {
     if (isEditing) {
       const { error } = await supabase
         .from('posts')
-        .update({ title: title.trim(), content, updated_at: new Date().toISOString() })
+        .update({ title: title.trim(), content, image_urls: imageUrls, updated_at: new Date().toISOString() })
         .eq('id', id)
         .eq('author_id', user.id)
 
@@ -66,7 +69,7 @@ export default function PostEditor() {
     } else {
       const { data, error } = await supabase
         .from('posts')
-        .insert({ author_id: user.id, title: title.trim(), content })
+        .insert({ author_id: user.id, title: title.trim(), content, image_urls: imageUrls })
         .select('id')
         .single()
 
@@ -103,6 +106,9 @@ export default function PostEditor() {
 
       {/* Markdown 编辑器 */}
       <MarkdownPreview content={content} onChange={setContent} rows={12} />
+
+      {/* 附图 */}
+      <MediaUploader images={imageUrls} onImagesChange={setImageUrls} />
 
       {/* 操作按钮 */}
       <div className="flex items-center gap-3 pt-2">
