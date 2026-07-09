@@ -9,32 +9,26 @@ import { supabase } from '@/lib/supabaseClient'
 import CreationCard from '@/components/creation/CreationCard'
 import EmptyState from '@/components/shared/EmptyState'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
-import { Palette, Plus, Search, Flame } from 'lucide-react'
+import { Palette, Plus, Search, Clock, Flame, ArrowDown, ArrowUp } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const RATING_FILTERS = [
+const CONTENT_FILTERS = [
   { key: 'all', label: '全部' },
-  { key: 'general', label: '全年龄' },
-  { key: '15plus', label: '15+' },
-  { key: '18plus', label: '18+' },
-]
-
-const SORT_OPTIONS = [
-  { key: 'latest', label: '最新' },
-  { key: 'views', label: '最多浏览' },
-  { key: 'likes', label: '最多赞' },
-  { key: 'hot', label: '最热' },
+  { key: 'text', label: '📝 文' },
+  { key: 'image', label: '🖼️ 图' },
+  { key: 'video', label: '🎬 视频' },
 ]
 
 export default function CreationPage() {
   const [creations, setCreations] = useState([])
   const [loading, setLoading] = useState(true)
-  const [ratingFilter, setRatingFilter] = useState('all')
-  const [sort, setSort] = useState('latest')
+  const [contentFilter, setContentFilter] = useState('all')
+  const [sort, setSort] = useState('time')
+  const [timeOrder, setTimeOrder] = useState('desc')
   const [search, setSearch] = useState('')
   const [popularTags, setPopularTags] = useState([])
 
-  useEffect(() => { fetchData() }, [ratingFilter, sort])
+  useEffect(() => { fetchData() }, [contentFilter, sort, timeOrder])
 
   async function fetchData() {
     setLoading(true)
@@ -43,14 +37,12 @@ export default function CreationPage() {
       .select('*, author:profiles!creations_author_id_fkey(username, display_name, avatar_url)')
       .eq('is_deleted', false)
 
-    if (ratingFilter !== 'all') query = query.eq('rating', ratingFilter)
-    if (sort === 'latest') query = query.order('created_at', { ascending: false })
-    else query = query.order('view_count', { ascending: false })
+    if (contentFilter !== 'all') query = query.eq('content_type', contentFilter)
 
     const { data } = await query
     let enriched = data || []
 
-    // 获取点赞数
+    // 获取点赞数 + 计算热度
     if (enriched.length > 0) {
       const ids = enriched.map((c) => c.id)
       const { data: likes } = await supabase
@@ -63,13 +55,18 @@ export default function CreationPage() {
 
       enriched = enriched.map((c) => {
         const l = likeMap[c.id] || 0
-        const age = (Date.now() - new Date(c.created_at).getTime()) / 3600000
-        const hotness = age > 0 ? (l * 2 + (c.view_count || 0) * 0.5) / Math.pow(age + 1, 1.2) : l * 2
+        const age = Math.max((Date.now() - new Date(c.created_at).getTime()) / 3600000, 0.1)
+        const hotness = (l + (c.view_count || 0)) / age
         return { ...c, like_count: l, hotness }
       })
 
-      if (sort === 'likes') enriched.sort((a, b) => b.like_count - a.like_count)
-      else if (sort === 'hot') enriched.sort((a, b) => b.hotness - a.hotness)
+      if (sort === 'time') {
+        enriched.sort((a, b) => timeOrder === 'desc'
+          ? new Date(b.created_at) - new Date(a.created_at)
+          : new Date(a.created_at) - new Date(b.created_at))
+      } else {
+        enriched.sort((a, b) => b.hotness - a.hotness)
+      }
     }
 
     setCreations(enriched)
@@ -115,22 +112,26 @@ export default function CreationPage() {
                 placeholder="搜索创作..." className="w-full bg-hover border border-border rounded-input pl-8 pr-3 py-2 text-primary text-sm focus:outline-none focus:border-accent" />
             </div>
             <div className="flex gap-1">
-              {RATING_FILTERS.map((f) => (
-                <button key={f.key} onClick={() => setRatingFilter(f.key)}
+              {CONTENT_FILTERS.map((f) => (
+                <button key={f.key} onClick={() => setContentFilter(f.key)}
                   className={cn('px-3 py-1.5 rounded-full text-xs transition-colors',
-                    ratingFilter === f.key ? 'bg-accent text-text-inverse' : 'bg-surface text-secondary border border-border hover:bg-hover')}>
+                    contentFilter === f.key ? 'bg-accent text-text-inverse' : 'bg-surface text-secondary border border-border hover:bg-hover')}>
                   {f.label}
                 </button>
               ))}
             </div>
             <div className="flex gap-1">
-              {SORT_OPTIONS.map((s) => (
-                <button key={s.key} onClick={() => setSort(s.key)}
-                  className={cn('px-3 py-1.5 rounded-full text-xs transition-colors',
-                    sort === s.key ? 'bg-accent text-text-inverse' : 'bg-surface text-secondary border border-border hover:bg-hover')}>
-                  {s.label}
-                </button>
-              ))}
+              <button onClick={() => { if (sort === 'time') { setTimeOrder((p) => p === 'desc' ? 'asc' : 'desc') } else { setSort('time'); setTimeOrder('desc') } }}
+                className={cn('flex items-center gap-1 px-3 py-1.5 rounded-full text-xs transition-colors',
+                  sort === 'time' ? 'bg-accent text-text-inverse' : 'bg-surface text-secondary border border-border hover:bg-hover')}>
+                <Clock size={12} /> 按时间排序
+                {sort === 'time' && (timeOrder === 'desc' ? <ArrowDown size={10} /> : <ArrowUp size={10} />)}
+              </button>
+              <button onClick={() => setSort('hot')}
+                className={cn('flex items-center gap-1 px-3 py-1.5 rounded-full text-xs transition-colors',
+                  sort === 'hot' ? 'bg-accent text-text-inverse' : 'bg-surface text-secondary border border-border hover:bg-hover')}>
+                <Flame size={12} /> 按热度排序
+              </button>
             </div>
           </div>
 

@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils'
 const links = [
   { to: '/discussion', label: '讨论区', icon: MessageSquare },
   { to: '/creation', label: '创作区', icon: Palette },
-  { to: '/library', label: '设定图书馆', icon: BookOpen },
+  { to: '/library', label: '档案馆', icon: BookOpen },
 ]
 
 export default function Sidebar() {

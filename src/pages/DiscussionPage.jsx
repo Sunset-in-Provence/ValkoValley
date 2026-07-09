@@ -7,35 +7,27 @@ import { supabase } from '@/lib/supabaseClient'
 import PostCard from '@/components/discussion/PostCard'
 import EmptyState from '@/components/shared/EmptyState'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
-import { MessageSquare, Plus, Clock, Flame, ArrowUp, ArrowDown } from 'lucide-react'
+import { MessageSquare, Plus, Clock, Flame, ArrowDown, ArrowUp } from 'lucide-react'
 import { cn } from '@/lib/utils'
-
-const SORT_OPTIONS = [
-  { key: 'newest', label: '最新', icon: Clock, order: 'desc' },
-  { key: 'oldest', label: '最早', icon: Clock, order: 'asc' },
-  { key: 'top', label: '最多赞', icon: ArrowUp, order: 'desc' },
-  { key: 'hot', label: '最热', icon: Flame, order: 'desc' },
-]
 
 export default function DiscussionPage() {
   const [posts, setPosts] = useState([])
   const [loading, setLoading] = useState(true)
-  const [sort, setSort] = useState('newest')
+  const [sort, setSort] = useState('time')  // 'time' | 'hot'
+  const [timeOrder, setTimeOrder] = useState('desc') // 'desc' | 'asc'
   const [search, setSearch] = useState('')
 
-  useEffect(() => { fetchPosts() }, [sort])
+  useEffect(() => { fetchPosts() }, [sort, timeOrder])
 
   async function fetchPosts() {
     setLoading(true)
-    let query = supabase
+    const { data, error } = await supabase
       .from('posts')
       .select('*, author:profiles!posts_author_id_fkey(username, display_name, avatar_url)')
       .eq('is_deleted', false)
 
-    const { data, error } = await query
     if (error || !data) { setLoading(false); return }
 
-    // 获取评论数和点赞数
     const postIds = data.map((p) => p.id)
     const [{ data: comments }, { data: likes }] = await Promise.all([
       supabase.from('comments').select('post_id').in('post_id', postIds).eq('is_deleted', false),
@@ -48,20 +40,35 @@ export default function DiscussionPage() {
     let enriched = data.map((p) => {
       const c = commentMap[p.id] || 0
       const l = likeMap[p.id] || 0
-      const age = (Date.now() - new Date(p.created_at).getTime()) / 3600000 // hours
-      const hotness = age > 0 ? (l * 2 + c * 3) / Math.pow(age + 1, 1.2) : l * 2 + c * 3
+      const age = Math.max((Date.now() - new Date(p.created_at).getTime()) / 3600000, 0.1) // hours
+      const hotness = (l + c) / age
       return { ...p, comment_count: c, like_count: l, hotness }
     })
 
-    // 排序
-    if (sort === 'newest') enriched.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-    else if (sort === 'oldest') enriched.sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
-    else if (sort === 'top') enriched.sort((a, b) => b.like_count - a.like_count)
-    else if (sort === 'hot') enriched.sort((a, b) => b.hotness - a.hotness)
+    if (sort === 'time') {
+      enriched.sort((a, b) => timeOrder === 'desc'
+        ? new Date(b.created_at) - new Date(a.created_at)
+        : new Date(a.created_at) - new Date(b.created_at))
+    } else {
+      enriched.sort((a, b) => b.hotness - a.hotness)
+    }
 
     setPosts(enriched)
     setLoading(false)
   }
+
+  function handleTimeClick() {
+    if (sort === 'time') {
+      setTimeOrder((prev) => prev === 'desc' ? 'asc' : 'desc')
+    } else {
+      setSort('time')
+      setTimeOrder('desc')
+    }
+  }
+
+  const filtered = posts.filter((p) =>
+    !search.trim() || p.title.toLowerCase().includes(search.trim().toLowerCase())
+  )
 
   return (
     <div>
@@ -74,16 +81,18 @@ export default function DiscussionPage() {
       </div>
 
       {/* 排序 */}
-      <div className="flex items-center gap-1.5 mb-3 flex-wrap">
-        {SORT_OPTIONS.map(({ key, label, icon: Icon, order }) => (
-          <button key={key} onClick={() => setSort(key)}
-            className={cn('flex items-center gap-1 px-3 py-1.5 rounded-full text-xs transition-colors',
-              sort === key ? 'bg-accent text-text-inverse' : 'bg-surface text-secondary border border-border hover:bg-hover')}>
-            <Icon size={12} />
-            {label}
-            {sort === key && (order === 'desc' ? <ArrowDown size={10} /> : <ArrowUp size={10} />)}
-          </button>
-        ))}
+      <div className="flex items-center gap-2 mb-4">
+        <button onClick={handleTimeClick}
+          className={cn('flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-colors',
+            sort === 'time' ? 'bg-accent text-text-inverse' : 'bg-surface text-secondary border border-border hover:bg-hover')}>
+          <Clock size={12} /> 按时间排序
+          {sort === 'time' && (timeOrder === 'desc' ? <ArrowDown size={10} /> : <ArrowUp size={10} />)}
+        </button>
+        <button onClick={() => setSort('hot')}
+          className={cn('flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-colors',
+            sort === 'hot' ? 'bg-accent text-text-inverse' : 'bg-surface text-secondary border border-border hover:bg-hover')}>
+          <Flame size={12} /> 按热度排序
+        </button>
       </div>
 
       {/* 搜索 */}
@@ -95,13 +104,13 @@ export default function DiscussionPage() {
 
       {loading ? (
         <div className="flex justify-center py-16"><LoadingSpinner size="lg" /></div>
-      ) : posts.length === 0 ? (
-        <EmptyState icon={MessageSquare} title="还没有帖子" description="成为第一个发起讨论的人吧！"
-          action={<Link to="/discussion/new" className="bg-accent text-text-inverse px-4 py-2 rounded-button text-sm no-underline">发布第一篇帖子</Link>} />
+      ) : filtered.length === 0 ? (
+        <EmptyState icon={MessageSquare} title={search ? '未找到匹配的帖子' : '还没有帖子'}
+          description={search ? '' : '成为第一个发起讨论的人吧！'}
+          action={!search && <Link to="/discussion/new" className="bg-accent text-text-inverse px-4 py-2 rounded-button text-sm no-underline">发布第一篇帖子</Link>} />
       ) : (
         <div className="space-y-3">
-          {posts.filter((p) => !search.trim() || p.title.toLowerCase().includes(search.trim().toLowerCase()))
-            .map((post) => <PostCard key={post.id} post={post} />)}
+          {filtered.map((post) => <PostCard key={post.id} post={post} />)}
         </div>
       )}
     </div>

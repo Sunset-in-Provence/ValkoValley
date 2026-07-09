@@ -17,11 +17,11 @@ import ReportButton from '@/components/report/ReportButton'
 import { ArrowLeft, User, Clock, Eye, Edit3, Trash2, MessageSquare } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const ratingLabels = { general: '全年龄', '15plus': '15+', '18plus': '18+' }
-const ratingColors = {
-  general: 'bg-success/10 text-success',
-  '15plus': 'bg-warning/10 text-warning',
-  '18plus': 'bg-danger/10 text-danger',
+const contentTypeLabels = { text: '📝 文', image: '🖼️ 图', video: '🎬 视频' }
+const contentTypeColors = {
+  text: 'bg-info/10 text-info',
+  image: 'bg-success/10 text-success',
+  video: 'bg-warning/10 text-warning',
 }
 
 export default function CreationDetailPage() {
@@ -104,8 +104,8 @@ export default function CreationDetailPage() {
         <div className="p-6 md:p-8">
           {/* 元信息 */}
           <div className="flex flex-wrap items-center gap-2 text-xs mb-4">
-            <span className={cn('px-2 py-0.5 rounded-full', ratingColors[creation.rating] || 'bg-hover text-muted')}>
-              {ratingLabels[creation.rating] || creation.rating}
+            <span className={cn('px-2 py-0.5 rounded-full', contentTypeColors[creation.content_type] || 'bg-hover text-muted')}>
+              {contentTypeLabels[creation.content_type] || creation.content_type}
             </span>
             {typeTag && (
               <span className="bg-accent/10 text-accent px-2 py-0.5 rounded-full">{typeTag}</span>

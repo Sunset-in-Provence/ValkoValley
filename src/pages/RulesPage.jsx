@@ -33,7 +33,7 @@ export default function RulesPage() {
               <ul className="list-disc pl-5 space-y-1">
                 <li>禁止未经授权转载、盗图、抄袭他人作品。</li>
                 <li>转载内容须标明出处并获得原作者许可。</li>
-                <li>创作区发布内容须选择正确的分级标签（全年龄/15+/18+）。</li>
+                <li>创作区发布内容须选择正确的类型（文/图/视频）。</li>
               </ul>
             </section>
             <section>

@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/context/AuthContext'
 import { MessageSquare, Send, X, Shield, Check, Trash2, Plus, RefreshCw, AlertTriangle } from 'lucide-react'
+import { loadBannedWords, checkBannedWords } from '@/lib/bannedWords'
 import toast from 'react-hot-toast'
 
 const PRESETS = [
@@ -48,6 +49,10 @@ export default function GuestbookCard() {
     if (!trimmed) { toast.error('请输入留言内容'); return }
     if (trimmed.length > 200) { toast.error('留言不能超过 200 字'); return }
 
+    const words = await loadBannedWords(supabase)
+    const hits = checkBannedWords(trimmed, words)
+    if (hits.length > 0) { toast.error(`内容包含违规词：${hits.slice(0, 3).join('、')}`); return }
+
     setSubmitting(true)
     const { error } = await supabase.from('guestbook').insert({
       author_id: user.id, content: trimmed,
@@ -75,6 +80,8 @@ export default function GuestbookCard() {
   async function handleAdd() {
     const trimmed = newText.trim()
     if (!trimmed) { toast.error('请输入内容'); return }
+    const words = await loadBannedWords(supabase)
+    if (checkBannedWords(trimmed, words).length > 0) { toast.error('内容包含违规词'); return }
     const { error } = await supabase.from('guestbook').insert({
       author_id: user.id, content: trimmed, status: 'approved', reviewed_at: new Date().toISOString(),
     })
@@ -205,6 +212,8 @@ export default function GuestbookCard() {
                     <div className="flex flex-wrap gap-1">
                       {PRESETS.map((p) => (
                         <button key={p} onClick={async () => {
+                          const words = await loadBannedWords(supabase)
+                          if (checkBannedWords(p, words).length > 0) return
                           const { error } = await supabase.from('guestbook').insert({
                             author_id: user.id, content: p, status: 'approved', reviewed_at: new Date().toISOString(),
                           })

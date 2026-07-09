@@ -8,16 +8,16 @@ import { Eye, User, Clock, Image } from 'lucide-react'
 import LikeButton from '@/components/shared/LikeButton'
 import { cn } from '@/lib/utils'
 
-const ratingLabels = {
-  general: '全年龄',
-  '15plus': '15+',
-  '18plus': '18+',
+const contentTypeLabels = {
+  text: '📝 文',
+  image: '🖼️ 图',
+  video: '🎬 视频',
 }
 
-const ratingColors = {
-  general: 'bg-success/10 text-success',
-  '15plus': 'bg-warning/10 text-warning',
-  '18plus': 'bg-danger/10 text-danger',
+const contentTypeColors = {
+  text: 'bg-info/10 text-info',
+  image: 'bg-success/10 text-success',
+  video: 'bg-warning/10 text-warning',
 }
 
 export default function CreationCard({ creation }) {
@@ -49,8 +49,8 @@ export default function CreationCard({ creation }) {
 
         {/* 标签行 */}
         <div className="flex flex-wrap items-center gap-1 mb-2">
-          <span className={cn('text-[10px] px-1.5 py-0.5 rounded-full', ratingColors[creation.rating] || 'bg-hover text-muted')}>
-            {ratingLabels[creation.rating] || creation.rating}
+          <span className={cn('text-[10px] px-1.5 py-0.5 rounded-full', contentTypeColors[creation.content_type] || 'bg-hover text-muted')}>
+            {contentTypeLabels[creation.content_type] || creation.content_type}
           </span>
           {typeTag && (
             <span className="bg-hover text-muted text-[10px] px-1.5 py-0.5 rounded-full">{typeTag}</span>

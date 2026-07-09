@@ -1,5 +1,5 @@
 /**
- * 设定图书馆主页 — 分类目录 + 卡片列表
+ * 档案馆主页 — 分类目录 + 卡片列表
  * UI 变量映射：bg-primary, bg-surface, text-primary, text-secondary, text-muted, text-accent,
  *   rounded-card, rounded-button, rounded-full, shadow-card, font-display
  */
@@ -43,7 +43,7 @@ export default function LibraryPage() {
       {/* 标题栏 */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="font-display text-accent text-2xl">📚 设定图书馆</h1>
+          <h1 className="font-display text-accent text-2xl">📚 档案馆</h1>
           <p className="text-muted text-sm mt-1">敖尹官方设定资料存档 · 社区共建</p>
         </div>
         <div className="flex gap-2">

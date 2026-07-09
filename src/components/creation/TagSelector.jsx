@@ -7,10 +7,10 @@ import { useState } from 'react'
 import { X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const RATING_OPTIONS = [
-  { key: 'general', label: '全年龄', desc: '适合所有用户' },
-  { key: '15plus', label: '15+', desc: '适合 15 岁以上' },
-  { key: '18plus', label: '18+', desc: '仅适合成人' },
+const CONTENT_TYPE_OPTIONS = [
+  { key: 'text', label: '📝 文' },
+  { key: 'image', label: '🖼️ 图' },
+  { key: 'video', label: '🎬 视频' },
 ]
 
 const TYPE_OPTIONS = [
@@ -34,13 +34,13 @@ export default function TagSelector({ rating, onRatingChange, type, onTypeChange
 
   return (
     <div className="space-y-4">
-      {/* 年龄分级（必选） */}
+      {/* 内容类型（必选） */}
       <div>
         <label className="text-secondary text-sm font-medium mb-2 block">
-          年龄分级 <span className="text-danger">*</span>
+          类型 <span className="text-danger">*</span>
         </label>
         <div className="flex gap-2">
-          {RATING_OPTIONS.map((opt) => (
+          {CONTENT_TYPE_OPTIONS.map((opt) => (
             <button
               key={opt.key}
               type="button"
@@ -51,7 +51,6 @@ export default function TagSelector({ rating, onRatingChange, type, onTypeChange
                   ? 'bg-accent text-text-inverse border-accent'
                   : 'bg-hover text-secondary border-border hover:border-accent'
               )}
-              title={opt.desc}
             >
               {opt.label}
             </button>

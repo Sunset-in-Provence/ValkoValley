@@ -1,5 +1,5 @@
 /**
- * 设定图书馆条目详情页
+ * 档案馆条目详情页
  * UI 变量映射：bg-surface, text-primary, text-secondary, text-muted, text-accent,
  *   rounded-card, rounded-button, rounded-input, shadow-card, font-display, font-body
  */
@@ -25,7 +25,7 @@ export default function LibraryDetailPage() {
     return (
       <div>
         <Link to="/library" className="flex items-center gap-1 text-muted text-sm mb-6 no-underline hover:text-accent">
-          <ArrowLeft size={14} /> 返回图书馆
+          <ArrowLeft size={14} /> 返回档案馆
         </Link>
         <div className="bg-surface rounded-card shadow-card p-6">
           <p className="text-muted text-sm">条目详情页（ID: {id}）— 完整实现在 Phase 4 开发</p>
@@ -37,7 +37,7 @@ export default function LibraryDetailPage() {
   return (
     <div>
       <Link to="/library" className="flex items-center gap-1 text-muted text-sm mb-6 no-underline hover:text-accent">
-        <ArrowLeft size={14} /> 返回图书馆
+        <ArrowLeft size={14} /> 返回档案馆
       </Link>
 
       <article className="bg-surface rounded-card shadow-card">

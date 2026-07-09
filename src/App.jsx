@@ -62,7 +62,7 @@ export default function App() {
         <Route path="/creation/new" element={<Lazy><ProtectedRoute><AppLayout><CreationEditor /></AppLayout></ProtectedRoute></Lazy>} />
         <Route path="/creation/:id/edit" element={<Lazy><ProtectedRoute><AppLayout><CreationEditor /></AppLayout></ProtectedRoute></Lazy>} />
 
-        {/* 设定图书馆 */}
+        {/* 档案馆 */}
         <Route path="/library" element={<Lazy><ProtectedRoute><AppLayout><LibraryPage /></AppLayout></ProtectedRoute></Lazy>} />
         <Route path="/library/:id" element={<Lazy><ProtectedRoute><AppLayout><LibraryDetailPage /></AppLayout></ProtectedRoute></Lazy>} />
         <Route path="/library/new" element={<Lazy><ProtectedRoute><AppLayout><LibraryEditorPage /></AppLayout></ProtectedRoute></Lazy>} />

@@ -1,5 +1,5 @@
 /**
- * 设定图书馆 — 添加/编辑条目（管理员） 或 用户投稿
+ * 档案馆 — 添加/编辑条目（管理员） 或 用户投稿
  * UI 变量映射：bg-surface, text-primary, text-secondary, text-muted, text-accent,
  *   rounded-card, rounded-button, rounded-input, shadow-card, font-display
  */
@@ -8,6 +8,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
 import { uploadImage } from '@/lib/upload'
+import { loadBannedWords, checkBannedWords } from '@/lib/bannedWords'
 import toast from 'react-hot-toast'
 import { ArrowLeft, Upload, X } from 'lucide-react'
 
@@ -74,6 +75,9 @@ export default function LibraryEditorPage() {
 
   async function handleSubmit(status = 'pending_review') {
     if (!title || !content) { toast.error('请填写标题和正文'); return }
+    const words = await loadBannedWords(supabase)
+    const hits = checkBannedWords(title + ' ' + content, words)
+    if (hits.length > 0) { toast.error(`内容包含违规词：${hits.slice(0, 3).join('、')}`); return }
     setSubmitting(true)
 
     const finalStatus = isAdmin ? 'published' : status
@@ -106,7 +110,7 @@ export default function LibraryEditorPage() {
   return (
     <div>
       <Link to="/library" className="flex items-center gap-1 text-muted text-sm mb-6 no-underline hover:text-accent">
-        <ArrowLeft size={14} /> 返回图书馆
+        <ArrowLeft size={14} /> 返回档案馆
       </Link>
 
       <div className="bg-surface rounded-card shadow-card p-6 md:p-8">
@@ -116,7 +120,7 @@ export default function LibraryEditorPage() {
 
         {!isAdmin && (
           <div className="bg-info/10 border border-info/30 text-secondary text-sm rounded-card p-3 mb-6">
-            💡 你的投稿将提交给管理员审核，审核通过后将在图书馆中展示。
+            💡 你的投稿将提交给管理员审核，审核通过后将在档案馆中展示。
           </div>
         )}
 

@@ -6,6 +6,7 @@
 import { useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/context/AuthContext'
+import { loadBannedWords, checkBannedWords } from '@/lib/bannedWords'
 import toast from 'react-hot-toast'
 
 export default function CommentForm({ postId = null, creationId = null, parentId = null, replyToId = null, depth = 0, onSuccess, onCancel }) {
@@ -16,6 +17,10 @@ export default function CommentForm({ postId = null, creationId = null, parentId
   async function handleSubmit(e) {
     e.preventDefault()
     if (!content.trim()) return
+
+    const words = await loadBannedWords(supabase)
+    const hits = checkBannedWords(content, words)
+    if (hits.length > 0) { toast.error(`内容包含违规词：${hits.slice(0, 3).join('、')}`); return }
 
     setSubmitting(true)
     const { error } = await supabase.from('comments').insert({

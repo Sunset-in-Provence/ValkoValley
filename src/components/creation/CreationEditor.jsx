@@ -12,6 +12,7 @@ import TagSelector from './TagSelector'
 import MediaUploader from './MediaUploader'
 import VideoEmbed from './VideoEmbed'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
+import { loadBannedWords, checkBannedWords } from '@/lib/bannedWords'
 import toast from 'react-hot-toast'
 
 export default function CreationEditor() {
@@ -22,7 +23,7 @@ export default function CreationEditor() {
 
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
-  const [rating, setRating] = useState('')
+  const [contentType, setContentType] = useState('')
   const [type, setType] = useState('')
   const [customTags, setCustomTags] = useState([])
   const [imageUrls, setImageUrls] = useState([])
@@ -41,7 +42,7 @@ export default function CreationEditor() {
       if (data) {
         setTitle(data.title)
         setContent(data.content)
-        setRating(data.rating)
+        setContentType(data.content_type || '')
         setImageUrls(data.image_urls || [])
         setVideoUrls(data.video_urls || [])
         const fullTags = data.tags || []
@@ -60,15 +61,19 @@ export default function CreationEditor() {
   async function handleSubmit() {
     if (!title.trim()) { toast.error('请填写标题'); return }
     if (!content.trim()) { toast.error('请填写正文'); return }
-    if (!rating) { toast.error('请选择年龄分级'); return }
+    if (!contentType) { toast.error('请选择内容类型'); return }
     if (!type) { toast.error('请选择原创或二创'); return }
+
+    const words = await loadBannedWords(supabase)
+    const hits = checkBannedWords(title + ' ' + content, words)
+    if (hits.length > 0) { toast.error(`内容包含违规词：${hits.slice(0, 3).join('、')}`); return }
 
     const allTags = [type, ...customTags]
 
     setSubmitting(true)
     const payload = {
       author_id: user.id, title: title.trim(), content,
-      rating, tags: allTags, image_urls: imageUrls, video_urls: videoUrls,
+      content_type: contentType, tags: allTags, image_urls: imageUrls, video_urls: videoUrls,
     }
 
     if (isEditing) {
@@ -103,7 +108,7 @@ export default function CreationEditor() {
 
       {/* 标签 */}
       <TagSelector
-        rating={rating} onRatingChange={setRating}
+        rating={contentType} onRatingChange={setContentType}
         type={type} onTypeChange={setType}
         customTags={customTags} onCustomTagsChange={setCustomTags}
       />

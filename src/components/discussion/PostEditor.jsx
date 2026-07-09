@@ -10,6 +10,7 @@ import { useAuth } from '@/context/AuthContext'
 import MarkdownPreview from './MarkdownPreview'
 import MediaUploader from '@/components/creation/MediaUploader'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
+import { loadBannedWords, checkBannedWords } from '@/lib/bannedWords'
 import toast from 'react-hot-toast'
 
 export default function PostEditor() {
@@ -51,6 +52,10 @@ export default function PostEditor() {
     e.preventDefault()
     if (!title.trim()) { toast.error('请填写标题'); return }
     if (!content.trim()) { toast.error('请填写内容'); return }
+
+    const words = await loadBannedWords(supabase)
+    const hits = checkBannedWords(title + ' ' + content, words)
+    if (hits.length > 0) { toast.error(`内容包含违规词：${hits.slice(0, 3).join('、')}`); return }
 
     setSubmitting(true)
 
