@@ -15,7 +15,7 @@ import { supabase } from '@/lib/supabaseClient'
 import ReportCard from '@/components/admin/ReportCard'
 import EmptyState from '@/components/shared/EmptyState'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
-import { Shield, Filter, RefreshCw, BookOpen, Palette as PaletteIcon, MessageSquare, Check, X, Clock } from 'lucide-react'
+import { Shield, Filter, RefreshCw, BookOpen, Palette as PaletteIcon, MessageSquare, Check, X, Clock, ArrowLeft } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
 
@@ -108,6 +108,9 @@ export default function AdminPage() {
 
   return (
     <div>
+      <Link to="/discussion" className="inline-flex items-center gap-1 bg-surface rounded-button px-3 py-1.5 text-muted text-sm mb-4 no-underline hover:text-accent transition-colors shadow-card">
+        <ArrowLeft size={16} /> 返回
+      </Link>
       {/* 标题栏 */}
       <div className="flex items-center justify-between mb-6">
         <div>

@@ -102,11 +102,8 @@ export default function HomePage() {
       {/* 底部链接 */}
       <footer className="text-center pb-8 relative z-10">
         <div className="flex justify-center gap-6 text-sm">
-          <Link to="/rules" className="text-muted hover:text-accent transition-colors no-underline">
-            社区公约
-          </Link>
-          <Link to="/violations" className="text-muted hover:text-accent transition-colors no-underline">
-            违规公示
+          <Link to="/announcements" className="text-muted hover:text-accent transition-colors no-underline">
+            公告中心
           </Link>
         </div>
         <p className="text-muted text-xs mt-3">

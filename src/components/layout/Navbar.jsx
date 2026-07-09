@@ -10,7 +10,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import { useTheme } from '@/context/ThemeContext'
 import { supabase } from '@/lib/supabaseClient'
-import { Sun, Moon, LogOut, User, Shield, X, MessageSquare, Check, AlertTriangle, Ban, Plus, Trash2 } from 'lucide-react'
+import { Sun, Moon, LogOut, User, Shield, X, MessageSquare, Check, AlertTriangle, Ban, Plus, Trash2, Megaphone } from 'lucide-react'
 import NotificationBell from '@/components/notification/NotificationBell'
 import { clearBannedWordsCache } from '@/lib/bannedWords'
 import { cn } from '@/lib/utils'
@@ -81,6 +81,10 @@ export default function Navbar() {
 
         {/* 导航链接 */}
         <div className="flex items-center gap-1">
+          <Link to="/announcements"
+            className="text-secondary hover:text-accent px-3 py-1.5 rounded-button text-sm transition-colors no-underline">
+            公告
+          </Link>
           <Link to="/discussion"
             className="text-secondary hover:text-accent px-3 py-1.5 rounded-button text-sm transition-colors no-underline">
             讨论区
@@ -181,6 +185,15 @@ export default function Navbar() {
                               </span>
                             ))}
                           </div>
+                        </div>
+
+                        {/* 公告管理 */}
+                        <div className="border-b border-border px-4 py-2">
+                          <button onClick={() => { setReviewOpen(false); navigate('/admin/announcements') }}
+                            className="w-full text-left flex items-center justify-between text-secondary text-xs hover:text-accent transition-colors">
+                            <span className="flex items-center gap-1"><Megaphone size={13} /> 公告管理</span>
+                            <span className="text-muted text-[10px]">前往</span>
+                          </button>
                         </div>
 
                         {/* 举报 */}

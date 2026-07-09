@@ -10,7 +10,7 @@ import HomePage from '@/pages/HomePage'
 import LoginPage from '@/pages/LoginPage'
 import RegisterPage from '@/pages/RegisterPage'
 import RulesPage from '@/pages/RulesPage'
-import ViolationsPage from '@/pages/ViolationsPage'
+import AnnouncementsPage from '@/pages/AnnouncementsPage'
 import NotFoundPage from '@/pages/NotFoundPage'
 
 // 需登录的页面 — 懒加载（路由级代码分割）
@@ -27,6 +27,7 @@ const UserProfilePage = lazy(() => import('@/pages/UserProfilePage'))
 const AdminPage = lazy(() => import('@/pages/AdminPage'))
 const AdminThemePage = lazy(() => import('@/pages/AdminThemePage'))
 const AdminExamPage = lazy(() => import('@/pages/AdminExamPage'))
+const AdminAnnouncePage = lazy(() => import('@/pages/AdminAnnouncePage'))
 
 function Lazy({ children }) {
   return <Suspense fallback={<div className="flex justify-center py-24"><LoadingSpinner size="lg" /></div>}>{children}</Suspense>
@@ -48,7 +49,7 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/rules" element={<RulesPage />} />
-        <Route path="/violations" element={<ViolationsPage />} />
+        <Route path="/announcements" element={<AnnouncementsPage />} />
 
         {/* 讨论区 */}
         <Route path="/discussion" element={<Lazy><ProtectedRoute><AppLayout><DiscussionPage /></AppLayout></ProtectedRoute></Lazy>} />
@@ -75,6 +76,7 @@ export default function App() {
         <Route path="/admin" element={<Lazy><ProtectedRoute adminOnly><AdminPage /></ProtectedRoute></Lazy>} />
         <Route path="/admin/theme" element={<Lazy><ProtectedRoute adminOnly><AdminThemePage /></ProtectedRoute></Lazy>} />
         <Route path="/admin/exam" element={<Lazy><ProtectedRoute adminOnly><AdminExamPage /></ProtectedRoute></Lazy>} />
+        <Route path="/admin/announcements" element={<Lazy><ProtectedRoute adminOnly><AdminAnnouncePage /></ProtectedRoute></Lazy>} />
 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
