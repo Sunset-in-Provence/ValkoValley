@@ -14,7 +14,7 @@ export default function ViolationsPage() {
         <div className="bg-surface rounded-card shadow-card p-8">
           <h1 className="font-display text-accent text-2xl mb-2">违规公示板</h1>
           <p className="text-muted text-sm mb-6">
-            以下为近 7 天内被处理的严重违规记录。为保护隐私，违规用户昵称和头像已做模糊处理。
+            以下为严重违规记录公示。为保护隐私，违规用户昵称和头像已做模糊处理。
           </p>
 
           {violations.length === 0 ? (
@@ -35,7 +35,7 @@ export default function ViolationsPage() {
                   </div>
                   <p className="text-secondary text-sm">{v.description}</p>
                   <p className="text-muted text-xs mt-2">
-                    处罚：{v.penalty} · 公示至 {new Date(v.expires_at).toLocaleDateString('zh-CN')}
+                    处罚：{v.penalty} · 永久公示
                   </p>
                 </div>
               ))}

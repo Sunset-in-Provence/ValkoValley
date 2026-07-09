@@ -41,7 +41,7 @@ export default function RulesPage() {
               <h2 className="font-display text-accent text-lg mt-6 mb-3">五、处罚措施</h2>
               <ul className="list-disc pl-5 space-y-1">
                 <li>轻微违规：警告通知 + 内容删除。</li>
-                <li>严重违规：封禁账户（1天/7天/30天/永久）+ 违规公示 7 天。</li>
+                <li>严重违规：封禁账户（1天/7天/30天/永久）+ 违规永久公示。</li>
                 <li>多次违规：永久封禁。</li>
               </ul>
             </section>

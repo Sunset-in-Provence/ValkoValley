@@ -125,14 +125,14 @@ const examQuestions = [
   },
   {
     category: 'rules',
-    question: 'ValkoValley 的违规公示会持续多久？',
+    question: 'ValkoValley 的严重违规公示会持续多久？',
     options: [
       'A. 永久公示',
       'B. 7 天',
       'C. 30 天',
       'D. 1 天',
     ],
-    correctIndex: 1,
+    correctIndex: 0,
   },
   {
     category: 'rules',
