@@ -6,16 +6,40 @@
  *   阴影：shadow-card
  *   字体：font-display, font-body
  */
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
+import GuestbookBanner from '@/components/shared/GuestbookBanner'
+import GuestbookCard from '@/components/shared/GuestbookCard'
+import AdminReviewPanel from '@/components/admin/AdminReviewPanel'
+
+const ADMIN_EMAILS = (import.meta.env.VITE_ADMIN_EMAIL || '').split(',').map((e) => e.trim())
+
+const WELCOMED_KEY = 'valkovalley-welcomed'
 
 export default function HomePage() {
   const { user } = useAuth()
+  const [greeting, setGreeting] = useState('')
+
+  useEffect(() => {
+    if (!user) { setGreeting(''); return }
+    const welcomed = localStorage.getItem(WELCOMED_KEY)
+    if (welcomed) {
+      setGreeting('欢迎回来')
+    } else {
+      setGreeting('欢迎到来')
+      localStorage.setItem(WELCOMED_KEY, '1')
+    }
+  }, [user])
+
+  const isPageAdmin = user?.email && ADMIN_EMAILS.includes(user.email)
 
   return (
     <div className="min-h-screen bg-primary">
+      <GuestbookBanner />
+      <GuestbookCard />
       {/* Hero 区域 */}
-      <section className="max-w-4xl mx-auto px-4 pt-24 pb-16 text-center">
+      <section className="max-w-4xl mx-auto px-4 pt-24 pb-16 text-center relative z-10">
         <h1 className="font-display text-accent text-5xl mb-4">
           ValkoValley
         </h1>
@@ -26,43 +50,30 @@ export default function HomePage() {
           敖尹 CP 同人创作与讨论的专属社区。通过入站考试，与同好一起守护这份美好。
         </p>
 
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex items-center justify-center">
           {user ? (
-            <>
-              <Link
-                to="/discussion"
-                className="bg-accent text-text-inverse px-6 py-2.5 rounded-button font-medium no-underline hover:opacity-90 transition-opacity"
-              >
-                进入讨论区
-              </Link>
-              <Link
-                to="/creation"
-                className="border border-border text-secondary px-6 py-2.5 rounded-button font-medium no-underline hover:bg-hover transition-colors"
-              >
-                浏览创作
-              </Link>
-            </>
+            <Link
+              to="/discussion"
+              className="bg-accent text-text-inverse px-8 py-3 rounded-button font-display text-lg no-underline hover:opacity-90 transition-opacity"
+            >
+              {greeting}
+            </Link>
           ) : (
-            <>
-              <Link
-                to="/register"
-                className="bg-accent text-text-inverse px-6 py-2.5 rounded-button font-medium no-underline hover:opacity-90 transition-opacity"
-              >
-                加入社区
-              </Link>
-              <Link
-                to="/login"
-                className="border border-border text-secondary px-6 py-2.5 rounded-button font-medium no-underline hover:bg-hover transition-colors"
-              >
-                登录
-              </Link>
-            </>
+            <Link
+              to="/register"
+              className="bg-accent text-text-inverse px-8 py-3 rounded-button font-display text-lg no-underline hover:opacity-90 transition-opacity"
+            >
+              加入社区
+            </Link>
           )}
         </div>
       </section>
 
+      {/* 管理员审核面板 */}
+      {isPageAdmin && <AdminReviewPanel />}
+
       {/* 特色介绍区域（管理员可编辑） */}
-      <section className="max-w-4xl mx-auto px-4 pb-16">
+      <section className="max-w-4xl mx-auto px-4 pb-16 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-surface rounded-card shadow-card p-6">
             <h3 className="font-display text-accent text-lg mb-2">📝 讨论区</h3>
@@ -86,7 +97,7 @@ export default function HomePage() {
       </section>
 
       {/* 底部链接 */}
-      <footer className="text-center pb-8">
+      <footer className="text-center pb-8 relative z-10">
         <div className="flex justify-center gap-6 text-sm">
           <Link to="/rules" className="text-muted hover:text-accent transition-colors no-underline">
             社区公约

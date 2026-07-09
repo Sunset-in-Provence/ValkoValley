@@ -28,7 +28,7 @@
   /* ---- 颜色：背景层 ---- */
   --color-primary: light-dark(#B8E6CC, #4A7C5F);
   /* 主色（页面背景） */
-  --color-secondary: light-dark(#FDE68A, #FDE68A);
+  --color-secondary: light-dark(#A67C00, #FDE68A);
   /* 辅色（高亮、徽章） */
   --color-surface: light-dark(#FFFFFF, #2A3F32);
   /* 表层背景（卡片、输入框） */
@@ -116,4 +116,9 @@ body {
 
 .prose img {
   border-radius: var(--radius-card);
+}
+
+/* === 弹幕墙动画 === */
+@keyframes danmaku-scroll {
+  to { transform: translateX(-100%); }
 }

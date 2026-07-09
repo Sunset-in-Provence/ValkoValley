@@ -1,11 +1,18 @@
+import { useNavigate } from 'react-router-dom'
+import { ArrowLeft } from 'lucide-react'
+
 /**
  * UI 变量映射：bg-primary, bg-surface, text-primary, text-secondary, text-accent,
  *   rounded-card, shadow-card, font-display, font-body
  */
 export default function RulesPage() {
+  const navigate = useNavigate()
   return (
     <div className="min-h-screen bg-primary">
       <div className="max-w-3xl mx-auto px-4 py-12">
+        <button onClick={() => navigate(-1)} className="inline-flex items-center gap-1 bg-surface rounded-button px-3 py-1.5 text-muted text-sm mb-4 hover:text-accent transition-colors shadow-card">
+          <ArrowLeft size={16} /> 返回
+        </button>
         <div className="bg-surface rounded-card shadow-card p-8">
           <h1 className="font-display text-accent text-2xl mb-6">ValkoValley 社区公约</h1>
           <div className="prose text-secondary font-body text-sm leading-relaxed space-y-4">

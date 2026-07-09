@@ -52,9 +52,11 @@ export function AuthProvider({ children }) {
     }
   }
 
-  const isAdmin =
-    profile?.username &&
-    import.meta.env.VITE_ADMIN_EMAIL?.split(',').includes(user?.email)
+  const isAdmin = (() => {
+    if (!user?.email) return false
+    const admins = (import.meta.env.VITE_ADMIN_EMAIL || '').split(',').map((e) => e.trim().toLowerCase())
+    return admins.includes(user.email.toLowerCase())
+  })()
 
   const value = {
     user,

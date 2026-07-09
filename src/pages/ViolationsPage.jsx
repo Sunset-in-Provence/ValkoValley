@@ -1,3 +1,6 @@
+import { useNavigate } from 'react-router-dom'
+import { ArrowLeft } from 'lucide-react'
+
 /**
  * UI 变量映射：bg-primary, bg-surface, text-primary, text-secondary, text-muted,
  *   text-danger, rounded-card, shadow-card, font-display
@@ -5,12 +8,16 @@
  * 违规公示板 — 对所有用户可见，违规用户昵称/头像模糊打码
  */
 export default function ViolationsPage() {
+  const navigate = useNavigate()
   // 占位数据，后续从 violations 表读取
   const violations = []
 
   return (
     <div className="min-h-screen bg-primary">
       <div className="max-w-3xl mx-auto px-4 py-12">
+        <button onClick={() => navigate(-1)} className="inline-flex items-center gap-1 bg-surface rounded-button px-3 py-1.5 text-muted text-sm mb-4 hover:text-accent transition-colors shadow-card">
+          <ArrowLeft size={16} /> 返回
+        </button>
         <div className="bg-surface rounded-card shadow-card p-8">
           <h1 className="font-display text-accent text-2xl mb-2">违规公示板</h1>
           <p className="text-muted text-sm mb-6">
