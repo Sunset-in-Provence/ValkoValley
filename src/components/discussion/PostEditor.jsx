@@ -1,0 +1,124 @@
+/**
+ * 帖子编辑器 — 新建/编辑帖子
+ * UI 变量映射：bg-surface, bg-hover, text-primary, text-secondary, text-muted, text-accent,
+ *   rounded-card, rounded-button, rounded-input, shadow-card, border-border, font-display
+ */
+import { useState, useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { supabase } from '@/lib/supabaseClient'
+import { useAuth } from '@/context/AuthContext'
+import MarkdownPreview from './MarkdownPreview'
+import LoadingSpinner from '@/components/shared/LoadingSpinner'
+import toast from 'react-hot-toast'
+
+export default function PostEditor() {
+  const { user } = useAuth()
+  const navigate = useNavigate()
+  const { id } = useParams() // 编辑模式下有 id
+  const isEditing = !!id
+
+  const [title, setTitle] = useState('')
+  const [content, setContent] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [loadingPost, setLoadingPost] = useState(isEditing)
+
+  // 编辑模式：加载已有帖子
+  useEffect(() => {
+    if (!id) return
+    async function load() {
+      const { data } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('id', id)
+        .eq('author_id', user.id)
+        .single()
+      if (data) {
+        setTitle(data.title)
+        setContent(data.content)
+      } else {
+        toast.error('帖子不存在或无权限编辑')
+        navigate('/discussion')
+      }
+      setLoadingPost(false)
+    }
+    load()
+  }, [id, user.id, navigate])
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    if (!title.trim()) { toast.error('请填写标题'); return }
+    if (!content.trim()) { toast.error('请填写内容'); return }
+
+    setSubmitting(true)
+
+    if (isEditing) {
+      const { error } = await supabase
+        .from('posts')
+        .update({ title: title.trim(), content, updated_at: new Date().toISOString() })
+        .eq('id', id)
+        .eq('author_id', user.id)
+
+      if (error) { toast.error('更新失败: ' + error.message) }
+      else {
+        toast.success('帖子已更新')
+        navigate(`/discussion/${id}`)
+      }
+    } else {
+      const { data, error } = await supabase
+        .from('posts')
+        .insert({ author_id: user.id, title: title.trim(), content })
+        .select('id')
+        .single()
+
+      if (error) { toast.error('发布失败: ' + error.message) }
+      else {
+        toast.success('帖子发布成功！')
+        navigate(`/discussion/${data.id}`)
+      }
+    }
+
+    setSubmitting(false)
+  }
+
+  if (loadingPost) {
+    return (
+      <div className="flex justify-center py-16">
+        <LoadingSpinner size="lg" />
+      </div>
+    )
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="bg-surface rounded-card shadow-card p-6 space-y-4">
+      <h1 className="font-display text-accent text-xl">
+        {isEditing ? '编辑帖子' : '发起讨论'}
+      </h1>
+
+      {/* 标题 */}
+      <input
+        type="text" value={title} onChange={(e) => setTitle(e.target.value)}
+        placeholder="帖子标题" required maxLength={200}
+        className="w-full bg-hover border border-border rounded-input px-4 py-2.5 text-primary text-sm placeholder:text-muted focus:outline-none focus:border-accent"
+      />
+
+      {/* Markdown 编辑器 */}
+      <MarkdownPreview content={content} onChange={setContent} rows={12} />
+
+      {/* 操作按钮 */}
+      <div className="flex items-center gap-3 pt-2">
+        <button
+          type="submit" disabled={submitting}
+          className="bg-accent text-text-inverse px-6 py-2.5 rounded-button font-medium text-sm hover:opacity-90 disabled:opacity-50"
+        >
+          {submitting ? '发布中...' : (isEditing ? '保存修改' : '发布帖子')}
+        </button>
+        <button
+          type="button" onClick={() => navigate(-1)}
+          className="border border-border text-secondary px-6 py-2.5 rounded-button text-sm hover:bg-hover"
+        >
+          取消
+        </button>
+      </div>
+    </form>
+  )
+}

@@ -1,0 +1,59 @@
+User-agent: *
+Disallow: /admin
+Disallow: /api
+Crawl-delay: 10
+
+# === AI 爬虫拦截 ===
+# OpenAI
+User-agent: GPTBot
+Disallow: /
+
+# Anthropic
+User-agent: anthropic-ai
+Disallow: /
+User-agent: Claude-Web
+Disallow: /
+
+# Common Crawl (被多家 AI 用作训练数据源)
+User-agent: CCBot
+Disallow: /
+
+# Google AI
+User-agent: Google-Extended
+Disallow: /
+User-agent: GoogleOther
+Disallow: /
+
+# ByteDance
+User-agent: Bytespider
+Disallow: /
+
+# Meta AI
+User-agent: FacebookBot
+Disallow: /
+User-agent: Meta-ExternalAgent
+Disallow: /
+
+# Cohere
+User-agent: cohere-ai
+Disallow: /
+
+# Perplexity
+User-agent: PerplexityBot
+Disallow: /
+
+# Imagesift
+User-agent: ImagesiftBot
+Disallow: /
+
+# Omgili
+User-agent: Omgilibot
+Disallow: /
+
+# Diffbot
+User-agent: Diffbot
+Disallow: /
+
+# Timpeline
+User-agent: TimpelineBot
+Disallow: /

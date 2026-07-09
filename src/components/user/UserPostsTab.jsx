@@ -1,0 +1,49 @@
+/**
+ * 用户帖子列表 Tab
+ * UI 变量映射：bg-surface, text-primary, text-secondary, text-muted, text-accent,
+ *   rounded-card, shadow-card
+ */
+import { useState, useEffect } from 'react'
+import { supabase } from '@/lib/supabaseClient'
+import PostCard from '@/components/discussion/PostCard'
+import EmptyState from '@/components/shared/EmptyState'
+import { MessageSquare } from 'lucide-react'
+
+export default function UserPostsTab({ userId }) {
+  const [posts, setPosts] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetch() {
+      const { data } = await supabase
+        .from('posts')
+        .select('*, author:profiles!posts_author_id_fkey(username, display_name, avatar_url)')
+        .eq('author_id', userId).eq('is_deleted', false)
+        .order('created_at', { ascending: false })
+
+      if (data) {
+        // 获取评论数
+        const postIds = data.map((p) => p.id)
+        const { data: counts } = await supabase
+          .from('comments')
+          .select('post_id').in('post_id', postIds).eq('is_deleted', false)
+        const countMap = {}
+        counts?.forEach((c) => { countMap[c.post_id] = (countMap[c.post_id] || 0) + 1 })
+        setPosts(data.map((p) => ({ ...p, comment_count: countMap[p.id] || 0 })))
+      }
+      setLoading(false)
+    }
+    fetch()
+  }, [userId])
+
+  if (loading) return null // handled by parent
+  if (posts.length === 0) {
+    return <EmptyState icon={MessageSquare} title="暂无帖子" description="该用户还没有发布过讨论帖" />
+  }
+
+  return (
+    <div className="space-y-3">
+      {posts.map((post) => <PostCard key={post.id} post={post} />)}
+    </div>
+  )
+}

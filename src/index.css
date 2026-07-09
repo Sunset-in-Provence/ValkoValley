@@ -1,0 +1,119 @@
+/**
+ * ========================================
+ *  ValkoValley — 全局样式与主题配置
+ * ========================================
+ *
+ * ★ 这是全站唯一控制视觉变量的文件 ★
+ * 修改以下 @theme 块中的值，全站所有组件自动同步，无需逐个文件修改。
+ *
+ * 设计令牌映射关系：
+ *   颜色 → bg-{name}, text-{name}, border-{name}
+ *   圆角 → rounded-{name}
+ *   阴影 → shadow-{name}
+ *   字体 → font-{name}
+ *
+ * 深色模式：
+ *   使用 CSS light-dark() 函数自动切换
+ *   .dark class 由 ThemeContext 挂载到 <html> 上
+ */
+
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+/* === 自定义变体 === */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* === 全局主题令牌（修改此处即可改变全站样式） === */
+@theme {
+  /* ---- 颜色：背景层 ---- */
+  --color-primary: light-dark(#8B5CF6, #A78BFA);
+  /* 主色（按钮、链接、强调） */
+  --color-secondary: light-dark(#FDE68A, #FDE68A);
+  /* 辅色（高亮、徽章） */
+  --color-surface: light-dark(#FFFFFF, #1F2937);
+  /* 表层背景（卡片、输入框） */
+  --color-hover: light-dark(#F3F4F6, #374151);
+  /* 悬停态背景 */
+  --color-accent: light-dark(#7C3AED, #A78BFA);
+  /* 强调背景（选中态、标签） */
+
+  /* ---- 颜色：文字层 ---- */
+  --color-text-primary: light-dark(#1F2937, #F3F4F6);
+  /* 主文字色 */
+  --color-text-secondary: light-dark(#6B7280, #9CA3AF);
+  /* 次级文字色 */
+  --color-text-muted: light-dark(#9CA3AF, #6B7280);
+  /* 弱化文字（时间戳、提示） */
+  --color-text-accent: light-dark(#7C3AED, #A78BFA);
+  /* 强调文字（链接、高亮） */
+  --color-text-inverse: light-dark(#FFFFFF, #1F2937);
+  /* 反色文字（深色底上的浅色字） */
+
+  /* ---- 颜色：功能色 ---- */
+  --color-danger: light-dark(#EF4444, #F87171);
+  /* 危险/删除/举报 */
+  --color-success: light-dark(#10B981, #34D399);
+  /* 成功/通过 */
+  --color-warning: light-dark(#F59E0B, #FBBF24);
+  /* 警告 */
+  --color-info: light-dark(#3B82F6, #60A5FA);
+  /* 信息 */
+
+  /* ---- 颜色：边框 ---- */
+  --color-border: light-dark(#E5E7EB, #374151);
+  /* 主边框色 */
+
+  /* ---- 圆角 ---- */
+  --radius-card: 12px;
+  /* 卡片圆角 */
+  --radius-button: 8px;
+  /* 按钮圆角 */
+  --radius-input: 6px;
+  /* 输入框圆角 */
+
+  /* ---- 阴影 ---- */
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.08);
+  /* 卡片阴影 */
+  --shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.12);
+  /* 浮层阴影 */
+
+  /* ---- 字体 ---- */
+  --font-display: 'ZCOOL KuaiLe', cursive;
+  /* 标题字体 */
+  --font-body: 'Noto Sans SC', sans-serif;
+  /* 正文字体 */
+}
+
+/*
+ * === 全局基础样式 ===
+ * 可在此处添加纸张纹理、手绘边框等全局效果
+ * 例如：
+ *   body { background-image: url('/texture/paper.png'); }
+ */
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background-color: light-dark(#F9FAFB, #111827);
+  color: light-dark(#1F2937, #F3F4F6);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* === 深色模式 color-scheme 绑定 === */
+:root {
+  color-scheme: light;
+}
+
+.dark {
+  color-scheme: dark;
+}
+
+/* === Markdown 预览基础样式 === */
+.prose {
+  max-width: none;
+}
+
+.prose img {
+  border-radius: var(--radius-card);
+}
