@@ -215,17 +215,7 @@ const examQuestions = [
     ],
     correctIndex: 1,
   },
-  {
-    category: 'aoyin',
-    question: '"狼和小铃兰"中的"狼"指的是谁？',
-    options: [
-      'A. 游戏中的怪物',
-      'B. 敖尹（Valko）',
-      'C. 社区管理员',
-      'D. 路人角色',
-    ],
-    correctIndex: 1,
-  },
+
   {
     category: 'aoyin',
     question: '"小铃兰"在 ValkoValley 社区中指的是什么？',
@@ -281,25 +271,15 @@ const examQuestions = [
     ],
     correctIndex: 1,
   },
+
   {
     category: 'aoyin',
-    question: '"不要在锅里洗澡"这句宣发语的原本含义暗指的是什么？',
+    question: '"不要在锅里洗澡"这句宣发语正确指向的神话原型是什么？',
     options: [
-      'A. 提醒注意厨房卫生',
-      'B. 古希腊神话中吕卡翁亵渎宙斯被变成狼人的故事',
-      'C. 一个普通的烹饪警告',
-      'D. 告诫不要在热水中泡太久',
-    ],
-    correctIndex: 1,
-  },
-  {
-    category: 'aoyin',
-    question: '"不要在锅里洗澡"曾被曲解为什么事件？',
-    options: [
-      'A. 美食烹饪大赛',
-      'B. 沸锅杀妻案',
-      'C. 温泉旅行',
-      'D. 巫师炼药事故',
+      'A. 北欧神话中的芬里尔巨狼',
+      'B. 古希腊神话中吕卡翁因亵渎宙斯被变为狼的故事',
+      'C. 埃及神话中的死神阿努比斯',
+      'D. 日本神话中的狼神大口真神',
     ],
     correctIndex: 1,
   },

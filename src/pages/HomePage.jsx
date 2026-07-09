@@ -77,9 +77,9 @@ export default function HomePage() {
             </p>
           </div>
           <div className="bg-surface rounded-card shadow-card p-6">
-            <h3 className="font-display text-accent text-lg mb-2">🛡️ 入站考试</h3>
+            <h3 className="font-display text-accent text-lg mb-2">🐺 档案馆</h3>
             <p className="text-secondary text-sm">
-              社区公约 + 敖尹知识，双重考试筛选真粉丝，守护社区氛围。
+              不只是讨论与创作！ValkoValley 收录敖尹相关的官方设定、同人史料与社区记忆，守护这片山谷中的一切痕迹。
             </p>
           </div>
         </div>

@@ -26,25 +26,25 @@
 /* === 全局主题令牌（修改此处即可改变全站样式） === */
 @theme {
   /* ---- 颜色：背景层 ---- */
-  --color-primary: light-dark(#8B5CF6, #A78BFA);
-  /* 主色（按钮、链接、强调） */
+  --color-primary: light-dark(#B8E6CC, #4A7C5F);
+  /* 主色（页面背景） */
   --color-secondary: light-dark(#FDE68A, #FDE68A);
   /* 辅色（高亮、徽章） */
-  --color-surface: light-dark(#FFFFFF, #1F2937);
+  --color-surface: light-dark(#FFFFFF, #2A3F32);
   /* 表层背景（卡片、输入框） */
-  --color-hover: light-dark(#F3F4F6, #374151);
+  --color-hover: light-dark(#E8F5ED, #3A5C46);
   /* 悬停态背景 */
-  --color-accent: light-dark(#7C3AED, #A78BFA);
-  /* 强调背景（选中态、标签） */
+  --color-accent: light-dark(#5DAF7C, #7EC89C);
+  /* 强调背景（按钮、选中态、标签） */
 
   /* ---- 颜色：文字层 ---- */
-  --color-text-primary: light-dark(#1F2937, #F3F4F6);
+  --color-text-primary: light-dark(#1F2937, #E8F5ED);
   /* 主文字色 */
-  --color-text-secondary: light-dark(#6B7280, #9CA3AF);
+  --color-text-secondary: light-dark(#4B7A5E, #A8D8BA);
   /* 次级文字色 */
-  --color-text-muted: light-dark(#9CA3AF, #6B7280);
+  --color-text-muted: light-dark(#7FA890, #6B9A7E);
   /* 弱化文字（时间戳、提示） */
-  --color-text-accent: light-dark(#7C3AED, #A78BFA);
+  --color-text-accent: light-dark(#4EA06A, #86D0A5);
   /* 强调文字（链接、高亮） */
   --color-text-inverse: light-dark(#FFFFFF, #1F2937);
   /* 反色文字（深色底上的浅色字） */
@@ -94,8 +94,8 @@
 body {
   margin: 0;
   font-family: var(--font-body);
-  background-color: light-dark(#F9FAFB, #111827);
-  color: light-dark(#1F2937, #F3F4F6);
+  background-color: light-dark(#F0F8F3, #1A2A20);
+  color: light-dark(#1F2937, #E8F5ED);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

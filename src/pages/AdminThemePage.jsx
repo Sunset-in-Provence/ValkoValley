@@ -15,11 +15,11 @@ import { Shield, Save, Undo2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const DEFAULT_COLORS = {
-  primary: '#8B5CF6',
+  primary: '#B8E6CC',
   secondary: '#FDE68A',
   surface: '#FFFFFF',
-  muted: '#9CA3AF',
-  accent: '#7C3AED',
+  muted: '#7FA890',
+  accent: '#5DAF7C',
   danger: '#EF4444',
   success: '#10B981',
   warning: '#F59E0B',
