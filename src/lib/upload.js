@@ -5,8 +5,10 @@ import { supabase } from './supabaseClient'
 
 const ALLOWED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/webp']
 const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm']
+const ALLOWED_AUDIO_TYPES = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/flac']
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024 // 10MB
 const MAX_VIDEO_SIZE = 100 * 1024 * 1024 // 100MB
+const MAX_AUDIO_SIZE = 50 * 1024 * 1024 // 50MB
 
 /**
  * 上传图片到 Supabase Storage
@@ -52,4 +54,23 @@ export async function uploadVideo(file) {
   }
 
   return uploadImage(file, 'videos')
+}
+
+export async function uploadAudio(file) {
+  if (!ALLOWED_AUDIO_TYPES.includes(file.type)) {
+    return { url: null, error: new Error('仅支持 MP3、WAV、OGG、FLAC 格式的音频') }
+  }
+  if (file.size > MAX_AUDIO_SIZE) {
+    return { url: null, error: new Error('音频大小不能超过 50MB') }
+  }
+  const ext = file.name.split('.').pop()
+  const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+
+  const { data, error } = await supabase.storage
+    .from('videos')
+    .upload(fileName, file, { cacheControl: '31536000', upsert: false })
+
+  if (error) return { url: null, error }
+  const { data: urlData } = supabase.storage.from('videos').getPublicUrl(data.path)
+  return { url: urlData.publicUrl, error: null }
 }

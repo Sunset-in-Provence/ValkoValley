@@ -40,7 +40,7 @@ export default function LibraryCard({ entry }) {
         {/* 置顶标识 */}
         {entry.is_pinned && (
           <span className="inline-block bg-accent/10 text-accent text-xs px-2 py-0.5 rounded-full mb-2">
-            📌 置顶
+            置顶
           </span>
         )}
 

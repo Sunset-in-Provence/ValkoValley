@@ -34,7 +34,7 @@ export default function AnnouncementsPage() {
 
   return (
     <div>
-      <Link to="/" className="inline-flex items-center gap-1 bg-surface rounded-button px-3 py-1.5 text-muted text-sm mb-4 no-underline hover:text-accent transition-colors shadow-card">
+      <Link to="/discussion" className="inline-flex items-center gap-1 bg-surface rounded-button px-3 py-1.5 text-muted text-sm mb-4 no-underline hover:text-accent transition-colors shadow-card">
         <ArrowLeft size={16} /> 返回
       </Link>
 

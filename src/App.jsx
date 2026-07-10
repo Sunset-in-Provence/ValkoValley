@@ -68,6 +68,7 @@ export default function App() {
         <Route path="/library/:id" element={<Lazy><ProtectedRoute><AppLayout><LibraryDetailPage /></AppLayout></ProtectedRoute></Lazy>} />
         <Route path="/library/new" element={<Lazy><ProtectedRoute><AppLayout><LibraryEditorPage /></AppLayout></ProtectedRoute></Lazy>} />
         <Route path="/library/submit" element={<Lazy><ProtectedRoute><AppLayout><LibraryEditorPage /></AppLayout></ProtectedRoute></Lazy>} />
+        <Route path="/library/:id/edit" element={<Lazy><ProtectedRoute><AppLayout><LibraryEditorPage /></AppLayout></ProtectedRoute></Lazy>} />
 
         {/* 个人主页 */}
         <Route path="/user/:username" element={<Lazy><ProtectedRoute><AppLayout><UserProfilePage /></AppLayout></ProtectedRoute></Lazy>} />

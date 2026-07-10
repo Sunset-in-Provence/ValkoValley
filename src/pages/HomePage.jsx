@@ -81,19 +81,19 @@ export default function HomePage() {
           <div className="bg-surface rounded-card shadow-card p-6">
             <h3 className="font-display text-accent text-lg mb-2">📝 讨论区</h3>
             <p className="text-secondary text-sm">
-              文字交流，Markdown 排版，支持楼中楼评论。在这里畅聊敖尹的一切。
+              文字交流，Markdown 排版，支持楼中楼评论。
             </p>
           </div>
           <div className="bg-surface rounded-card shadow-card p-6">
             <h3 className="font-display text-accent text-lg mb-2">🎨 创作区</h3>
             <p className="text-secondary text-sm">
-              图文视频创作，自由打标签。发布你的同人文、手绘、MAD 作品。
+              图文、视频，在这里发布你的匠心之作！
             </p>
           </div>
           <div className="bg-surface rounded-card shadow-card p-6">
             <h3 className="font-display text-accent text-lg mb-2">🐺 档案馆</h3>
             <p className="text-secondary text-sm">
-              不只是讨论与创作！ValkoValley 收录敖尹相关的官方设定、同人史料与社区记忆，守护这片山谷中的一切痕迹。
+              这里收录了敖尹所有的已释出官方物料和坊间传闻，如果你有新的信息，欢迎投稿！
             </p>
           </div>
         </div>

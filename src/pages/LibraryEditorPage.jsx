@@ -3,14 +3,15 @@
  * UI 变量映射：bg-surface, text-primary, text-secondary, text-muted, text-accent,
  *   rounded-card, rounded-button, rounded-input, shadow-card, font-display
  */
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
-import { uploadImage } from '@/lib/upload'
+import { uploadImage, uploadVideo, uploadAudio } from '@/lib/upload'
 import { loadBannedWords, checkBannedWords } from '@/lib/bannedWords'
 import toast from 'react-hot-toast'
-import { ArrowLeft, Upload, X } from 'lucide-react'
+import LoadingSpinner from '@/components/shared/LoadingSpinner'
+import { ArrowLeft, Upload, X, Loader2, Video, Music, FileText } from 'lucide-react'
 
 const categories = [
   { key: 'character', label: '👤 角色设定' },
@@ -24,6 +25,9 @@ const categories = [
 export default function LibraryEditorPage() {
   const { user, isAdmin } = useAuth()
   const navigate = useNavigate()
+  const { id } = useParams()
+  const isEditing = !!id
+  const [loadingData, setLoadingData] = useState(isEditing)
 
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
@@ -34,9 +38,29 @@ export default function LibraryEditorPage() {
   const [imageUploading, setImageUploading] = useState(false)
   const [videoUrls, setVideoUrls] = useState([])
   const [videoInput, setVideoInput] = useState('')
+  const [videoUploading, setVideoUploading] = useState(false)
+  const [audioUrls, setAudioUrls] = useState([])
+  const [audioUploading, setAudioUploading] = useState(false)
+  const [lyrics, setLyrics] = useState('')
   const [tags, setTags] = useState([])
   const [tagInput, setTagInput] = useState('')
   const [submitting, setSubmitting] = useState(false)
+
+  // 编辑模式：加载已有数据
+  useEffect(() => {
+    if (!id) return
+    async function load() {
+      const { data } = await supabase.from('library_entries').select('*').eq('id', id).single()
+      if (data) {
+        setTitle(data.title); setContent(data.content); setCategory(data.category)
+        setCoverUrl(data.cover_url || ''); setImageUrls(data.image_urls || [])
+        setVideoUrls(data.video_urls || []); setAudioUrls(data.audio_urls || [])
+        setLyrics(data.lyrics || ''); setTags(data.tags || [])
+      } else { toast.error('条目不存在'); navigate('/library') }
+      setLoadingData(false)
+    }
+    load()
+  }, [id, navigate])
 
   // 封面上传
   async function handleCoverUpload(e) {
@@ -66,6 +90,28 @@ export default function LibraryEditorPage() {
     setVideoInput('')
   }
 
+  async function handleVideoUpload(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = ''
+    setVideoUploading(true)
+    const { url, error } = await uploadVideo(file)
+    if (error) { toast.error('视频上传失败: ' + error.message) }
+    else { setVideoUrls((prev) => [...prev, url]) }
+    setVideoUploading(false)
+  }
+
+  async function handleAudioUpload(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = ''
+    setAudioUploading(true)
+    const { url, error } = await uploadAudio(file)
+    if (error) { toast.error('音频上传失败: ' + error.message) }
+    else { setAudioUrls((prev) => [...prev, url]) }
+    setAudioUploading(false)
+  }
+
   function addTag() {
     const tag = tagInput.trim()
     if (!tag || tags.includes(tag)) return
@@ -73,39 +119,42 @@ export default function LibraryEditorPage() {
     setTagInput('')
   }
 
-  async function handleSubmit(status = 'pending_review') {
+  async function handleSubmit(status) {
+    const finalStatus = status || (isAdmin ? 'published' : 'pending_review')
     if (!title || !content) { toast.error('请填写标题和正文'); return }
     const words = await loadBannedWords(supabase)
     const hits = checkBannedWords(title + ' ' + content, words)
     if (hits.length > 0) { toast.error(`内容包含违规词：${hits.slice(0, 3).join('、')}`); return }
     setSubmitting(true)
 
-    const finalStatus = isAdmin ? 'published' : status
-
-    const { error } = await supabase.from('library_entries').insert({
-      author_id: user.id,
-      title,
-      content,
-      category,
-      cover_url: coverUrl || null,
-      image_urls: imageUrls,
-      video_urls: videoUrls,
-      tags,
-      status: finalStatus,
-    })
-
-    setSubmitting(false)
-    if (error) {
-      toast.error('发布失败: ' + error.message)
+    if (isEditing) {
+      const { error } = await supabase.rpc('update_library_entry', {
+        _id: id, _title: title, _content: content, _category: category,
+        _cover_url: coverUrl || null, _image_urls: imageUrls,
+        _video_urls: videoUrls, _audio_urls: audioUrls,
+        _lyrics: lyrics || null, _tags: tags, _status: finalStatus,
+      })
+      setSubmitting(false)
+      if (error) { toast.error('更新失败: ' + error.message) }
+      else { toast.success('条目已更新'); navigate(`/library/${id}`) }
     } else {
-      toast.success(
-        finalStatus === 'published'
-          ? '条目已发布！'
-          : '投稿已提交，等待管理员审核'
-      )
-      navigate('/library')
+      const { error } = await supabase.rpc('insert_library_entry', {
+        _title: title, _content: content, _category: category,
+        _cover_url: coverUrl || null, _image_urls: imageUrls,
+        _video_urls: videoUrls, _audio_urls: audioUrls,
+        _lyrics: lyrics || null, _tags: tags, _status: finalStatus,
+      })
+      setSubmitting(false)
+      if (error) {
+        toast.error('发布失败: ' + error.message)
+      } else {
+        toast.success(finalStatus === 'published' ? '条目已发布！' : '投稿已提交，等待管理员审核')
+        navigate('/library')
+      }
     }
   }
+
+  if (loadingData) return <div className="flex justify-center py-24"><LoadingSpinner size="lg" /></div>
 
   return (
     <div>
@@ -115,7 +164,7 @@ export default function LibraryEditorPage() {
 
       <div className="bg-surface rounded-card shadow-card p-6 md:p-8">
         <h1 className="font-display text-accent text-2xl mb-6">
-          {isAdmin ? '📝 添加条目' : '📤 投稿'}
+          {isEditing ? '编辑条目' : (isAdmin ? '添加条目' : '投稿')}
         </h1>
 
         {!isAdmin && (
@@ -200,10 +249,10 @@ export default function LibraryEditorPage() {
           )}
         </div>
 
-        {/* 视频链接 */}
+        {/* 视频 */}
         <div className="mb-4">
-          <label className="text-secondary text-sm font-medium mb-1.5 block">视频链接（B站/YouTube）</label>
-          <div className="flex gap-2">
+          <label className="text-secondary text-sm font-medium mb-1.5 block">视频（链接或本地上传）</label>
+          <div className="flex gap-2 mb-2">
             <input
               type="text" value={videoInput} onChange={(e) => setVideoInput(e.target.value)}
               placeholder="粘贴 B站 / YouTube 视频链接"
@@ -214,6 +263,11 @@ export default function LibraryEditorPage() {
               className="bg-hover border border-border text-secondary px-4 py-2 rounded-button text-sm hover:bg-accent hover:text-text-inverse">
               添加
             </button>
+            <label className="flex items-center gap-1 bg-hover border border-border text-secondary px-4 py-2 rounded-button text-sm cursor-pointer hover:bg-accent hover:text-text-inverse">
+              {videoUploading ? <Loader2 size={14} className="animate-spin" /> : <Video size={14} />}
+              {videoUploading ? '上传中' : '本地上传'}
+              <input type="file" accept="video/mp4,video/webm" onChange={handleVideoUpload} hidden />
+            </label>
           </div>
           {videoUrls.length > 0 && (
             <div className="flex flex-col gap-1 mt-2">
@@ -227,6 +281,42 @@ export default function LibraryEditorPage() {
             </div>
           )}
         </div>
+
+        {/* 音频上传 */}
+        <div className="mb-4">
+          <label className="text-secondary text-sm font-medium mb-1.5 block">音频（OST/音乐）</label>
+          <div className="flex gap-2 mb-2">
+            <label className="flex items-center gap-1 bg-hover border border-border text-secondary px-4 py-2 rounded-button text-sm cursor-pointer hover:bg-accent hover:text-text-inverse">
+              {audioUploading ? <Loader2 size={14} className="animate-spin" /> : <Music size={14} />}
+              {audioUploading ? '上传中' : '上传音频'}
+              <input type="file" accept="audio/mpeg,audio/mp3,audio/wav,audio/ogg,audio/flac" onChange={handleAudioUpload} hidden />
+            </label>
+          </div>
+          {audioUrls.length > 0 && (
+            <div className="flex flex-col gap-1 mt-2">
+              {audioUrls.map((url, i) => (
+                <div key={i} className="flex items-center justify-between text-xs text-muted bg-hover rounded-input px-3 py-1.5">
+                  <span className="truncate">{url.split('/').pop()}</span>
+                  <button onClick={() => setAudioUrls((prev) => prev.filter((_, j) => j !== i))}
+                    className="text-danger hover:underline ml-2 shrink-0">删除</button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* 歌词（音乐分类时显示） */}
+        {category === 'music' && (
+          <div className="mb-4">
+            <label className="text-secondary text-sm font-medium mb-1.5 flex items-center gap-1">
+              <FileText size={14} /> 滚动歌词
+            </label>
+            <textarea value={lyrics} onChange={(e) => setLyrics(e.target.value)}
+              rows={6} placeholder={`[00:12.34]第一行歌词&#10;[00:15.67]第二行歌词&#10;或者直接粘贴纯文本歌词`}
+              className="w-full bg-hover border border-border rounded-input px-4 py-2.5 text-primary text-sm resize-none focus:outline-none focus:border-accent font-mono" />
+            <p className="text-muted text-xs mt-1">支持 LRC 格式（[分:秒.毫秒]歌词），也支持纯文本</p>
+          </div>
+        )}
 
         {/* 标签 */}
         <div className="mb-6">
