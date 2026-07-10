@@ -15,7 +15,7 @@ import { supabase } from '@/lib/supabaseClient'
 import ReportCard from '@/components/admin/ReportCard'
 import EmptyState from '@/components/shared/EmptyState'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
-import { Shield, Filter, RefreshCw, BookOpen, Palette as PaletteIcon, MessageSquare, Check, X, Clock, ArrowLeft } from 'lucide-react'
+import { Shield, Filter, RefreshCw, BookOpen, Palette as PaletteIcon, MessageSquare, Check, X, Clock, ArrowLeft, Ticket } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
 
@@ -128,6 +128,10 @@ export default function AdminPage() {
           <Link to="/admin/theme"
             className="flex items-center gap-1 text-muted text-sm no-underline hover:text-accent px-3 py-1.5 rounded-button border border-border">
             <PaletteIcon size={14} /> 主题管理
+          </Link>
+          <Link to="/admin/invites"
+            className="flex items-center gap-1 text-muted text-sm no-underline hover:text-accent px-3 py-1.5 rounded-button border border-border">
+            <Ticket size={14} /> 邀请码
           </Link>
           <button onClick={() => activeTab === 'reports' ? fetchReports() : fetchMessages()}
             className="flex items-center gap-1 text-muted text-sm hover:text-accent px-3 py-1.5 rounded-button border border-border">
