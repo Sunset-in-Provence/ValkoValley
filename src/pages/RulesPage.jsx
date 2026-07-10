@@ -37,7 +37,16 @@ export default function RulesPage() {
               </ul>
             </section>
             <section>
-              <h2 className="font-display text-accent text-lg mt-6 mb-3">四、隐私与安全</h2>
+              <h2 className="font-display text-accent text-lg mt-6 mb-3">四、禁止内容</h2>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>严禁发布任何形式的色情、淫秽、低俗、性暗示内容。</li>
+                <li>严禁发布封建迷信、玄学占卜、算命风水等内容。</li>
+                <li>严禁发布任何违反中华人民共和国法律法规的内容。</li>
+                <li>以上违规行为一经发现，永久封禁，不予申诉。</li>
+              </ul>
+            </section>
+            <section>
+              <h2 className="font-display text-accent text-lg mt-6 mb-3">五、隐私与安全</h2>
               <ul className="list-disc pl-5 space-y-1">
                 <li>禁止公开他人隐私信息（真实姓名、联系方式、照片等）。</li>
                 <li>禁止发布违法内容、恶意链接、钓鱼信息。</li>
@@ -45,7 +54,7 @@ export default function RulesPage() {
               </ul>
             </section>
             <section>
-              <h2 className="font-display text-accent text-lg mt-6 mb-3">五、处罚措施</h2>
+              <h2 className="font-display text-accent text-lg mt-6 mb-3">六、处罚措施</h2>
               <ul className="list-disc pl-5 space-y-1">
                 <li>轻微违规：警告通知 + 内容删除。</li>
                 <li>严重违规：封禁账户（1天/7天/30天/永久）+ 违规永久公示。</li>
