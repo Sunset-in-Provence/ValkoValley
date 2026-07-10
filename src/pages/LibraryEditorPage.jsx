@@ -138,7 +138,7 @@ export default function LibraryEditorPage() {
 
   async function handleSubmit(status) {
     const finalStatus = status || (isAdmin ? 'published' : 'pending_review')
-    if (!title || !content) { toast.error('请填写标题和正文'); return }
+    if (!title) { toast.error('请填写标题'); return }
     const words = await loadBannedWords(supabase)
     const hits = checkBannedWords(title + ' ' + content, words)
     if (hits.length > 0) { toast.error(`内容包含违规词：${hits.slice(0, 3).join('、')}`); return }
@@ -245,7 +245,7 @@ export default function LibraryEditorPage() {
 
         {/* 正文 */}
         <div className="mb-4">
-          <label className="text-secondary text-sm font-medium mb-1.5 block">正文（Markdown）*</label>
+          <label className="text-secondary text-sm font-medium mb-1.5 block">正文（Markdown）</label>
           <textarea
             value={content} onChange={(e) => setContent(e.target.value)}
             placeholder="支持 Markdown 格式..." rows={12} required
@@ -333,7 +333,7 @@ export default function LibraryEditorPage() {
         </div>
 
         {/* 歌词（音乐分类时显示） */}
-        {category === 'music' && (
+        {category.startsWith('music_') && (
           <div className="mb-4">
             <label className="text-secondary text-sm font-medium mb-1.5 flex items-center gap-1">
               <FileText size={14} /> 滚动歌词

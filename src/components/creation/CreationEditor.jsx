@@ -60,7 +60,6 @@ export default function CreationEditor() {
 
   async function handleSubmit() {
     if (!title.trim()) { toast.error('请填写标题'); return }
-    if (!content.trim()) { toast.error('请填写正文'); return }
     if (!contentType) { toast.error('请选择内容类型'); return }
     if (!type) { toast.error('请选择原创或二创'); return }
 

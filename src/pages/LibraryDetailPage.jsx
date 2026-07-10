@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/context/AuthContext'
 import { renderMarkdown } from '@/lib/markdown'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
-import { ArrowLeft, Eye, Calendar, User, Edit3 } from 'lucide-react'
+import { ArrowLeft, Eye, Calendar, User, Edit3, Trash2 } from 'lucide-react'
 
 const catLabels = {
   gallery_promo: '宣图', gallery_card: '卡面', gallery_text: '文案',
@@ -22,6 +22,13 @@ export default function LibraryDetailPage() {
   const [entry, setEntry] = useState(null)
   const [loading, setLoading] = useState(true)
   const canEdit = !!user
+
+  async function handleDelete() {
+    if (!window.confirm('确定删除此条目？')) return
+    const { error } = await supabase.rpc('delete_library_entry', { _id: id })
+    if (error) toast.error('删除失败: ' + error.message)
+    else { toast.success('已删除'); navigate('/library') }
+  }
 
   useEffect(() => {
     async function load() {
@@ -157,6 +164,12 @@ export default function LibraryDetailPage() {
               className="inline-flex items-center gap-1 bg-hover rounded-button px-3 py-1.5 text-muted text-sm hover:bg-accent hover:text-text-inverse transition-colors">
               <Edit3 size={14} /> 编辑条目
             </button>
+            {isAdmin && (
+              <button onClick={handleDelete}
+                className="inline-flex items-center gap-1 bg-hover rounded-button px-3 py-1.5 text-danger text-sm hover:bg-danger/10 transition-colors">
+                <Trash2 size={14} /> 删除
+              </button>
+            )}
           </div>
         )}
       </article>
