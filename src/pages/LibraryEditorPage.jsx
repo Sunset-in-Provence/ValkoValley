@@ -13,13 +13,30 @@ import toast from 'react-hot-toast'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import { ArrowLeft, Upload, X, Loader2, Video, Music, FileText } from 'lucide-react'
 
-const categories = [
-  { key: 'character', label: '👤 角色设定' },
-  { key: 'worldview', label: '🌍 世界观' },
-  { key: 'timeline', label: '📅 剧情年表' },
-  { key: 'gallery', label: '🖼️ 官方图鉴' },
-  { key: 'music', label: '🎵 音乐/OST' },
-  { key: 'other', label: '📦 其他' },
+const CATEGORY_GROUPS = [
+  {
+    label: '图鉴',
+    items: [
+      { key: 'gallery_promo', label: '宣图' },
+      { key: 'gallery_card', label: '卡面' },
+      { key: 'gallery_text', label: '文案' },
+    ],
+  },
+  {
+    label: '视频',
+    items: [
+      { key: 'video_pv', label: '个人PV' },
+      { key: 'video_story', label: '卡面剧情' },
+      { key: 'video_other', label: '其它' },
+    ],
+  },
+  {
+    label: '音乐',
+    items: [
+      { key: 'music_official', label: '官方' },
+      { key: 'music_fan', label: '同人' },
+    ],
+  },
 ]
 
 export default function LibraryEditorPage() {
@@ -186,15 +203,25 @@ export default function LibraryEditorPage() {
         {/* 分类 */}
         <div className="mb-4">
           <label className="text-secondary text-sm font-medium mb-1.5 block">分类 *</label>
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="w-full bg-hover border border-border rounded-input px-4 py-2.5 text-primary text-sm focus:outline-none focus:border-accent"
-          >
-            {categories.map((c) => (
-              <option key={c.key} value={c.key}>{c.label}</option>
+          <div className="grid grid-cols-3 gap-4">
+            {CATEGORY_GROUPS.map((group) => (
+              <div key={group.label} className="bg-hover rounded-card p-3">
+                <p className="text-muted text-xs font-medium mb-2">{group.label}</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {group.items.map((item) => (
+                    <button key={item.key} type="button"
+                      onClick={() => setCategory(item.key)}
+                      className={`px-2.5 py-1 rounded-button text-xs transition-colors ${
+                        category === item.key
+                          ? 'bg-accent text-text-inverse'
+                          : 'bg-surface text-secondary border border-border hover:border-accent'
+                      }`}
+                    >{item.label}</button>
+                  ))}
+                </div>
+              </div>
             ))}
-          </select>
+          </div>
         </div>
 
         {/* 封面 */}

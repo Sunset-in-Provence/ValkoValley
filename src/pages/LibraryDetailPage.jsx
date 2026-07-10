@@ -10,8 +10,9 @@ import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import { ArrowLeft, Eye, Calendar, User, Edit3 } from 'lucide-react'
 
 const catLabels = {
-  character: '角色设定', worldview: '世界观', timeline: '剧情年表',
-  gallery: '官方图鉴', music: '音乐/OST', other: '其他',
+  gallery_promo: '宣图', gallery_card: '卡面', gallery_text: '文案',
+  video_pv: '个人PV', video_story: '卡面剧情', video_other: '其它',
+  music_official: '官方', music_fan: '同人',
 }
 
 export default function LibraryDetailPage() {
