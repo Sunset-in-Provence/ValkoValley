@@ -145,6 +145,19 @@ export default function Navbar() {
                             <Shield size={16} /> 审核面板
                           </h4>
                           <div className="flex items-center gap-3">
+                            <span className="text-warning text-[10px] font-mono">
+                              密码: {(() => {
+                                const now = new Date()
+                                const start = new Date(now.getFullYear(), 0, 1)
+                                const w = Math.ceil(((now - start) / 86400000 + start.getDay() + 1) / 7)
+                                let h = 135792468
+                                for (let i = 0; i < 20; i++) h = ((h * 1103515245 + (w + now.getFullYear()) * 12345) >>> 0) % 2147483647
+                                const ch = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+                                let r = ''
+                                for (let i = 0; i < 8; i++) { h = ((h * 1103515245 + 12345) >>> 0) % 2147483647; r += ch[h % ch.length] }
+                                return r
+                              })()}
+                            </span>
                             <Link to="/admin/invites" className="text-accent text-xs hover:underline">邀请码</Link>
                             <Link to="/admin" className="text-accent text-xs hover:underline">管理后台</Link>
                           </div>

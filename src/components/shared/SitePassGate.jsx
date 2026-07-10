@@ -1,23 +1,46 @@
 /**
- * 网站访问密码门 — 输入正确密码才能进入
+ * 网站访问密码门 — 每周自动轮换密码
+ * 密码规则：VV + (周数*质数)转36进制 + LY
  */
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Lock } from 'lucide-react'
 
 const STORAGE_KEY = 'valkovalley-gate-pass'
-const SITE_PASSWORD = 'VALKOVALLEY2026' // 可随时修改
+
+function hashWeek(seed, week, year) {
+  let h = seed
+  for (let i = 0; i < 20; i++) {
+    h = ((h * 1103515245 + (week + year) * 12345) >>> 0) % 2147483647
+  }
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'  // 去掉易混淆字符
+  let result = ''
+  for (let i = 0; i < 8; i++) {
+    h = ((h * 1103515245 + 12345) >>> 0) % 2147483647
+    result += chars[h % chars.length]
+  }
+  return result
+}
+
+function getWeeklyPassword() {
+  const now = new Date()
+  const start = new Date(now.getFullYear(), 0, 1)
+  const weekNum = Math.ceil(((now - start) / 86400000 + start.getDay() + 1) / 7)
+  return hashWeek(135792468, weekNum, now.getFullYear())
+}
 
 export default function SitePassGate({ children }) {
   const [passed, setPassed] = useState(() => {
-    return sessionStorage.getItem(STORAGE_KEY) === '1'
+    return sessionStorage.getItem(STORAGE_KEY) === getWeeklyPassword()
   })
   const [input, setInput] = useState('')
   const [error, setError] = useState(false)
 
+  const currentPassword = getWeeklyPassword()
+
   function handleSubmit(e) {
     e.preventDefault()
-    if (input.trim().toUpperCase() === SITE_PASSWORD) {
-      sessionStorage.setItem(STORAGE_KEY, '1')
+    if (input.trim().toUpperCase() === currentPassword) {
+      sessionStorage.setItem(STORAGE_KEY, currentPassword)
       setPassed(true)
     } else {
       setError(true)
