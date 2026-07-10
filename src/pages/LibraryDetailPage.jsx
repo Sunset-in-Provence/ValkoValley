@@ -142,8 +142,16 @@ export default function LibraryDetailPage() {
                   }
                   return (
                     <div key={i} className="aspect-video">
-                      <iframe src={url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/').replace('bilibili.com/video/', 'player.bilibili.com/player.html?bvid=')}
-                        className="w-full h-full rounded-card" allowFullScreen />
+                      <iframe src={(() => {
+                        if (url.includes('bilibili.com') || url.includes('b23.tv')) {
+                          const match = url.match(/BV\w+/)
+                          return match ? `https://player.bilibili.com/player.html?bvid=${match[0]}&high_quality=1&danmaku=0` : url
+                        }
+                        return url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')
+                      })()}
+                        className="w-full h-full rounded-card" allowFullScreen
+                          sandbox="allow-scripts allow-same-origin"
+                          referrerPolicy="no-referrer" />
                     </div>
                   )
                 })}
