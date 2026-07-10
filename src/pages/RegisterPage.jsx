@@ -22,6 +22,8 @@ import UserAgreement from '@/components/auth/UserAgreement'
 
 const QUESTIONS_PER_STAGE = 10
 const PASS_THRESHOLD = 0.8 // 80%
+const COOLDOWN_KEY = 'valkovalley-exam-cooldown'
+const COOLDOWN_MINUTES = 30
 
 /** 从题库中随机抽取不重复题目 */
 function pickQuestions(pool, count) {
@@ -60,15 +62,26 @@ export default function RegisterPage() {
 
   // ---- 处理函数 ----
 
-  /** 选择答案 */
+  /** 选择答案 — 立即锁定，不可更改 */
   function handleAnswer(stage, questionIndex, optionIndex) {
     if (stage === 'rules') {
-      if (rulesSubmitted) return
+      if (rulesSubmitted || rulesAnswers[questionIndex] !== undefined) return
       setRulesAnswers((prev) => ({ ...prev, [questionIndex]: optionIndex }))
     } else {
-      if (aoyinSubmitted) return
+      if (aoyinSubmitted || aoyinAnswers[questionIndex] !== undefined) return
       setAoyinAnswers((prev) => ({ ...prev, [questionIndex]: optionIndex }))
     }
+  }
+
+  /** 检查冷却 */
+  function checkCooldown() {
+    const until = localStorage.getItem(COOLDOWN_KEY)
+    if (until && Date.now() < parseInt(until)) {
+      const mins = Math.ceil((parseInt(until) - Date.now()) / 60000)
+      toast.error(`考试未通过，请等待 ${mins} 分钟后再试`)
+      return true
+    }
+    return false
   }
 
   /** 开始第一阶段考试 */
@@ -81,8 +94,8 @@ export default function RegisterPage() {
     if (username.length < 2 || username.length > 30) {
       toast.error('用户名需 2-30 个字符'); return
     }
+    if (checkCooldown()) return
 
-    // 检查题库是否充足
     if (rulesPool.length < QUESTIONS_PER_STAGE) {
       toast.error(`公约题库不足 ${QUESTIONS_PER_STAGE} 题，请联系管理员补充`)
       return
@@ -111,6 +124,12 @@ export default function RegisterPage() {
 
     setRulesResult({ correct, total: rulesQuestions.length, passed })
 
+    // 保存考试记录
+    const rWrong = rulesQuestions
+      .filter((q, i) => rulesAnswers[i] !== q.correctIndex)
+      .map((q, i) => ({ question: q.question, picked: q.options[rulesAnswers[i]] || '未作答', correct: q.options[q.correctIndex] }))
+    supabase.from('exam_attempts').insert({ email, username, stage: 'rules', passed, correct_count: correct, total_count: rulesQuestions.length, wrong_details: rWrong }).then()
+
     if (passed) {
       toast.success(`公约考试通过！(${correct}/${rulesQuestions.length})`)
 
@@ -130,7 +149,8 @@ export default function RegisterPage() {
         setStep('aoyin_exam')
       }, 1500)
     } else {
-      toast.error(`公约考试未通过（${correct}/${rulesQuestions.length}），请重读公约后重试`)
+      localStorage.setItem(COOLDOWN_KEY, String(Date.now() + COOLDOWN_MINUTES * 60000))
+      toast.error(`公约考试未通过（${correct}/${rulesQuestions.length}），请 ${COOLDOWN_MINUTES} 分钟后再试`)
     }
   }
 
@@ -149,11 +169,20 @@ export default function RegisterPage() {
 
     setAoyinResult({ correct, total: aoyinQuestions.length, passed })
 
+    const wrongDetails = aoyinQuestions
+      .filter((q, i) => aoyinAnswers[i] !== q.correctIndex)
+      .map((q, i) => ({ question: q.question, picked: q.options[aoyinAnswers[Object.keys(aoyinAnswers)[i]]] || '未作答', correct: q.options[q.correctIndex] }))
+    supabase.from('exam_attempts').insert({ email, username, stage: 'aoyin', passed, correct_count: correct, total_count: aoyinQuestions.length, wrong_details: wrongDetails }).then()
+
     if (passed) {
-      toast.success(`敖尹考试通过！(${correct}/${aoyinQuestions.length})`)
-      setTimeout(() => createAccount(), 1000)
+      toast.success(`敖尹考试通过！正在创建账户...`)
+      setTimeout(async () => {
+        await createAccount()
+        toast.success('账户已创建！请前往邮箱点击确认链接完成注册', { duration: 8000 })
+      }, 1000)
     } else {
-      toast.error(`敖尹考试未通过（${correct}/${aoyinQuestions.length}），请重温敖尹的故事后重试`)
+      localStorage.setItem(COOLDOWN_KEY, String(Date.now() + COOLDOWN_MINUTES * 60000))
+      toast.error(`敖尹考试未通过（${correct}/${aoyinQuestions.length}），请 ${COOLDOWN_MINUTES} 分钟后再试`)
     }
   }
 
@@ -237,7 +266,7 @@ export default function RegisterPage() {
                 index={i}
                 selectedAnswer={answers[i]}
                 onSelect={(qi, oi) => handleAnswer(stage, qi, oi)}
-                showResult={submitted}
+                locked={answers[i] !== undefined}
               />
             ))}
           </div>

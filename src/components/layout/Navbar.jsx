@@ -10,7 +10,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import { useTheme } from '@/context/ThemeContext'
 import { supabase } from '@/lib/supabaseClient'
-import { Sun, Moon, LogOut, User, Shield, X, MessageSquare, Check, AlertTriangle, Ban, Plus, Trash2, Megaphone, BookOpen } from 'lucide-react'
+import { Sun, Moon, LogOut, User, Shield, X, MessageSquare, Check, AlertTriangle, Ban, Plus, Trash2, BookOpen } from 'lucide-react'
 import NotificationBell from '@/components/notification/NotificationBell'
 import { clearBannedWordsCache } from '@/lib/bannedWords'
 import { cn } from '@/lib/utils'
@@ -135,6 +135,7 @@ export default function Navbar() {
                     )}
                   </button>
 
+
                   {reviewOpen && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setReviewOpen(false)} />
@@ -143,6 +144,7 @@ export default function Navbar() {
                           <h4 className="text-accent text-sm font-medium flex items-center gap-1.5">
                             <Shield size={16} /> 审核面板
                           </h4>
+                          <Link to="/admin" className="text-accent text-xs hover:underline">管理后台</Link>
                           <button onClick={() => setReviewOpen(false)} className="text-muted hover:text-secondary"><X size={14} /></button>
                         </div>
 
@@ -216,14 +218,8 @@ export default function Navbar() {
                           </div>
                         )}
 
-                        {/* 公告管理 */}
-                        <div className="border-b border-border px-4 py-2">
-                          <button onClick={() => { setReviewOpen(false); navigate('/admin/announcements') }}
-                            className="w-full text-left flex items-center justify-between text-secondary text-xs hover:text-accent transition-colors">
-                            <span className="flex items-center gap-1"><Megaphone size={13} /> 公告管理</span>
-                            <span className="text-muted text-[10px]">前往</span>
-                          </button>
-                        </div>
+
+
 
                         {/* 举报 */}
                         <div className="px-4 py-2">

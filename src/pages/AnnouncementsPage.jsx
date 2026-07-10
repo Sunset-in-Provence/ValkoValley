@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '@/lib/supabaseClient'
+import { useAuth } from '@/context/AuthContext'
 import { renderMarkdown } from '@/lib/markdown'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
-import { ArrowLeft, FileText, Megaphone, AlertTriangle, Clock } from 'lucide-react'
+import { ArrowLeft, FileText, Megaphone, AlertTriangle, Clock, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const TABS = [
@@ -13,6 +14,7 @@ const TABS = [
 ]
 
 export default function AnnouncementsPage() {
+  const { isAdmin } = useAuth()
   const [activeTab, setActiveTab] = useState('general')
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
@@ -39,7 +41,15 @@ export default function AnnouncementsPage() {
       </Link>
 
       <div className="bg-surface rounded-card shadow-card p-6">
-        <h1 className="font-display text-accent text-2xl mb-4">公告中心</h1>
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="font-display text-accent text-2xl">公告中心</h1>
+          {isAdmin && (
+            <Link to="/admin/announcements"
+              className="flex items-center gap-1 bg-accent text-text-inverse px-3 py-1.5 rounded-button text-sm no-underline hover:opacity-90">
+              <Settings size={14} /> 管理公告
+            </Link>
+          )}
+        </div>
 
         <div className="flex gap-1 mb-6 border-b border-border">
           {TABS.map((tab) => (

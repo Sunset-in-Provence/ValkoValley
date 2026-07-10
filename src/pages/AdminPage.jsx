@@ -22,6 +22,7 @@ import toast from 'react-hot-toast'
 const TABS = [
   { key: 'reports', label: '举报审核' },
   { key: 'guestbook', label: '留言审核' },
+  { key: 'exams', label: '考试记录' },
 ]
 
 const STATUS_FILTERS = [
@@ -285,6 +286,82 @@ export default function AdminPage() {
           )}
         </>
       )}
+
+      {/* ====== 考试记录 ====== */}
+      {activeTab === 'exams' && <ExamAttemptsTab />}
     </div>
+  )
+}
+
+function ExamAttemptsTab() {
+  const [attempts, setAttempts] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function load() {
+      const { data } = await supabase.from('exam_attempts').select('*').order('created_at', { ascending: false }).limit(100)
+      setAttempts(data || [])
+      setLoading(false)
+    }
+    load()
+  }, [])
+
+  if (loading) return <div className="flex justify-center py-16"><LoadingSpinner size="lg" /></div>
+
+  const failed = attempts.filter((a) => !a.passed)
+  const passed = attempts.filter((a) => a.passed)
+
+  return (
+    <>
+      <div className="grid grid-cols-3 gap-3 mb-6">
+        <div className="bg-surface rounded-card shadow-card p-4 text-center">
+          <p className="text-muted text-2xl font-display">{attempts.length}</p>
+          <p className="text-muted text-xs mt-1">总记录</p>
+        </div>
+        <div className="bg-surface rounded-card shadow-card p-4 text-center">
+          <p className="text-success text-2xl font-display">{passed.length}</p>
+          <p className="text-muted text-xs mt-1">通过</p>
+        </div>
+        <div className="bg-surface rounded-card shadow-card p-4 text-center">
+          <p className="text-danger text-2xl font-display">{failed.length}</p>
+          <p className="text-muted text-xs mt-1">未通过</p>
+        </div>
+      </div>
+
+      {attempts.length === 0 ? (
+        <EmptyState icon={BookOpen} title="暂无考试记录" />
+      ) : (
+        <div className="space-y-2">
+          {attempts.map((a) => (
+            <div key={a.id} className="bg-surface rounded-card border border-border p-4">
+              <div className="flex items-center justify-between mb-2">
+                <div>
+                  <span className="text-secondary text-sm font-medium">{a.email}</span>
+                  <span className="text-muted text-xs ml-2">@{a.username}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={cn('text-xs px-2 py-0.5 rounded-full', a.passed ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger')}>
+                    {a.passed ? '通过' : '未通过'}
+                  </span>
+                  <span className="text-muted text-xs">{a.stage === 'rules' ? '公约' : '敖尹'}</span>
+                  <span className="text-muted text-xs">{a.correct_count}/{a.total_count}</span>
+                </div>
+              </div>
+              {a.wrong_details?.length > 0 && (
+                <div className="text-muted text-xs space-y-0.5 mt-2 pt-2 border-t border-border/50">
+                  {a.wrong_details.map((w, i) => (
+                    <div key={i}>
+                      <p className="text-secondary">Q: {w.question}</p>
+                      <p>选了：<span className="text-danger">{w.picked}</span> | 正确：<span className="text-success">{w.correct}</span></p>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <p className="text-muted text-[10px] mt-2">{new Date(a.created_at).toLocaleString('zh-CN')}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </>
   )
 }
