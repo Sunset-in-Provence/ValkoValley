@@ -23,7 +23,6 @@ const TABS = [
   { key: 'reports', label: '举报审核' },
   { key: 'guestbook', label: '留言审核' },
   { key: 'exams', label: '考试记录' },
-  { key: 'invites', label: '邀请码管理' },
 ]
 
 const STATUS_FILTERS = [
@@ -290,7 +289,6 @@ export default function AdminPage() {
 
       {/* ====== 考试记录 ====== */}
       {activeTab === 'exams' && <ExamAttemptsTab />}
-      {activeTab === 'invites' && <InviteCodesTab />}
     </div>
   )
 }
@@ -365,93 +363,5 @@ function ExamAttemptsTab() {
         </div>
       )}
     </>
-  )
-}
-
-function InviteCodesTab() {
-  const [codes, setCodes] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [newCode, setNewCode] = useState('')
-  const { user } = useAuth()
-
-  async function fetch() {
-    setLoading(true)
-    const { data } = await supabase.from('invite_codes').select('*').order('created_at', { ascending: false })
-    setCodes(data || [])
-    setLoading(false)
-  }
-
-  useEffect(() => { fetch() }, [])
-
-  async function handleGenerate() {
-    const code = newCode.trim().toUpperCase()
-    if (!code) { toast.error('请输入邀请码'); return }
-    const { error } = await supabase.from('invite_codes').insert({ code, created_by: user.id, max_uses: 1 })
-    if (error) { toast.error(error.code === '23505' ? '该码已存在' : '创建失败') }
-    else { toast.success('邀请码已生成: ' + code); setNewCode(''); fetch() }
-  }
-
-  async function handleRandom() {
-    const code = 'VV' + Math.random().toString(36).slice(2, 8).toUpperCase()
-    const { error } = await supabase.from('invite_codes').insert({ code, created_by: user.id, max_uses: 1 })
-    if (error) toast.error('生成失败，请重试')
-    else { toast.success('邀请码已生成: ' + code); fetch() }
-  }
-
-  async function handleToggle(id, active) {
-    await supabase.from('invite_codes').update({ is_active: active }).eq('id', id)
-    fetch()
-  }
-
-  if (loading) return <div className="flex justify-center py-16"><LoadingSpinner size="lg" /></div>
-
-  const unused = codes.filter((c) => c.used_count === 0 && c.is_active)
-
-  return (
-    <div>
-      <div className="flex gap-2 mb-4">
-        <input type="text" value={newCode} onChange={(e) => setNewCode(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter') handleGenerate() }}
-          placeholder="输入邀请码" className="flex-1 bg-hover border border-border rounded-input px-3 py-2 text-primary text-sm focus:outline-none focus:border-accent" />
-        <button onClick={handleGenerate} className="bg-accent text-text-inverse px-4 py-2 rounded-button text-sm hover:opacity-90">添加</button>
-        <button onClick={handleRandom} className="border border-border text-secondary px-4 py-2 rounded-button text-sm hover:bg-hover">随机生成</button>
-      </div>
-
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        <div className="bg-surface rounded-card shadow-card p-4 text-center">
-          <p className="text-muted text-2xl font-display">{codes.length}</p>
-          <p className="text-muted text-xs mt-1">总数</p>
-        </div>
-        <div className="bg-surface rounded-card shadow-card p-4 text-center">
-          <p className="text-success text-2xl font-display">{unused.length}</p>
-          <p className="text-muted text-xs mt-1">可用</p>
-        </div>
-        <div className="bg-surface rounded-card shadow-card p-4 text-center">
-          <p className="text-warning text-2xl font-display">{codes.length - unused.length}</p>
-          <p className="text-muted text-xs mt-1">已用/已禁</p>
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        {codes.map((c) => (
-          <div key={c.id} className="bg-surface rounded-card border border-border p-3 flex items-center justify-between">
-            <div>
-              <span className="text-primary text-sm font-mono font-bold">{c.code}</span>
-              <span className={cn('ml-2 text-xs px-1.5 py-0.5 rounded-full',
-                c.used_count >= c.max_uses ? 'bg-danger/10 text-danger' : c.is_active ? 'bg-success/10 text-success' : 'bg-hover text-muted')}>
-                {c.used_count >= c.max_uses ? '已使用' : c.is_active ? '可用' : '已禁用'}
-              </span>
-            </div>
-            <div className="flex items-center gap-3 text-xs text-muted">
-              <span>{c.used_count}/{c.max_uses}</span>
-              <button onClick={() => handleToggle(c.id, !c.is_active)}
-                className={c.is_active ? 'text-warning hover:underline' : 'text-success hover:underline'}>
-                {c.is_active ? '禁用' : '启用'}
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
   )
 }

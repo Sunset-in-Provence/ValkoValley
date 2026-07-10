@@ -29,6 +29,7 @@ const AdminPage = lazy(() => import('@/pages/AdminPage'))
 const AdminThemePage = lazy(() => import('@/pages/AdminThemePage'))
 const AdminExamPage = lazy(() => import('@/pages/AdminExamPage'))
 const AdminAnnouncePage = lazy(() => import('@/pages/AdminAnnouncePage'))
+const AdminInvitesPage = lazy(() => import('@/pages/AdminInvitesPage'))
 
 function Lazy({ children }) {
   return <Suspense fallback={<div className="flex justify-center py-24"><LoadingSpinner size="lg" /></div>}>{children}</Suspense>
@@ -80,6 +81,7 @@ export default function App() {
         <Route path="/admin/theme" element={<Lazy><ProtectedRoute adminOnly><AdminThemePage /></ProtectedRoute></Lazy>} />
         <Route path="/admin/exam" element={<Lazy><ProtectedRoute adminOnly><AdminExamPage /></ProtectedRoute></Lazy>} />
         <Route path="/admin/announcements" element={<Lazy><ProtectedRoute adminOnly><AdminAnnouncePage /></ProtectedRoute></Lazy>} />
+        <Route path="/admin/invites" element={<Lazy><ProtectedRoute adminOnly><AdminInvitesPage /></ProtectedRoute></Lazy>} />
 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

@@ -144,7 +144,10 @@ export default function Navbar() {
                           <h4 className="text-accent text-sm font-medium flex items-center gap-1.5">
                             <Shield size={16} /> 审核面板
                           </h4>
-                          <Link to="/admin" className="text-accent text-xs hover:underline">管理后台</Link>
+                          <div className="flex items-center gap-3">
+                            <Link to="/admin/invites" className="text-accent text-xs hover:underline">邀请码</Link>
+                            <Link to="/admin" className="text-accent text-xs hover:underline">管理后台</Link>
+                          </div>
                           <button onClick={() => setReviewOpen(false)} className="text-muted hover:text-secondary"><X size={14} /></button>
                         </div>
 
