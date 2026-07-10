@@ -32,7 +32,9 @@ const CATEGORY_GROUPS = [
   {
     label: '视频',
     items: [
-      { key: 'video_pv', label: '个人PV' },
+      { key: 'video_pv_concept', label: '概念短片' },
+      { key: 'video_pv_game', label: '不驯者的游戏' },
+      { key: 'video_pv_instinct', label: '本能沦陷法则' },
       { key: 'video_story', label: '卡面剧情' },
       { key: 'video_other', label: '其它' },
     ],

@@ -16,7 +16,12 @@ const MAIN = [
     { key: 'gallery_promo', label: '宣图' }, { key: 'gallery_card', label: '卡面' }, { key: 'gallery_text', label: '文案' }
   ]},
   { key: 'video', label: '视频', subs: [
-    { key: 'video_pv', label: '个人PV' }, { key: 'video_story', label: '卡面剧情' }, { key: 'video_other', label: '其它' }
+    { key: 'video_pv', label: '个人PV', children: [
+      { key: 'video_pv_concept', label: '概念短片' },
+      { key: 'video_pv_game', label: '不驯者的游戏' },
+      { key: 'video_pv_instinct', label: '本能沦陷法则' },
+    ]},
+    { key: 'video_story', label: '卡面剧情' }, { key: 'video_other', label: '其它' }
   ]},
   { key: 'music', label: '音乐', subs: [
     { key: 'music_official', label: '官方' }, { key: 'music_fan', label: '同人' }
@@ -49,7 +54,11 @@ export default function LibraryPage() {
   )
 
   const groups = MAIN.map((m) => {
-    const keys = m.subs.map((s) => s.key)
+    const keys = []
+    m.subs.forEach((s) => {
+      keys.push(s.key)
+      if (s.children) s.children.forEach((c) => keys.push(c.key))
+    })
     const items = filtered.filter((e) => keys.includes(e.category))
     return { ...m, items }
   })
@@ -85,11 +94,20 @@ export default function LibraryPage() {
                   </button>
                   <div className="flex flex-col gap-0.5 ml-2">
                     {m.subs.map((s) => (
-                      <button key={s.key}
-                        onClick={() => document.getElementById('sub-' + s.key)?.scrollIntoView({ behavior: 'smooth' })}
-                        className="text-left px-2 py-1 rounded-button text-xs text-muted hover:text-secondary hover:bg-hover transition-colors">
-                        {s.label}
-                      </button>
+                      <div key={s.key}>
+                        <button
+                          onClick={() => document.getElementById('sub-' + s.key)?.scrollIntoView({ behavior: 'smooth' })}
+                          className="text-left w-full px-2 py-1 rounded-button text-xs text-muted hover:text-secondary hover:bg-hover transition-colors">
+                          {s.label}
+                        </button>
+                        {s.children && s.children.map((c) => (
+                          <button key={c.key}
+                            onClick={() => document.getElementById('sub-' + c.key)?.scrollIntoView({ behavior: 'smooth' })}
+                            className="text-left w-full pl-4 py-0.5 rounded-button text-[10px] text-muted hover:text-secondary hover:bg-hover transition-colors">
+                            {c.label}
+                          </button>
+                        ))}
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -108,7 +126,7 @@ export default function LibraryPage() {
                   const items = group.items.filter((e) => e.category === sub.key)
                   if (items.length === 0) return null
                   return (
-                    <div key={sub.key} id={'sub-' + sub.key} className="mb-8">
+                    <div key={sub.key} id={'sub-' + sub.key} className="mb-8 scroll-mt-20">
                       <h3 className="text-secondary text-sm font-medium mb-3">{sub.label}</h3>
                       {items.map((e) => (
                         <div key={e.id} className="bg-surface rounded-card shadow-card p-6 md:p-10 mb-4">
@@ -137,13 +155,29 @@ export default function LibraryPage() {
               ) : (
                 group.subs.map((sub) => {
                   const items = group.items.filter((e) => e.category === sub.key)
-                  if (items.length === 0) return null
+                  const childItems = sub.children ? sub.children.flatMap((c) => group.items.filter((e) => e.category === c.key)) : []
+                  const allItems = [...items, ...childItems]
+                  if (allItems.length === 0 && !sub.children) return null
                   return (
-                    <div key={sub.key} id={'sub-' + sub.key} className="mb-6">
+                    <div key={sub.key} id={'sub-' + sub.key} className="mb-6 scroll-mt-20">
                       <h3 className="text-secondary text-sm font-medium mb-3">{sub.label}</h3>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                        {items.map((e) => <LibraryCard key={e.id} entry={e} />)}
-                      </div>
+                      {sub.children && sub.children.map((c) => {
+                        const ci = group.items.filter((e) => e.category === c.key)
+                        if (ci.length === 0) return null
+                        return (
+                          <div key={c.key} id={'sub-' + c.key} className="mb-4 scroll-mt-20">
+                            <h4 className="text-muted text-xs font-medium mb-2">{c.label}</h4>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                              {ci.map((e) => <LibraryCard key={e.id} entry={e} />)}
+                            </div>
+                          </div>
+                        )
+                      })}
+                      {items.length > 0 && (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                          {items.map((e) => <LibraryCard key={e.id} entry={e} />)}
+                        </div>
+                      )}
                     </div>
                   )
                 })
