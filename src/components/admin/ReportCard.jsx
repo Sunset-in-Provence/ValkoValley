@@ -37,7 +37,6 @@ export default function ReportCard({ report, onAction }) {
     }
 
     if (actionType === 'ban_user') {
-      // 找到被举报内容的作者并封禁
       const tableMap = { post: 'posts', comment: 'comments', creation: 'creations' }
       const table = tableMap[report.target_type]
       if (table) {
@@ -48,6 +47,7 @@ export default function ReportCard({ report, onAction }) {
       } else if (report.target_type === 'user') {
         await supabase.from('profiles').update({ is_banned: true, ban_expires_at: null }).eq('id', report.target_id)
       }
+      toast.success('用户已永久封禁')
     }
 
     // 更新举报状态

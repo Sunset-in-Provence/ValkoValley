@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
+import { isDeviceBanned } from '@/lib/fingerprint'
+import toast from 'react-hot-toast'
 
 const AuthContext = createContext()
 
@@ -39,11 +41,18 @@ export function AuthProvider({ children }) {
 
   async function fetchProfile(userId) {
     try {
-      const { data } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single()
+      const [{ data }, deviceBanned] = await Promise.all([
+        supabase.from('profiles').select('*').eq('id', userId).single(),
+        isDeviceBanned(supabase),
+      ])
+
+      if (data?.is_banned || deviceBanned) {
+        await supabase.auth.signOut()
+        setUser(null); setProfile(null)
+        toast.error('您的账号已被封禁')
+        setLoading(false)
+        return
+      }
       setProfile(data)
     } catch (error) {
       console.error('获取用户资料失败:', error)
