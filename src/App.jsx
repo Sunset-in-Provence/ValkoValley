@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import AppLayout from '@/components/layout/AppLayout'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
+import SitePassGate from '@/components/shared/SitePassGate'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 
 // 公开页面 — 立即加载（作为入口页面，不应延迟）
@@ -43,6 +44,7 @@ export default function App() {
           style: { borderRadius: 'var(--radius-card)', fontFamily: 'var(--font-body)' },
         }}
       />
+      <SitePassGate>
       <Routes>
         {/* 公开页面 — 立即加载 */}
         <Route path="/" element={<HomePage />} />
@@ -81,6 +83,7 @@ export default function App() {
 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+      </SitePassGate>
     </>
   )
 }

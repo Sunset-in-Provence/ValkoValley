@@ -38,6 +38,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [username, setUsername] = useState('')
+  const [inviteCode, setInviteCode] = useState('')
   const [agreed, setAgreed] = useState(false)
 
   // ---- 流程状态 ----
@@ -85,7 +86,7 @@ export default function RegisterPage() {
   }
 
   /** 开始第一阶段考试 */
-  function startExam() {
+  async function startExam() {
     if (!agreed) { toast.error('请先阅读并同意社区公约'); return }
     if (!email.trim() || !password.trim() || !username.trim()) {
       toast.error('请填写完整信息'); return
@@ -94,6 +95,13 @@ export default function RegisterPage() {
     if (username.length < 2 || username.length > 30) {
       toast.error('用户名需 2-30 个字符'); return
     }
+    if (!inviteCode.trim()) { toast.error('请输入邀请码'); return }
+
+    // 验证邀请码
+    const { data: codeData } = await supabase.from('invite_codes')
+      .select('*').eq('code', inviteCode.trim().toUpperCase()).eq('is_active', true).single()
+    if (!codeData) { toast.error('邀请码无效'); return }
+    if (codeData.used_count >= codeData.max_uses) { toast.error('邀请码已用完'); return }
     if (checkCooldown()) return
 
     if (rulesPool.length < QUESTIONS_PER_STAGE) {
@@ -179,6 +187,8 @@ export default function RegisterPage() {
       setTimeout(async () => {
         await createAccount()
         toast.success('账户已创建！请前往邮箱点击确认链接完成注册', { duration: 8000 })
+        // 扣减邀请码
+        supabase.rpc('increment_invite_usage', { _code: inviteCode.trim().toUpperCase() }).then()
       }, 1000)
     } else {
       localStorage.setItem(COOLDOWN_KEY, String(Date.now() + COOLDOWN_MINUTES * 60000))
@@ -380,6 +390,16 @@ export default function RegisterPage() {
             <input
               type="text" value={username} onChange={(e) => setUsername(e.target.value)}
               placeholder="2-30 个字符" required minLength={2} maxLength={30}
+              className="w-full bg-hover border border-border rounded-input px-4 py-2.5 text-primary text-sm placeholder:text-muted focus:outline-none focus:border-accent transition-colors"
+            />
+          </div>
+
+          {/* 邀请码 */}
+          <div>
+            <label className="text-secondary text-sm font-medium mb-1 block">邀请码</label>
+            <input
+              type="text" value={inviteCode} onChange={(e) => setInviteCode(e.target.value)}
+              placeholder="输入邀请码" required
               className="w-full bg-hover border border-border rounded-input px-4 py-2.5 text-primary text-sm placeholder:text-muted focus:outline-none focus:border-accent transition-colors"
             />
           </div>
