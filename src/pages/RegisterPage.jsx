@@ -186,8 +186,7 @@ export default function RegisterPage() {
       toast.success(`敖尹考试通过！正在创建账户...`)
       setTimeout(async () => {
         await createAccount()
-        toast.success('账户已创建！请前往邮箱点击确认链接完成注册', { duration: 8000 })
-        // 扣减邀请码
+        toast.success('请前往邮箱点击确认链接完成注册', { duration: 8000 })
         supabase.rpc('increment_invite_usage', { _code: inviteCode.trim().toUpperCase() }).then()
       }, 1000)
     } else {
@@ -206,20 +205,13 @@ export default function RegisterPage() {
       return
     }
     if (data.user) {
-      const { error: profileError } = await supabase.from('profiles').upsert({
-        id: data.user.id,
-        username,
-        display_name: username,
-        exam_passed_at: new Date().toISOString(),
-        exam_attempts: 1,
+      // 后台异步创建 profile，不阻塞
+      supabase.from('profiles').upsert({
+        id: data.user.id, username, display_name: username,
+        exam_passed_at: new Date().toISOString(), exam_attempts: 1,
+      }).then(({ error }) => {
+        if (error) console.error('profile 创建失败（触发器中处理）:', error.message)
       })
-      if (profileError) {
-        console.error('创建 profile 失败:', profileError)
-        toast.error('创建用户资料失败，请联系管理员')
-      } else {
-        toast.success('🎉 欢迎加入 ValkoValley！')
-        navigate('/discussion')
-      }
     }
     setLoading(false)
   }
