@@ -15,6 +15,13 @@ import { ArrowLeft, Upload, X, Loader2, Video, Music, FileText } from 'lucide-re
 
 const CATEGORY_GROUPS = [
   {
+    label: '设定',
+    items: [
+      { key: 'lore_official', label: '官方设定' },
+      { key: 'lore_rumor', label: '坊间传闻' },
+    ],
+  },
+  {
     label: '图鉴',
     items: [
       { key: 'gallery_promo', label: '宣图' },

@@ -4,10 +4,14 @@ import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/context/AuthContext'
 import LibraryCard from '@/components/library/LibraryCard'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
-import { Plus, Search } from 'lucide-react'
+import { renderMarkdown } from '@/lib/markdown'
+import { Plus, Search, Edit3 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const MAIN = [
+  { key: 'lore', label: '设定', subs: [
+    { key: 'lore_official', label: '官方设定' }, { key: 'lore_rumor', label: '坊间传闻' }
+  ]},
   { key: 'gallery', label: '图鉴', subs: [
     { key: 'gallery_promo', label: '宣图' }, { key: 'gallery_card', label: '卡面' }, { key: 'gallery_text', label: '文案' }
   ]},
@@ -20,7 +24,7 @@ const MAIN = [
 ]
 
 export default function LibraryPage() {
-  const { isAdmin } = useAuth()
+  const { isAdmin, user } = useAuth()
   const [entries, setEntries] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -99,18 +103,51 @@ export default function LibraryPage() {
           groups.map((group) => (
             <div key={group.key} className="mb-10">
               <h2 id={'sec-' + group.key} className={cn('font-display text-lg mb-4 pb-2 border-b-2 text-accent border-accent scroll-mt-20')}>{group.label}</h2>
-              {group.subs.map((sub) => {
-                const items = group.items.filter((e) => e.category === sub.key)
-                if (items.length === 0) return null
-                return (
-                  <div key={sub.key} id={'sub-' + sub.key} className="mb-6">
-                    <h3 className="text-secondary text-sm font-medium mb-3">{sub.label}</h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                      {items.map((e) => <LibraryCard key={e.id} entry={e} />)}
-                  </div>
-                </div>
-              )
-            })}
+              {group.key === 'lore' ? (
+                group.subs.map((sub) => {
+                  const items = group.items.filter((e) => e.category === sub.key)
+                  if (items.length === 0) return null
+                  return (
+                    <div key={sub.key} id={'sub-' + sub.key} className="mb-8">
+                      <h3 className="text-secondary text-sm font-medium mb-3">{sub.label}</h3>
+                      {items.map((e) => (
+                        <div key={e.id} className="bg-surface rounded-card shadow-card p-6 md:p-10 mb-4">
+                          <div className="flex items-center justify-between mb-4">
+                            <h4 className="font-display text-accent text-2xl">{e.title}</h4>
+                            {user && (
+                              <Link to={`/library/${e.id}/edit`}
+                                className="flex items-center gap-1 text-muted text-xs hover:text-accent no-underline">
+                                <Edit3 size={12} /> 编辑
+                              </Link>
+                            )}
+                          </div>
+                          <div className="prose max-w-none text-secondary text-sm leading-relaxed">
+                            {e.content ? renderMarkdown(e.content) : <p className="text-muted italic">暂无内容，点击编辑补充</p>}
+                          </div>
+                          {e.author && (
+                            <p className="text-muted text-xs mt-6 pt-4 border-t border-border">
+                              最后编辑：{e.author.display_name || e.author.username} · {new Date(e.updated_at || e.created_at).toLocaleString('zh-CN')}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )
+                })
+              ) : (
+                group.subs.map((sub) => {
+                  const items = group.items.filter((e) => e.category === sub.key)
+                  if (items.length === 0) return null
+                  return (
+                    <div key={sub.key} id={'sub-' + sub.key} className="mb-6">
+                      <h3 className="text-secondary text-sm font-medium mb-3">{sub.label}</h3>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                        {items.map((e) => <LibraryCard key={e.id} entry={e} />)}
+                      </div>
+                    </div>
+                  )
+                })
+              )}
             {group.items.length === 0 && <p className="text-muted text-sm py-8 text-center">暂无内容</p>}
           </div>
         ))

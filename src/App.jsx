@@ -65,9 +65,9 @@ export default function App() {
 
         {/* 档案馆 */}
         <Route path="/library" element={<Lazy><ProtectedRoute><AppLayout><LibraryPage /></AppLayout></ProtectedRoute></Lazy>} />
-        <Route path="/library/:id" element={<Lazy><ProtectedRoute><AppLayout><LibraryDetailPage /></AppLayout></ProtectedRoute></Lazy>} />
         <Route path="/library/new" element={<Lazy><ProtectedRoute><AppLayout><LibraryEditorPage /></AppLayout></ProtectedRoute></Lazy>} />
         <Route path="/library/submit" element={<Lazy><ProtectedRoute><AppLayout><LibraryEditorPage /></AppLayout></ProtectedRoute></Lazy>} />
+        <Route path="/library/:id" element={<Lazy><ProtectedRoute><AppLayout><LibraryDetailPage /></AppLayout></ProtectedRoute></Lazy>} />
         <Route path="/library/:id/edit" element={<Lazy><ProtectedRoute><AppLayout><LibraryEditorPage /></AppLayout></ProtectedRoute></Lazy>} />
 
         {/* 个人主页 */}

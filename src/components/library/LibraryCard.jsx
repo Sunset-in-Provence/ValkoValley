@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { Eye, Image } from 'lucide-react'
 
 const catLabels = {
+  lore_official: '官方设定', lore_rumor: '坊间传闻',
   gallery_promo: '宣图', gallery_card: '卡面', gallery_text: '文案',
   video_pv: '个人PV', video_story: '卡面剧情', video_other: '其它',
   music_official: '官方', music_fan: '同人',
