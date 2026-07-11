@@ -5,9 +5,14 @@ export default function ScrollToTop() {
   const [show, setShow] = useState(false)
 
   useEffect(() => {
-    function onScroll() { setShow(window.scrollY > 300) }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    function check() {
+      // 检测页面最外层滚动
+      const y = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop
+      setShow(y > 200)
+    }
+    window.addEventListener('scroll', check, { passive: true })
+    check()
+    return () => window.removeEventListener('scroll', check)
   }, [])
 
   if (!show) return null
@@ -15,9 +20,10 @@ export default function ScrollToTop() {
   return (
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      className="fixed bottom-20 right-6 z-40 w-10 h-10 bg-surface border border-border rounded-full shadow-elevated flex items-center justify-center hover:bg-accent hover:text-text-inverse hover:border-accent transition-all"
+      className="fixed bottom-24 right-6 z-50 w-11 h-11 bg-white border border-border rounded-full shadow-lg flex items-center justify-center hover:bg-accent hover:text-white hover:border-accent transition-all"
+      title="返回顶部"
     >
-      <ArrowUp size={18} />
+      <ArrowUp size={20} />
     </button>
   )
 }
