@@ -34,10 +34,13 @@ export function AuthProvider({ children }) {
       }
     )
 
-    return () => {
-      listener?.subscription.unsubscribe()
-    }
+    return () => { listener?.subscription.unsubscribe() }
   }, [])
+
+  useEffect(() => {
+    if (user?.email) checkAdmin(user.email)
+    else setIsAdmin(false)
+  }, [user])
 
   async function fetchProfile(userId) {
     try {
@@ -61,11 +64,16 @@ export function AuthProvider({ children }) {
     }
   }
 
-  const isAdmin = (() => {
-    if (!user?.email) return false
-    const admins = (import.meta.env.VITE_ADMIN_EMAIL || '').split(',').map((e) => e.trim().toLowerCase())
-    return admins.includes(user.email.toLowerCase())
-  })()
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  async function checkAdmin(email) {
+    if (!email) return
+    // 先查 .env 再查数据库
+    const envAdmins = (import.meta.env.VITE_ADMIN_EMAIL || '').split(',').map((e) => e.trim().toLowerCase())
+    if (envAdmins.includes(email.toLowerCase())) { setIsAdmin(true); return }
+    const { data } = await supabase.from('admin_emails').select('id').eq('email', email.toLowerCase()).maybeSingle()
+    setIsAdmin(!!data)
+  }
 
   const value = {
     user,
