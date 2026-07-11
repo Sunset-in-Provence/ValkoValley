@@ -98,6 +98,12 @@ export default function Navbar() {
           ValkoValley
         </Link>
 
+        {/* 桌面端快捷链接 */}
+        <div className="hidden lg:flex items-center gap-1">
+          <Link to="/announcements" className="text-secondary hover:text-accent px-2 py-1.5 rounded-button text-sm transition-colors no-underline">公告</Link>
+          <Link to="/help" className="text-secondary hover:text-accent px-2 py-1.5 rounded-button text-sm transition-colors no-underline">帮助中心</Link>
+        </div>
+
         {/* 汉堡菜单 — 仅移动端 */}
         <div className="lg:hidden relative">
           <button onClick={() => setMobileMenu(!mobileMenu)}
