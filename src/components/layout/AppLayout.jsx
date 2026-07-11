@@ -8,11 +8,13 @@ import Navbar from './Navbar'
 import Sidebar from './Sidebar'
 import Footer from './Footer'
 import AnnouncementModal from '@/components/shared/AnnouncementModal'
+import ScrollToTop from '@/components/shared/ScrollToTop'
 
 export default function AppLayout({ children }) {
   return (
     <div className="min-h-screen bg-primary flex flex-col">
       <AnnouncementModal />
+      <ScrollToTop />
       <Navbar />
       <div className="flex flex-1 max-w-7xl mx-auto w-full gap-4 lg:gap-6 px-3 sm:px-4 py-4 sm:py-6">
         <Sidebar />
