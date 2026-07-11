@@ -35,17 +35,27 @@ export default function SitePassGate({ children }) {
 
   useEffect(() => {
     async function check() {
-      // 老用户 — 直接进站，跳过密码门
+      // 老用户：Supabase本地有session → 直接放行
       const { data: { session } } = await supabase.auth.getSession()
       if (session?.user) {
         setAuthorized(true)
         setPassed(true)
         return
       }
-      // 检查设备是否被邀请链接授权过
+      // 或者 localStorage 有设备授权记录
+      if (localStorage.getItem('vv-authorized') === '1') {
+        setAuthorized(true)
+        return
+      }
+      // 新设备：检查是否被邀请链接授权过
       const deviceId = getDeviceId()
       const { data } = await supabase.from('authorized_devices').select('id').eq('device_id', deviceId).maybeSingle()
-      setAuthorized(!!data)
+      if (data) {
+        localStorage.setItem('vv-authorized', '1')
+        setAuthorized(true)
+      } else {
+        setAuthorized(false)
+      }
     }
     check()
   }, [])
