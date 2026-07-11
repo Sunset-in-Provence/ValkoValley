@@ -35,10 +35,11 @@ export default function SitePassGate({ children }) {
 
   useEffect(() => {
     async function check() {
-      // 检查是否有已登录的 session（老用户直接放行）
+      // 老用户 — 直接进站，跳过密码门
       const { data: { session } } = await supabase.auth.getSession()
       if (session?.user) {
         setAuthorized(true)
+        setPassed(true)
         return
       }
       // 检查设备是否被邀请链接授权过
