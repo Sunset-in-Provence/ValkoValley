@@ -148,7 +148,7 @@ export default function CreationPage() {
         </div>
 
         {/* 侧边：标签云 */}
-        <aside className="hidden lg:block">
+        <aside>
           <div className="bg-surface rounded-card shadow-card p-4 sticky top-20">
             <h3 className="text-secondary text-sm font-medium mb-3">🏷️ 热门标签</h3>
             {popularTags.length === 0 ? (

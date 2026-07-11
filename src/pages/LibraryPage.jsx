@@ -83,7 +83,7 @@ export default function LibraryPage() {
       </div>
 
       <div className="flex gap-6">
-        <div className="w-44 shrink-0 hidden lg:block">
+        <div className="w-40 sm:w-44 shrink-0">
           <div className="bg-surface rounded-card shadow-card p-3 sticky top-20">
             <nav className="flex flex-col gap-1">
               {MAIN.map((m) => (
