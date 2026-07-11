@@ -87,6 +87,7 @@ export default function Navbar() {
     { to: '/discussion', label: '讨论区' },
     { to: '/creation', label: '创作区' },
     { to: '/library', label: '档案馆' },
+    { to: '/help', label: '帮助中心' },
   ]
 
   return (

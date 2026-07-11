@@ -30,6 +30,7 @@ const AdminPage = lazy(() => import('@/pages/AdminPage'))
 const AdminThemePage = lazy(() => import('@/pages/AdminThemePage'))
 const AdminExamPage = lazy(() => import('@/pages/AdminExamPage'))
 const AdminAnnouncePage = lazy(() => import('@/pages/AdminAnnouncePage'))
+const HelpCenterPage = lazy(() => import('@/pages/HelpCenterPage'))
 const AdminInvitesPage = lazy(() => import('@/pages/AdminInvitesPage'))
 
 function Lazy({ children }) {
@@ -77,6 +78,7 @@ export default function App() {
         <Route path="/library/submit" element={<Lazy><ProtectedRoute><AppLayout><LibraryEditorPage /></AppLayout></ProtectedRoute></Lazy>} />
         <Route path="/library/:id" element={<Lazy><ProtectedRoute><AppLayout><LibraryDetailPage /></AppLayout></ProtectedRoute></Lazy>} />
         <Route path="/library/:id/edit" element={<Lazy><ProtectedRoute><AppLayout><LibraryEditorPage /></AppLayout></ProtectedRoute></Lazy>} />
+        <Route path="/help" element={<Lazy><ProtectedRoute><AppLayout><HelpCenterPage /></AppLayout></ProtectedRoute></Lazy>} />
 
         {/* 个人主页 */}
         <Route path="/user/:username" element={<Lazy><ProtectedRoute><AppLayout><UserProfilePage /></AppLayout></ProtectedRoute></Lazy>} />
