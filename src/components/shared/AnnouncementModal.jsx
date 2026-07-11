@@ -35,13 +35,10 @@ export default function AnnouncementModal() {
     load()
   }, [user])
 
-  function handleScroll() {
-    const el = contentRef.current
-    if (!el) return
-    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 20) {
-      setScrolledBottom(true)
-    }
-  }
+  useEffect(() => {
+    const timer = setTimeout(() => setScrolledBottom(true), 5000)
+    return () => clearTimeout(timer)
+  }, [announcements])
 
   async function handleConfirm() {
     if (!scrolledBottom) return
@@ -76,8 +73,7 @@ export default function AnnouncementModal() {
           <span className="text-muted text-xs">{current + 1}/{announcements.length}</span>
         </div>
 
-        <div ref={contentRef} onScroll={handleScroll}
-          className="flex-1 overflow-y-auto p-4 prose max-w-none text-secondary text-sm">
+        <div className="flex-1 overflow-y-auto p-4 prose max-w-none text-secondary text-sm">
           <h1 className="text-accent">{ann.title}</h1>
           {renderMarkdown(ann.content)}
           <p className="text-muted text-xs mt-4">
@@ -85,7 +81,7 @@ export default function AnnouncementModal() {
           </p>
           {!scrolledBottom && (
             <div className="text-center py-4 text-muted text-xs animate-pulse">
-              请继续向下滚动阅读完整内容
+              请在 5 秒阅读时间结束后确认
             </div>
           )}
         </div>
@@ -93,7 +89,7 @@ export default function AnnouncementModal() {
         <div className="p-4 border-t border-border shrink-0">
           <button onClick={handleConfirm} disabled={!scrolledBottom}
             className="w-full bg-accent text-text-inverse py-2.5 rounded-button font-medium text-sm hover:opacity-90 disabled:opacity-30 transition-all">
-            {scrolledBottom ? '我已阅读并确认公告内容' : '请先滚动阅读完整公告'}
+            {scrolledBottom ? '我已阅读并确认' : '请等待 5 秒'}
           </button>
         </div>
       </div>
