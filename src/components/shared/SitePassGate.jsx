@@ -41,9 +41,10 @@ export default function SitePassGate({ children }) {
         setPassed(true)
         return
       }
-      // 老用户：Supabase本地有session → 直接放行
+      // 老用户：检查本地是否有登录过的痕迹
       const { data: { session } } = await supabase.auth.getSession()
-      if (session?.user) {
+      const hasLocalAuth = localStorage.getItem('sb-' + 'vajcfjmhxphxsxshqtac' + '-auth-token')
+      if (session?.user || hasLocalAuth) {
         setAuthorized(true)
         setPassed(true)
         return
