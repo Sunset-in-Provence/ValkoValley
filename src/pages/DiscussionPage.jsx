@@ -72,34 +72,33 @@ export default function DiscussionPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="font-display text-accent text-2xl">📝 讨论区</h1>
-        <Link to="/discussion/new"
-          className="flex items-center gap-1.5 bg-accent text-text-inverse px-4 py-2 rounded-button text-sm no-underline hover:opacity-90">
-          <Plus size={16} /> 发帖
-        </Link>
-      </div>
-
-      {/* 排序 */}
-      <div className="flex items-center gap-2 mb-4">
-        <button onClick={handleTimeClick}
-          className={cn('flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-colors',
-            sort === 'time' ? 'bg-accent text-text-inverse' : 'bg-surface text-secondary border border-border hover:bg-hover')}>
-          <Clock size={12} /> 按时间排序
-          {sort === 'time' && (timeOrder === 'desc' ? <ArrowDown size={10} /> : <ArrowUp size={10} />)}
-        </button>
-        <button onClick={() => setSort('hot')}
-          className={cn('flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-colors',
-            sort === 'hot' ? 'bg-accent text-text-inverse' : 'bg-surface text-secondary border border-border hover:bg-hover')}>
-          <Flame size={12} /> 按热度排序
-        </button>
-      </div>
-
-      {/* 搜索 */}
-      <div className="relative mb-4">
-        <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
-          placeholder="搜索帖子标题…"
-          className="w-full bg-surface border border-border rounded-input pl-4 pr-4 py-2 text-primary text-sm placeholder:text-muted focus:outline-none focus:border-accent" />
+      <div className="sticky top-14 z-20 bg-primary pb-3 -mx-3 px-3">
+        <div className="flex items-center justify-between mb-3">
+          <h1 className="font-display text-accent text-2xl">讨论区</h1>
+          <Link to="/discussion/new"
+            className="flex items-center gap-1.5 bg-accent text-text-inverse px-4 py-2 rounded-button text-sm no-underline hover:opacity-90 whitespace-nowrap">
+            <Plus size={16} /> 发帖
+          </Link>
+        </div>
+        <div className="flex items-center gap-2 mb-3">
+          <button onClick={handleTimeClick}
+            className={cn('flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-colors',
+              sort === 'time' ? 'bg-accent text-text-inverse' : 'bg-surface text-secondary border border-border hover:bg-hover')}>
+            <Clock size={12} /> 按时间排序
+            {sort === 'time' && (timeOrder === 'desc' ? <ArrowDown size={10} /> : <ArrowUp size={10} />)}
+          </button>
+          <button onClick={() => setSort('hot')}
+            className={cn('flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-colors',
+              sort === 'hot' ? 'bg-accent text-text-inverse' : 'bg-surface text-secondary border border-border hover:bg-hover')}>
+            <Flame size={12} /> 按热度排序
+          </button>
+        </div>
+        {/* 搜索 */}
+        <div className="relative">
+          <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
+            placeholder="搜索帖子标题…"
+            className="w-full bg-surface border border-border rounded-input pl-4 pr-4 py-2 text-primary text-sm placeholder:text-muted focus:outline-none focus:border-accent" />
+        </div>
       </div>
 
       {loading ? (

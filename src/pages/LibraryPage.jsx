@@ -74,7 +74,8 @@ export default function LibraryPage() {
         </div>
       </div>
 
-      <div className="mb-6">
+      {/* 搜索栏 — 固定 */}
+      <div className="sticky top-14 z-20 bg-primary pb-3 -mx-3 px-3">
         <div className="relative max-w-md">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
           <input type="text" placeholder="搜索设定..." value={search} onChange={(e) => setSearch(e.target.value)}
@@ -84,7 +85,7 @@ export default function LibraryPage() {
 
       <div className="flex gap-6">
         <div className="w-40 sm:w-44 shrink-0">
-          <div className="bg-surface rounded-card shadow-card p-3 sticky top-20">
+          <div className="bg-surface rounded-card shadow-card p-3 sticky top-[5.5rem]">
             <nav className="flex flex-col gap-1">
               {MAIN.map((m) => (
                 <div key={m.key}>
