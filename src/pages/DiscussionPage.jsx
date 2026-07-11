@@ -71,8 +71,8 @@ export default function DiscussionPage() {
   )
 
   return (
-    <div>
-      <div className="sticky top-14 z-30 bg-primary/95 backdrop-blur-sm pb-3">
+    <div className="flex flex-col" style={{ height: 'calc(100vh - 3.5rem)' }}>
+      <div className="shrink-0">
         <div className="flex items-center justify-between mb-3">
           <h1 className="font-display text-accent text-2xl">讨论区</h1>
           <Link to="/discussion/new"
@@ -101,6 +101,8 @@ export default function DiscussionPage() {
         </div>
       </div>
 
+      </div>
+      <div className="flex-1 overflow-y-auto min-w-0">
       {loading ? (
         <div className="flex justify-center py-16"><LoadingSpinner size="lg" /></div>
       ) : filtered.length === 0 ? (
@@ -112,6 +114,7 @@ export default function DiscussionPage() {
           {filtered.map((post) => <PostCard key={post.id} post={post} />)}
         </div>
       )}
+      </div>
     </div>
   )
 }
