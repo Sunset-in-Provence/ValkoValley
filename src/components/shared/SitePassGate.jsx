@@ -1,23 +1,20 @@
 /**
- * 网站访问密码门 — 每周自动轮换密码
- * 密码规则：VV + (周数*质数)转36进制 + LY
+ * 网站访问密码门 — 每周自动轮换密码 + 设备授权检查
  */
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Lock } from 'lucide-react'
+import { supabase } from '@/lib/supabaseClient'
+import { getDeviceId } from '@/lib/fingerprint'
+import UninvitedPage from '@/pages/UninvitedPage'
 
 const STORAGE_KEY = 'valkovalley-gate-pass'
 
 function hashWeek(seed, week, year) {
   let h = seed
-  for (let i = 0; i < 20; i++) {
-    h = ((h * 1103515245 + (week + year) * 12345) >>> 0) % 2147483647
-  }
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'  // 去掉易混淆字符
+  for (let i = 0; i < 20; i++) h = ((h * 1103515245 + (week + year) * 12345) >>> 0) % 2147483647
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
   let result = ''
-  for (let i = 0; i < 8; i++) {
-    h = ((h * 1103515245 + 12345) >>> 0) % 2147483647
-    result += chars[h % chars.length]
-  }
+  for (let i = 0; i < 8; i++) { h = ((h * 1103515245 + 12345) >>> 0) % 2147483647; result += chars[h % chars.length] }
   return result
 }
 
@@ -29,11 +26,24 @@ function getWeeklyPassword() {
 }
 
 export default function SitePassGate({ children }) {
+  const [authorized, setAuthorized] = useState(null) // null=loading
   const [passed, setPassed] = useState(() => {
     return sessionStorage.getItem(STORAGE_KEY) === getWeeklyPassword()
   })
   const [input, setInput] = useState('')
   const [error, setError] = useState(false)
+
+  useEffect(() => {
+    async function check() {
+      const deviceId = getDeviceId()
+      const { data } = await supabase.from('authorized_devices').select('id').eq('device_id', deviceId).maybeSingle()
+      setAuthorized(!!data)
+    }
+    check()
+  }, [])
+
+  if (authorized === null) return null
+  if (!authorized) return <UninvitedPage />
 
   const currentPassword = getWeeklyPassword()
 
