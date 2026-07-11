@@ -88,22 +88,22 @@ export default function Navbar() {
           ValkoValley
         </Link>
 
-        {/* 导航链接 */}
-        <div className="flex items-center gap-1">
+        {/* 导航链接 — 小屏隐藏 */}
+        <div className="hidden md:flex items-center gap-1">
           <Link to="/announcements"
-            className="text-secondary hover:text-accent px-3 py-1.5 rounded-button text-sm transition-colors no-underline">
+            className="text-secondary hover:text-accent px-2 py-1.5 rounded-button text-xs lg:text-sm transition-colors no-underline">
             公告
           </Link>
           <Link to="/discussion"
-            className="text-secondary hover:text-accent px-3 py-1.5 rounded-button text-sm transition-colors no-underline">
+            className="text-secondary hover:text-accent px-2 py-1.5 rounded-button text-xs lg:text-sm transition-colors no-underline">
             讨论区
           </Link>
           <Link to="/creation"
-            className="text-secondary hover:text-accent px-3 py-1.5 rounded-button text-sm transition-colors no-underline">
+            className="text-secondary hover:text-accent px-2 py-1.5 rounded-button text-xs lg:text-sm transition-colors no-underline">
             创作区
           </Link>
           <Link to="/library"
-            className="text-secondary hover:text-accent px-3 py-1.5 rounded-button text-sm transition-colors no-underline">
+            className="text-secondary hover:text-accent px-2 py-1.5 rounded-button text-xs lg:text-sm transition-colors no-underline">
             档案馆
           </Link>
         </div>

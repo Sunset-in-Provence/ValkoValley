@@ -91,6 +91,11 @@
  *   body { background-image: url('/texture/paper.png'); }
  */
 
+html {
+  overflow-x: hidden;
+  width: 100%;
+}
+
 body {
   margin: 0;
   font-family: var(--font-body);
@@ -98,6 +103,9 @@ body {
   color: light-dark(#1F2937, #E8F5ED);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
 }
 
 /* === 深色模式 color-scheme 绑定 === */

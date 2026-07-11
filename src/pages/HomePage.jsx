@@ -34,16 +34,16 @@ export default function HomePage() {
       <GuestbookBanner />
       <GuestbookCard />
       {/* Hero 区域 */}
-      <section className="max-w-4xl mx-auto px-4 pt-24 pb-16 text-center relative z-10">
-        <h1 className="font-display text-7xl mb-4"
+      <section className="max-w-4xl mx-auto px-4 pt-16 sm:pt-24 pb-12 sm:pb-16 text-center relative z-10">
+        <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl mb-4"
           style={{ color: '#2D5A3A', textShadow: '0 4px 8px rgba(46,139,87,0.35), 0 2px 4px rgba(34,139,34,0.25)' }}>
           ValkoValley
         </h1>
-        <p className="font-display text-3xl mb-2"
+        <p className="font-display text-xl sm:text-2xl lg:text-3xl mb-2"
           style={{ color: '#2D5A3A', textShadow: '0 3px 6px rgba(46,139,87,0.35), 0 2px 3px rgba(34,139,34,0.25)' }}>
           狼和铃兰的幸福归来
         </p>
-        <p className="text-muted text-xl mb-8 max-w-xl mx-auto"
+        <p className="text-muted text-base sm:text-lg lg:text-xl mb-6 sm:mb-8 max-w-xl mx-auto"
           style={{ textShadow: '0 2px 4px rgba(46,139,87,0.4), 0 1px 2px rgba(34,139,34,0.3)' }}>
           「敖尹×你」的专属社区
         </p>
@@ -75,8 +75,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 特色介绍区域（管理员可编辑） */}
-      <section className="max-w-4xl mx-auto px-4 pb-16 relative z-10">
+      {/* 特色介绍区域 */}
+      <section className="max-w-4xl mx-auto px-4 pb-12 sm:pb-16 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-surface rounded-card shadow-card p-6">
             <h3 className="font-display text-accent text-lg mb-2">📝 讨论区</h3>

@@ -11,12 +11,12 @@ import AnnouncementModal from '@/components/shared/AnnouncementModal'
 
 export default function AppLayout({ children }) {
   return (
-    <div className="min-h-screen bg-primary flex flex-col">
+    <div className="min-h-screen bg-primary flex flex-col overflow-x-hidden">
       <AnnouncementModal />
       <Navbar />
-      <div className="flex flex-1 max-w-7xl mx-auto w-full gap-6 px-4 py-6">
+      <div className="flex flex-1 max-w-7xl mx-auto w-full gap-4 lg:gap-6 px-3 sm:px-4 py-4 sm:py-6">
         <Sidebar />
-        <main className="flex-1 min-w-0">{children}</main>
+        <main className="flex-1 min-w-0 max-w-full">{children}</main>
       </div>
       <Footer />
     </div>

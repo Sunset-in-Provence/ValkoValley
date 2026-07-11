@@ -68,7 +68,7 @@ export default function AnnouncementModal() {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60" />
-      <div className="relative bg-surface rounded-card shadow-elevated w-full max-w-lg max-h-[80vh] flex flex-col">
+      <div className="relative bg-surface rounded-card shadow-elevated w-full max-w-lg max-h-[85vh] flex flex-col mx-2">
         <div className="flex items-center justify-between p-4 border-b border-border shrink-0">
           <h2 className="flex items-center gap-2 text-accent font-display text-lg">
             <AlertTriangle size={20} /> {catLabels[ann.category] || '公告'}
