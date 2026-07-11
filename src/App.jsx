@@ -32,6 +32,8 @@ const AdminExamPage = lazy(() => import('@/pages/AdminExamPage'))
 const AdminAnnouncePage = lazy(() => import('@/pages/AdminAnnouncePage'))
 const HelpCenterPage = lazy(() => import('@/pages/HelpCenterPage'))
 const AdminInvitesPage = lazy(() => import('@/pages/AdminInvitesPage'))
+const AdminContactsPage = lazy(() => import('@/pages/AdminContactsPage'))
+const ContactPage = lazy(() => import('@/pages/ContactPage'))
 
 function Lazy({ children }) {
   return <Suspense fallback={<div className="flex justify-center py-24"><LoadingSpinner size="lg" /></div>}>{children}</Suspense>
@@ -79,6 +81,7 @@ export default function App() {
         <Route path="/library/:id" element={<Lazy><ProtectedRoute><AppLayout><LibraryDetailPage /></AppLayout></ProtectedRoute></Lazy>} />
         <Route path="/library/:id/edit" element={<Lazy><ProtectedRoute><AppLayout><LibraryEditorPage /></AppLayout></ProtectedRoute></Lazy>} />
         <Route path="/help" element={<Lazy><ProtectedRoute><AppLayout><HelpCenterPage /></AppLayout></ProtectedRoute></Lazy>} />
+        <Route path="/contact" element={<Lazy><ProtectedRoute><AppLayout><ContactPage /></AppLayout></ProtectedRoute></Lazy>} />
 
         {/* 个人主页 */}
         <Route path="/user/:username" element={<Lazy><ProtectedRoute><AppLayout><UserProfilePage /></AppLayout></ProtectedRoute></Lazy>} />
@@ -89,6 +92,7 @@ export default function App() {
         <Route path="/admin/exam" element={<Lazy><ProtectedRoute adminOnly><AdminExamPage /></ProtectedRoute></Lazy>} />
         <Route path="/admin/announcements" element={<Lazy><ProtectedRoute adminOnly><AdminAnnouncePage /></ProtectedRoute></Lazy>} />
         <Route path="/admin/invites" element={<Lazy><ProtectedRoute adminOnly><AdminInvitesPage /></ProtectedRoute></Lazy>} />
+        <Route path="/admin/contacts" element={<Lazy><ProtectedRoute adminOnly><AdminContactsPage /></ProtectedRoute></Lazy>} />
 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

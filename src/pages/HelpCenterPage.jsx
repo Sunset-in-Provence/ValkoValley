@@ -30,7 +30,8 @@ const SECTIONS = [
   },
   {
     icon: HelpCircle, title: '其他问题',
-    content: '如有其他疑问，请联系管理员或在讨论区发帖求助。',
+    content: '如有其他疑问，请联系管理员或在讨论区发帖求助。你也可以前往「联系我们」页面查看所有管理员的联系信息。',
+    link: { to: '/contact', label: '查看管理员名单' },
   },
 ]
 

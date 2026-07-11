@@ -150,6 +150,7 @@ export default function Navbar() {
                         <div className="px-4 py-2 space-y-1">
                           <Link to="/admin/invites" className="text-accent text-xs hover:underline block">邀请码管理</Link>
                           <Link to="/admin/announcements" className="text-accent text-xs hover:underline block">公告管理</Link>
+                          <Link to="/admin/contacts" className="text-accent text-xs hover:underline block">管理员名单</Link>
                           <Link to="/admin" className="text-accent text-xs hover:underline block">管理后台</Link>
                         </div>
                         {/* 举报 */}
