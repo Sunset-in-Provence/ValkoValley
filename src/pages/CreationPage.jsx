@@ -53,7 +53,7 @@ export default function CreationPage() {
 
   return (
     <div>
-      <div className="sticky top-14 z-20 bg-primary pb-3 -mx-3 px-3">
+      <div className="sticky top-14 z-30 bg-primary/95 backdrop-blur-sm pb-3">
         <div className="flex items-center justify-between mb-3">
           <h1 className="font-display text-accent text-2xl">创作区</h1>
           <Link to="/creation/new" className="flex items-center gap-1.5 bg-accent text-text-inverse px-4 py-2 rounded-button text-sm no-underline hover:opacity-90 whitespace-nowrap"><Plus size={16} /> 发布创作</Link>

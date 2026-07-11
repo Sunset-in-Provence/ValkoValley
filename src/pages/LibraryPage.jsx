@@ -74,8 +74,8 @@ export default function LibraryPage() {
         </div>
       </div>
 
-      {/* 搜索栏 — 固定 */}
-      <div className="sticky top-14 z-20 bg-primary pb-3 -mx-3 px-3">
+      {/* 搜索栏 — 浮动吸顶 */}
+      <div className="sticky top-14 z-30 bg-primary/95 backdrop-blur-sm pb-3">
         <div className="relative max-w-md">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
           <input type="text" placeholder="搜索设定..." value={search} onChange={(e) => setSearch(e.target.value)}

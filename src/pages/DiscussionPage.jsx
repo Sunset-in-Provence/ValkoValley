@@ -72,7 +72,7 @@ export default function DiscussionPage() {
 
   return (
     <div>
-      <div className="sticky top-14 z-20 bg-primary pb-3 -mx-3 px-3">
+      <div className="sticky top-14 z-30 bg-primary/95 backdrop-blur-sm pb-3">
         <div className="flex items-center justify-between mb-3">
           <h1 className="font-display text-accent text-2xl">讨论区</h1>
           <Link to="/discussion/new"
