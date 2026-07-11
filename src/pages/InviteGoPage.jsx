@@ -28,8 +28,8 @@ export default function InviteGoPage() {
       const deviceId = getDeviceId()
       await supabase.from('authorized_devices').upsert({ device_id: deviceId, invite_token: token }, { onConflict: 'device_id' })
 
-      // 扣减使用次数
-      await supabase.from('invite_links').update({ used_count: link.used_count + 1 }).eq('id', link.id)
+      // 扣减使用次数（RPC绕过RLS）
+      await supabase.rpc('use_invite_link', { _token: token })
 
       setStatus('success')
       setTimeout(() => navigate('/'), 1500)

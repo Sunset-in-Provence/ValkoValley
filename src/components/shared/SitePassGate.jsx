@@ -35,6 +35,12 @@ export default function SitePassGate({ children }) {
 
   useEffect(() => {
     async function check() {
+      // 本地开发环境直接放行
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        setAuthorized(true)
+        setPassed(true)
+        return
+      }
       // 老用户：Supabase本地有session → 直接放行
       const { data: { session } } = await supabase.auth.getSession()
       if (session?.user) {
