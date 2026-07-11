@@ -10,7 +10,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import { useTheme } from '@/context/ThemeContext'
 import { supabase } from '@/lib/supabaseClient'
-import { Sun, Moon, LogOut, User, Shield, X, MessageSquare, Check, AlertTriangle, Ban, Plus, Trash2, BookOpen } from 'lucide-react'
+import { Sun, Moon, LogOut, User, Shield, X, MessageSquare, Check, AlertTriangle, Ban, Plus, Trash2, BookOpen, Menu } from 'lucide-react'
 import NotificationBell from '@/components/notification/NotificationBell'
 import { clearBannedWordsCache } from '@/lib/bannedWords'
 import { cn } from '@/lib/utils'
@@ -78,7 +78,16 @@ export default function Navbar() {
     navigate('/')
   }
 
+  const [mobileMenu, setMobileMenu] = useState(false)
+
   const totalPending = pendingMsgs.length + pendingReportCount
+
+  const navItems = [
+    { to: '/announcements', label: '公告' },
+    { to: '/discussion', label: '讨论区' },
+    { to: '/creation', label: '创作区' },
+    { to: '/library', label: '档案馆' },
+  ]
 
   return (
     <nav className="bg-surface border-b border-border shadow-elevated sticky top-0 z-50">
@@ -106,6 +115,27 @@ export default function Navbar() {
             className="text-secondary hover:text-accent px-2 py-1.5 rounded-button text-xs lg:text-sm transition-colors no-underline">
             档案馆
           </Link>
+        </div>
+
+        {/* 移动端汉堡菜单 */}
+        <div className="md:hidden relative">
+          <button onClick={() => setMobileMenu(!mobileMenu)}
+            className="p-2 rounded-button text-secondary hover:bg-hover transition-colors">
+            {mobileMenu ? <X size={18} /> : <Menu size={18} />}
+          </button>
+          {mobileMenu && (
+            <>
+              <div className="fixed inset-0 z-30" onClick={() => setMobileMenu(false)} />
+              <div className="absolute right-0 top-full mt-1 w-40 bg-surface rounded-card shadow-elevated border border-border z-40 py-1">
+                {navItems.map((item) => (
+                  <Link key={item.to} to={item.to} onClick={() => setMobileMenu(false)}
+                    className="block px-4 py-2.5 text-secondary text-sm no-underline hover:bg-hover hover:text-accent transition-colors">
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            </>
+          )}
         </div>
 
         {/* 右侧操作区 */}
