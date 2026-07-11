@@ -69,8 +69,8 @@ export default function LibraryPage() {
         <div><h1 className="font-display text-accent text-2xl">档案馆</h1>
           <p className="text-muted text-sm mt-1">敖尹官方设定资料存档 · 社区共建</p></div>
         <div className="flex gap-2">
-          {isAdmin && <Link to="/library/new" className="flex items-center gap-1.5 bg-accent text-text-inverse px-4 py-2 rounded-button text-sm no-underline hover:opacity-90"><Plus size={16} /> 添加条目</Link>}
-          <Link to="/library/submit" className="flex items-center gap-1.5 border border-border text-secondary px-4 py-2 rounded-button text-sm no-underline hover:bg-hover"><Plus size={16} /> 投稿</Link>
+          {isAdmin && <Link to="/library/new" className="flex items-center gap-1 bg-accent text-text-inverse px-2 sm:px-4 py-1.5 sm:py-2 rounded-button text-xs sm:text-sm no-underline hover:opacity-90 whitespace-nowrap"><Plus size={14} /> 添加条目</Link>}
+          <Link to="/library/submit" className="flex items-center gap-1 border border-border text-secondary px-2 sm:px-4 py-1.5 sm:py-2 rounded-button text-xs sm:text-sm no-underline hover:bg-hover whitespace-nowrap"><Plus size={14} /> 投稿</Link>
         </div>
       </div>
 

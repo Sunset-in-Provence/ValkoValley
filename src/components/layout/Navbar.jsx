@@ -269,16 +269,16 @@ export default function Navbar() {
 
               {/* 用户菜单 */}
               <Link to={`/user/${profile?.username || user.email}`}
-                className="flex items-center gap-2 px-2 py-1 rounded-button hover:bg-hover transition-colors no-underline">
-                <span className="text-secondary text-sm">
+                className="flex items-center gap-1.5 px-1.5 sm:px-2 py-1 rounded-button hover:bg-hover transition-colors no-underline max-w-[80px] sm:max-w-[160px]">
+                <span className="text-secondary text-xs sm:text-sm truncate">
                   {profile?.display_name || profile?.username || user.email}
                 </span>
               </Link>
 
               {/* 登出 */}
               <button onClick={handleLogout}
-                className="p-2 rounded-button text-muted hover:text-danger hover:bg-hover transition-colors" title="登出">
-                <LogOut size={18} />
+                className="p-1.5 sm:p-2 rounded-button text-muted hover:text-danger hover:bg-hover transition-colors shrink-0" title="登出">
+                <LogOut size={16} />
               </button>
             </>
           ) : (
