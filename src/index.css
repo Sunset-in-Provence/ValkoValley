@@ -42,7 +42,7 @@
   /* 主文字色 */
   --color-text-secondary: light-dark(#4B7A5E, #A8D8BA);
   /* 次级文字色 */
-  --color-text-muted: light-dark(#7FA890, #6B9A7E);
+  --color-text-muted: light-dark(#5A7A65, #8BBA9C);
   /* 弱化文字（时间戳、提示） */
   --color-text-accent: light-dark(#4EA06A, #86D0A5);
   /* 强调文字（链接、高亮） */
