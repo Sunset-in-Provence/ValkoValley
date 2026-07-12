@@ -200,18 +200,7 @@ export default function AdminPage() {
             <EmptyState icon={Shield} title="暂无举报"
               description={filter === 'pending' ? '没有待处理的举报，社区状态良好' : ''} />
           ) : (
-            <div className="space-y-3">
-              {reports.map((report) => (
-                <div key={report.id}>
-                  {report.duplicate_count > 1 && (
-                    <div className="text-warning text-xs mb-1 px-2">
-                      ⚠️ 同一内容被举报 {report.duplicate_count} 次
-                    </div>
-                  )}
-                  <ReportCard report={report} onAction={fetchReports} />
-                </div>
-              ))}
-            </div>
+            <GroupedReports reports={reports} onAction={fetchReports} />
           )}
         </>
       )}
@@ -376,6 +365,42 @@ function ExamAttemptsTab() {
         </div>
       )}
     </>
+  )
+}
+
+function GroupedReports({ reports, onAction }) {
+  const [openGroups, setOpenGroups] = useState({})
+
+  const groups = {}
+  reports.forEach((r) => {
+    const key = `${r.target_type}:${r.target_id}`
+    if (!groups[key]) groups[key] = []
+    groups[key].push(r)
+  })
+
+  const toggleGroup = (key) => setOpenGroups((prev) => ({ ...prev, [key]: !prev[key] }))
+
+  return (
+    <div className="space-y-3">
+      {Object.entries(groups).map(([key, group]) => {
+        const main = group[0]
+        const rest = group.slice(1)
+        const open = openGroups[key]
+        return (
+          <div key={key}>
+            {group.length > 1 && (
+              <div className="text-warning text-xs mb-1 px-2 cursor-pointer hover:underline" onClick={() => toggleGroup(key)}>
+                {open ? '收起' : `展开`} — 同一内容被举报 {group.length} 次
+              </div>
+            )}
+            <ReportCard report={main} onAction={onAction} />
+            {open && rest.map((r) => (
+              <ReportCard key={r.id} report={r} onAction={onAction} />
+            ))}
+          </div>
+        )
+      })}
+    </div>
   )
 }
 
