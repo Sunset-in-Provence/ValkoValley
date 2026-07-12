@@ -115,10 +115,9 @@ export default function GuestbookBanner() {
       {danmaku.map((d) => (
         <div
           key={d.id}
-          className="absolute whitespace-nowrap select-none"
+          className="absolute whitespace-nowrap select-none danmaku-text"
           style={{
             fontSize: `${d.size}px`,
-            color: '#2D5A3A',
             top: `${d.top}%`,
             transform: `translateX(${d.startX}vw)`,
             animation: `danmaku-scroll ${d.duration}s linear ${d.delay}s both`,

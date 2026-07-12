@@ -97,5 +97,9 @@ input::placeholder, textarea::placeholder { opacity: 1; }
 .prose { max-width: none; }
 .prose img { border-radius: var(--radius-card); }
 
+/* === 弹幕墙颜色 === */
+.danmaku-text { color: #2D5A3A; }
+.dark .danmaku-text { color: #cfe8d5; }
+
 /* === 弹幕墙动画 === */
 @keyframes danmaku-scroll { to { transform: translateX(-100%); } }
