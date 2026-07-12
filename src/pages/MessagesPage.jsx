@@ -53,9 +53,8 @@ export default function MessagesPage() {
       list.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0) || new Date(b.lastTime) - new Date(a.lastTime))
       setContacts(list)
 
-      // 进入页面就标记已读
-      await supabase.from('messages').update({ is_read: true }).eq('receiver_id', user.id).eq('is_read', false)
-      window.dispatchEvent(new Event('msg-unread-change'))
+      // 不在此处标记已读，保留红点
+
 
       if (targetUser) setActiveChat(targetUser)
       setLoading(false)
@@ -72,7 +71,11 @@ export default function MessagesPage() {
         .or(`and(sender_id.eq.${user.id},receiver_id.eq.${activeChat}),and(sender_id.eq.${activeChat},receiver_id.eq.${user.id})`)
         .order('created_at', { ascending: true })
       setMessages(data || [])
-      supabase.from('messages').update({ is_read: true }).eq('receiver_id', user.id).eq('sender_id', activeChat).eq('is_read', false).then()
+      const { error } = await supabase.from('messages').update({ is_read: true }).eq('receiver_id', user.id).eq('sender_id', activeChat).eq('is_read', false)
+      if (!error) {
+        setContacts((prev) => prev.map((c) => c.otherId === activeChat ? { ...c, unread: 0 } : c))
+        window.dispatchEvent(new Event('msg-unread-change'))
+      }
     }
     load()
     const t = setInterval(load, 3000)
