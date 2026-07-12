@@ -61,7 +61,7 @@ export default function CreationPage() {
         <div className="flex flex-wrap gap-2 mb-2">
           <div className="relative flex-1 min-w-[140px]">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-            <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="搜索创作..." className="w-full bg-hover border border-border rounded-input pl-8 pr-3 py-2 text-primary text-sm focus:outline-none focus:border-accent" />
+            <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="搜索创作..." className="w-full bg-surface border border-border rounded-input pl-8 pr-3 py-2 text-primary text-sm focus:outline-none focus:border-accent" />
           </div>
           {CONTENT_FILTERS.map((f) => (
             <button key={f.key} onClick={() => setContentFilter(f.key)} className={cn('px-3 py-1.5 rounded-full text-xs transition-colors', contentFilter === f.key ? 'bg-accent text-text-inverse' : 'bg-surface text-secondary border border-border hover:bg-hover')}>{f.label}</button>
