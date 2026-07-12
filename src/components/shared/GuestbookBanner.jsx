@@ -84,6 +84,7 @@ export default function GuestbookBanner() {
 
   // 首屏立即发射
   useEffect(() => {
+    if (poolRef.current.length === 0) return
     for (let i = 0; i < 7; i++) {
       const text = poolRef.current[Math.floor(Math.random() * poolRef.current.length)]
       spawn(text, randomBetween(30, 100))
@@ -92,6 +93,7 @@ export default function GuestbookBanner() {
 
   // 持续发射
   useEffect(() => {
+    if (poolRef.current.length === 0) return
     const interval = setInterval(() => {
       const text = poolRef.current[Math.floor(Math.random() * poolRef.current.length)]
       spawn(text, 100)
