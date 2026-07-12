@@ -135,6 +135,7 @@ export default function MessagesPage() {
                       await supabase.from('messages').update({ is_read: false }).eq('sender_id', c.otherId).eq('receiver_id', user.id).eq('is_read', true)
                       toast.success('已标记未读')
                       setContacts((prev) => prev.map((x) => x.otherId === c.otherId ? { ...x, unread: x.unread + 1 } : x))
+                      window.dispatchEvent(new Event('msg-unread-change'))
                     }}
                       className="text-muted text-[10px] hover:text-accent">标记未读</button>
                   </div>

@@ -66,7 +66,9 @@ export default function Navbar() {
     }
     fetchMsg()
     const t = setInterval(fetchMsg, 15000)
-    return () => clearInterval(t)
+    const onMsgChange = () => fetchMsg()
+    window.addEventListener('msg-unread-change', onMsgChange)
+    return () => { clearInterval(t); window.removeEventListener('msg-unread-change', onMsgChange) }
   }, [user])
 
   const totalPending = pendingMsgs.length + pendingReportCount
