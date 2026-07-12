@@ -381,7 +381,7 @@ function UsersTab() {
 
   useEffect(() => {
     async function load() {
-      const { data } = await supabase.from('profiles').select('*').order('created_at', { ascending: false })
+      const { data } = await supabase.rpc('list_users_with_email')
       setUsers(data || [])
       setLoading(false)
     }
@@ -412,7 +412,7 @@ function UsersTab() {
                 <Link to={`/user/${u.username}`} className="text-accent text-sm font-medium no-underline hover:underline">
                   {u.display_name || u.username}
                 </Link>
-                <p className="text-muted text-[10px]">{u.username}</p>
+                <p className="text-muted text-[10px]">{u.email || u.username}</p>
               </div>
             </div>
             <div className="flex items-center gap-3 text-xs text-muted">
