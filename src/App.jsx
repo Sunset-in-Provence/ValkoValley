@@ -76,6 +76,7 @@ export default function App() {
         <Route path="/library/:id" element={<Lazy><ProtectedRoute><AppLayout><LibraryDetailPage /></AppLayout></ProtectedRoute></Lazy>} />
         <Route path="/library/:id/edit" element={<Lazy><ProtectedRoute><AppLayout><LibraryEditorPage /></AppLayout></ProtectedRoute></Lazy>} />
         <Route path="/help" element={<Lazy><ProtectedRoute><AppLayout><HelpCenterPage /></AppLayout></ProtectedRoute></Lazy>} />
+        <Route path="/messages" element={<Lazy><ProtectedRoute><AppLayout><MessagesPage /></AppLayout></ProtectedRoute></Lazy>} />
         <Route path="/contact" element={<Lazy><ProtectedRoute><AppLayout><ContactPage /></AppLayout></ProtectedRoute></Lazy>} />
 
         {/* 个人主页 */}

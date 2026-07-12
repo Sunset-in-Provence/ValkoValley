@@ -24,7 +24,10 @@ export function useNotifications() {
 
       if (!error && data) {
         setNotifications(data)
-        setUnreadCount(data.filter((n) => !n.is_read).length)
+        // 通知未读 + 私信未读
+        const noteUnread = data.filter((n) => !n.is_read).length
+        const { count: msgUnread } = await supabase.from('messages').select('*', { count: 'exact', head: true }).eq('receiver_id', user.id).eq('is_read', false)
+        setUnreadCount(noteUnread + (msgUnread || 0))
       }
       setLoading(false)
     }
