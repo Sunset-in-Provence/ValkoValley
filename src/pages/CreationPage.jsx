@@ -18,8 +18,6 @@ export default function CreationPage() {
   const [sort, setSort] = useState('time')
   const [timeOrder, setTimeOrder] = useState('desc')
   const [search, setSearch] = useState('')
-  const [popularTags, setPopularTags] = useState([])
-
   useEffect(() => { fetchData() }, [contentFilter, sort, timeOrder])
 
   async function fetchData() {
@@ -45,8 +43,6 @@ export default function CreationPage() {
     }
     setCreations(enriched)
     setLoading(false)
-    const tagCount = {}; enriched.forEach((c) => { (c.tags || []).forEach((t) => { if (!['原创', '二创'].includes(t)) tagCount[t] = (tagCount[t] || 0) + 1 }) })
-    setPopularTags(Object.entries(tagCount).sort((a, b) => b[1] - a[1]).slice(0, 15).map(([n, c]) => ({ name: n, count: c })))
   }
 
   const filtered = creations.filter((c) => !search || c.title.toLowerCase().includes(search.toLowerCase()) || (c.tags || []).some((t) => t.toLowerCase().includes(search.toLowerCase())))
@@ -71,19 +67,10 @@ export default function CreationPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_200px] gap-6">
-        <div>
-          {loading ? <div className="flex justify-center py-16"><LoadingSpinner size="lg" /></div>
-           : filtered.length === 0 ? <EmptyState icon={Palette} title="暂无作品" description="成为第一个发布创作的人吧！" action={<Link to="/creation/new" className="bg-accent text-text-inverse px-4 py-2 rounded-button text-sm no-underline">发布创作</Link>} />
-           : <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">{filtered.map((c) => <CreationCard key={c.id} creation={c} />)}</div>}
-        </div>
-        <aside>
-          <div className="bg-surface rounded-card shadow-card p-4 sticky top-44">
-            <h3 className="text-secondary text-sm font-medium mb-3">热门标签</h3>
-            {popularTags.length === 0 ? <p className="text-muted text-xs">暂无标签</p>
-             : <div className="flex flex-wrap gap-1.5">{popularTags.map((tag) => <button key={tag.name} onClick={() => setSearch(tag.name)} className="bg-hover text-secondary text-xs px-2 py-1 rounded-full hover:bg-accent/10 hover:text-accent">{tag.name}<span className="text-muted ml-1">{tag.count}</span></button>)}</div>}
-          </div>
-        </aside>
+      <div>
+        {loading ? <div className="flex justify-center py-16"><LoadingSpinner size="lg" /></div>
+         : filtered.length === 0 ? <EmptyState icon={Palette} title="暂无作品" description="成为第一个发布创作的人吧！" action={<Link to="/creation/new" className="bg-accent text-text-inverse px-4 py-2 rounded-button text-sm no-underline">发布创作</Link>} />
+         : <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">{filtered.map((c) => <CreationCard key={c.id} creation={c} />)}</div>}
       </div>
     </div>
   )
