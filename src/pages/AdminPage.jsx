@@ -10,7 +10,7 @@
  *   rounded-card, rounded-button, rounded-full, shadow-card, font-display, border-border
  */
 import { useState, useEffect, useCallback } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabaseClient'
 import ReportCard from '@/components/admin/ReportCard'
 import EmptyState from '@/components/shared/EmptyState'
@@ -33,7 +33,8 @@ const STATUS_FILTERS = [
 ]
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState('reports')
+  const [searchParams] = useSearchParams()
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'reports')
 
   // ---- 举报审核 ----
   const [reports, setReports] = useState([])

@@ -78,8 +78,8 @@ export default function UserProfilePage() {
           <ArrowLeft size={14} /> 返回
         </Link>
         {searchParams.get('from') === 'admin' && (
-          <Link to="/admin" className="flex items-center gap-1 text-accent text-sm no-underline hover:underline">
-            返回管理后台
+          <Link to="/admin?tab=users" className="flex items-center gap-1 text-accent text-sm no-underline hover:underline">
+            返回用户列表
           </Link>
         )}
       </div>
