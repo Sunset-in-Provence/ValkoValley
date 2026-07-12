@@ -32,6 +32,7 @@ const AdminAnnouncePage = lazy(() => import('@/pages/AdminAnnouncePage'))
 const HelpCenterPage = lazy(() => import('@/pages/HelpCenterPage'))
 const AdminInvitesPage = lazy(() => import('@/pages/AdminInvitesPage'))
 const AdminContactsPage = lazy(() => import('@/pages/AdminContactsPage'))
+const MessagesPage = lazy(() => import('@/pages/MessagesPage'))
 const ContactPage = lazy(() => import('@/pages/ContactPage'))
 
 function Lazy({ children }) {
