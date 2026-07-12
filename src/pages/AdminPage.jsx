@@ -23,6 +23,7 @@ const TABS = [
   { key: 'reports', label: '举报审核' },
   { key: 'guestbook', label: '留言审核' },
   { key: 'exams', label: '考试记录' },
+  { key: 'library', label: '档案馆审核' },
   { key: 'users', label: '用户列表' },
 ]
 
@@ -296,6 +297,9 @@ export default function AdminPage() {
       {/* ====== 考试记录 ====== */}
       {activeTab === 'exams' && <ExamAttemptsTab />}
 
+      {/* ====== 档案馆审核 ====== */}
+      {activeTab === 'library' && <LibraryReviewTab />}
+
       {/* ====== 用户列表 ====== */}
       {activeTab === 'users' && <UsersTab />}
     </div>
@@ -372,6 +376,51 @@ function ExamAttemptsTab() {
         </div>
       )}
     </>
+  )
+}
+
+function LibraryReviewTab() {
+  const [entries, setEntries] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  async function fetch() {
+    setLoading(true)
+    const { data } = await supabase.from('library_entries').select('*, author:profiles!library_entries_author_id_fkey(username, display_name)').eq('status', 'pending_review').order('created_at', { ascending: false })
+    setEntries(data || [])
+    setLoading(false)
+  }
+
+  useEffect(() => { fetch() }, [])
+
+  async function handleReview(id, approve) {
+    const { error } = await supabase.rpc('review_library_entry', { _id: id, _approve: approve })
+    if (error) toast.error('操作失败')
+    else { toast.success(approve ? '已通过' : '已拒绝'); fetch() }
+  }
+
+  if (loading) return <div className="flex justify-center py-16"><LoadingSpinner size="lg" /></div>
+
+  return (
+    <div>
+      <p className="text-muted text-xs mb-4">{entries.length} 条待审核</p>
+      {entries.length === 0 ? <EmptyState icon={BookOpen} title="暂无待审核" /> : (
+        <div className="space-y-3">
+          {entries.map((e) => (
+            <div key={e.id} className="bg-surface rounded-card border border-border p-4">
+              <h3 className="text-accent text-sm font-medium">{e.title}</h3>
+              <p className="text-muted text-xs mt-1">{e.author?.display_name || e.author?.username} · {new Date(e.created_at).toLocaleString('zh-CN')}</p>
+              <p className="text-secondary text-xs mt-2 line-clamp-3">{e.content?.slice(0, 200)}</p>
+              <div className="flex gap-2 mt-3">
+                <button onClick={() => handleReview(e.id, true)}
+                  className="bg-success/10 text-success text-xs px-3 py-1.5 rounded-button hover:bg-success/20 flex items-center gap-1"><Check size={12} /> 通过</button>
+                <button onClick={() => handleReview(e.id, false)}
+                  className="bg-danger/10 text-danger text-xs px-3 py-1.5 rounded-button hover:bg-danger/20 flex items-center gap-1"><X size={12} /> 拒绝</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
 

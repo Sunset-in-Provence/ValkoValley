@@ -22,14 +22,16 @@ export default function Navbar() {
   const [mobileMenu, setMobileMenu] = useState(false)
 
   const fetchPending = useCallback(async () => {
-    const [{ data: msgs }, { count }, { data: bw }] = await Promise.all([
+    const [{ data: msgs }, { count }, { data: bw }, { data: lib }] = await Promise.all([
       supabase.from('guestbook').select('*').eq('status', 'pending').order('created_at', { ascending: false }),
       supabase.from('reports').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
       supabase.from('banned_words').select('*').order('created_at', { ascending: false }),
+      supabase.from('library_entries').select('*').eq('status', 'pending_review').order('created_at', { ascending: false }),
     ])
     if (msgs) setPendingMsgs(msgs)
     if (count != null) setPendingReportCount(count)
     if (bw) setBannedWords(bw)
+    if (lib) setPendingLibrary(lib)
   }, [])
 
   async function handleMsgAction(id, action) {
@@ -138,6 +140,24 @@ export default function Navbar() {
                             </div>
                           ))}
                         </div>
+                        {/* 档案馆审核 */}
+                        {pendingLibrary.length > 0 && (
+                          <div className="border-b border-border">
+                            <div className="px-4 py-2 text-secondary text-xs font-medium flex items-center gap-1"><BookOpen size={13} /> 档案馆审核 ({pendingLibrary.length})</div>
+                            {pendingLibrary.slice(0,5).map((e) => (
+                              <div key={e.id} className="px-4 py-2 border-t border-border/50 text-xs text-secondary">
+                                <span>{e.title}</span>
+                                <div className="flex gap-1.5 mt-1">
+                                  <button onClick={async () => { await supabase.rpc('review_library_entry', { _id: e.id, _approve: true }); fetchPending() }}
+                                    className="bg-success/10 text-success text-[10px] px-2 py-0.5 rounded-button hover:bg-success/20"><Check size={10} /> 通过</button>
+                                  <button onClick={async () => { await supabase.rpc('review_library_entry', { _id: e.id, _approve: false }); fetchPending() }}
+                                    className="bg-danger/10 text-danger text-[10px] px-2 py-0.5 rounded-button hover:bg-danger/20"><X size={10} /> 拒绝</button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
                         {/* 违禁词管理 */}
                         <div className="border-b border-border px-4 py-2">
                           <div className="text-secondary text-xs font-medium flex items-center gap-1 mb-2"><Ban size={13} /> 违禁词管理</div>
