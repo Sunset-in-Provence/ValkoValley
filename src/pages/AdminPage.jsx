@@ -409,7 +409,11 @@ function LibraryReviewTab() {
             <div key={e.id} className="bg-surface rounded-card border border-border p-4">
               <h3 className="text-accent text-sm font-medium">{e.title}</h3>
               <p className="text-muted text-xs mt-1">{e.author?.display_name || e.author?.username} · {new Date(e.created_at).toLocaleString('zh-CN')}</p>
-              <p className="text-secondary text-xs mt-2 line-clamp-3">{e.content?.slice(0, 200)}</p>
+              <p className="text-secondary text-xs mt-2 line-clamp-5 whitespace-pre-wrap">{e.content?.slice(0, 500)}</p>
+              <div className="flex items-center gap-3 mt-1">
+                <a href={`/library/${e.id}`} target="_blank" className="text-accent text-xs hover:underline">查看详情</a>
+                <span className="text-muted text-xs">{e.category}</span>
+              </div>
               <div className="flex gap-2 mt-3">
                 <button onClick={() => handleReview(e.id, true)}
                   className="bg-success/10 text-success text-xs px-3 py-1.5 rounded-button hover:bg-success/20 flex items-center gap-1"><Check size={12} /> 通过</button>

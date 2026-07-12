@@ -7,6 +7,7 @@
 import { useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import toast from 'react-hot-toast'
+import { Link } from 'react-router-dom'
 import { User, Clock, FileText, Palette, MessageSquare } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -85,22 +86,31 @@ export default function ReportCard({ report, onAction }) {
 
       <p className="text-secondary text-sm mb-3">{report.reason}</p>
 
-      {report.status === 'pending' && (
-        <div className="flex gap-2 pt-2 border-t border-border">
-          <button onClick={() => handleAction('delete_content')} disabled={acting}
-            className="text-warning text-xs px-3 py-1.5 rounded-button border border-warning/30 hover:bg-warning/5 disabled:opacity-50">
-            🗑 删除内容
-          </button>
-          <button onClick={() => handleAction('ban_user')} disabled={acting}
-            className="text-danger text-xs px-3 py-1.5 rounded-button border border-danger/30 hover:bg-danger/5 disabled:opacity-50">
-            🚫 封禁用户
-          </button>
-          <button onClick={() => handleAction('dismiss')} disabled={acting}
-            className="text-muted text-xs px-3 py-1.5 rounded-button border border-border hover:bg-hover disabled:opacity-50 ml-auto">
-            驳回
-          </button>
+        <div className="flex items-center gap-2 text-xs text-muted mt-2">
+          {report.target_type === 'post' && (
+            <Link to={`/discussion/${report.target_id}`} target="_blank" className="text-accent hover:underline">查看被举报内容</Link>
+          )}
+          {report.target_type === 'creation' && (
+            <Link to={`/creation/${report.target_id}`} target="_blank" className="text-accent hover:underline">查看被举报内容</Link>
+          )}
         </div>
-      )}
+
+        {report.status === 'pending' && (
+          <div className="flex gap-2 pt-2 border-t border-border mt-2">
+            <button onClick={() => handleAction('dismiss')} disabled={acting}
+              className="text-muted text-xs px-3 py-1.5 rounded-button border border-border hover:bg-hover disabled:opacity-50">
+              驳回
+            </button>
+            <button onClick={() => handleAction('delete_content')} disabled={acting}
+              className="text-warning text-xs px-3 py-1.5 rounded-button border border-warning/30 hover:bg-warning/5 disabled:opacity-50">
+              删除内容
+            </button>
+            <button onClick={() => handleAction('ban_user')} disabled={acting}
+              className="text-danger text-xs px-3 py-1.5 rounded-button border border-danger/30 hover:bg-danger/5 disabled:opacity-50">
+              封禁用户
+            </button>
+          </div>
+        )}
     </div>
   )
 }

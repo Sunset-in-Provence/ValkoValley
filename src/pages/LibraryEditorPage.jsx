@@ -151,6 +151,9 @@ export default function LibraryEditorPage() {
     const words = await loadBannedWords(supabase)
     const hits = checkBannedWords(title + ' ' + content, words)
     if (hits.length > 0) { toast.error(`内容包含违规词：${hits.slice(0, 3).join('、')}`); return }
+    // 防重复提交
+    const { data: dup } = await supabase.from('library_entries').select('id').eq('title', title.trim()).eq('category', category).eq('status', 'pending_review').maybeSingle()
+    if (dup) { toast.error('该内容已提交审核，请勿重复投稿'); return }
     setSubmitting(true)
 
     if (isEditing) {
