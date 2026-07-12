@@ -15,7 +15,7 @@ import { supabase } from '@/lib/supabaseClient'
 import ReportCard from '@/components/admin/ReportCard'
 import EmptyState from '@/components/shared/EmptyState'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
-import { Shield, Filter, RefreshCw, BookOpen, Palette as PaletteIcon, MessageSquare, Check, X, Clock, ArrowLeft, Ticket } from 'lucide-react'
+import { Shield, Filter, RefreshCw, BookOpen, Palette as PaletteIcon, MessageSquare, Check, X, Clock, ArrowLeft, Ticket, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
 
@@ -23,6 +23,7 @@ const TABS = [
   { key: 'reports', label: '举报审核' },
   { key: 'guestbook', label: '留言审核' },
   { key: 'exams', label: '考试记录' },
+  { key: 'users', label: '用户列表' },
 ]
 
 const STATUS_FILTERS = [
@@ -293,6 +294,9 @@ export default function AdminPage() {
 
       {/* ====== 考试记录 ====== */}
       {activeTab === 'exams' && <ExamAttemptsTab />}
+
+      {/* ====== 用户列表 ====== */}
+      {activeTab === 'users' && <UsersTab />}
     </div>
   )
 }
@@ -367,5 +371,57 @@ function ExamAttemptsTab() {
         </div>
       )}
     </>
+  )
+}
+
+function UsersTab() {
+  const [users, setUsers] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+
+  useEffect(() => {
+    async function load() {
+      const { data } = await supabase.from('profiles').select('*').order('created_at', { ascending: false })
+      setUsers(data || [])
+      setLoading(false)
+    }
+    load()
+  }, [])
+
+  const filtered = users.filter((u) =>
+    !search || u.username?.toLowerCase().includes(search.toLowerCase()) || u.display_name?.toLowerCase().includes(search.toLowerCase())
+  )
+
+  if (loading) return <div className="flex justify-center py-16"><LoadingSpinner size="lg" /></div>
+
+  return (
+    <div>
+      <div className="flex items-center gap-2 mb-4">
+        <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
+          placeholder="搜索用户..." className="flex-1 bg-hover border border-border rounded-input px-3 py-2 text-primary text-sm placeholder:text-muted focus:outline-none focus:border-accent" />
+        <span className="text-muted text-xs">共 {users.length} 人</span>
+      </div>
+      <div className="space-y-2">
+        {filtered.map((u) => (
+          <div key={u.id} className="bg-surface rounded-card border border-border p-3 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-hover flex items-center justify-center">
+                {u.avatar_url ? <img src={u.avatar_url} className="w-8 h-8 rounded-full object-cover" alt="" /> : <User size={14} className="text-muted" />}
+              </div>
+              <div>
+                <Link to={`/user/${u.username}`} className="text-accent text-sm font-medium no-underline hover:underline">
+                  {u.display_name || u.username}
+                </Link>
+                <p className="text-muted text-[10px]">{u.username}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 text-xs text-muted">
+              {u.is_banned && <span className="bg-danger/10 text-danger px-1.5 py-0.5 rounded-full">已封禁</span>}
+              <span>{new Date(u.created_at).toLocaleDateString('zh-CN')}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }
