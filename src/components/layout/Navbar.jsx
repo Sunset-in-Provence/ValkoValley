@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import { useTheme } from '@/context/ThemeContext'
 import { supabase } from '@/lib/supabaseClient'
-import { Sun, Moon, LogOut, User, Shield, X, MessageSquare, Check, AlertTriangle, Ban, Plus, Trash2, BookOpen, Menu } from 'lucide-react'
+import { Sun, Moon, LogOut, User, Shield, X, MessageSquare, Check, AlertTriangle, Ban, Plus, Trash2, BookOpen, Menu, Mail } from 'lucide-react'
 import NotificationBell from '@/components/notification/NotificationBell'
 import { clearBannedWordsCache } from '@/lib/bannedWords'
 import { cn } from '@/lib/utils'
@@ -106,6 +106,9 @@ export default function Navbar() {
 
           {user ? (
             <>
+              <Link to="/messages" className="p-1.5 sm:p-2 rounded-button text-secondary hover:bg-hover transition-colors" title="私信">
+                <Mail size={16} />
+              </Link>
               <NotificationBell />
               {isAdmin && (
                 <div className="relative">
