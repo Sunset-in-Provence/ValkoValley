@@ -378,6 +378,14 @@ function GroupedReports({ reports, onAction }) {
     groups[key].push(r)
   })
 
+  async function handleDismissAll(group) {
+    if (!window.confirm(`确定驳回此内容全部 ${group.length} 条举报？`)) return
+    const ids = group.map((r) => r.id)
+    await supabase.from('reports').update({ status: 'dismissed', action_taken: 'dismissed', resolved_at: new Date().toISOString() }).in('id', ids)
+    toast.success(`已驳回 ${ids.length} 条举报`)
+    if (onAction) onAction()
+  }
+
   const toggleGroup = (key) => setOpenGroups((prev) => ({ ...prev, [key]: !prev[key] }))
 
   return (
@@ -389,8 +397,14 @@ function GroupedReports({ reports, onAction }) {
         return (
           <div key={key}>
             {group.length > 1 && (
-              <div className="text-warning text-xs mb-1 px-2 cursor-pointer hover:underline" onClick={() => toggleGroup(key)}>
-                {open ? '收起' : `展开`} — 同一内容被举报 {group.length} 次
+              <div className="flex items-center gap-2 text-warning text-xs mb-1 px-2">
+                <span className="cursor-pointer hover:underline" onClick={() => toggleGroup(key)}>
+                  {open ? '收起' : `展开`} — 同一内容被举报 {group.length} 次
+                </span>
+                <button onClick={() => handleDismissAll(group)}
+                  className="text-muted text-[10px] hover:text-danger border border-border rounded-button px-1.5 py-0.5">
+                  一键驳回
+                </button>
               </div>
             )}
             <ReportCard report={main} onAction={onAction} />
