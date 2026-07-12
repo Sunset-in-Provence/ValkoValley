@@ -49,7 +49,7 @@ export default function NotificationBell() {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full mt-2 bg-surface rounded-card shadow-elevated border border-border z-50 max-h-[70vh] overflow-y-auto overflow-x-hidden w-[90vw] max-w-[280px]">
+          <div className="fixed top-16 left-1/2 -translate-x-1/2 bg-surface rounded-card shadow-elevated border border-border z-50 max-h-[70vh] overflow-y-auto overflow-x-hidden w-[90vw] max-w-[280px]">
             <div className="flex items-center justify-between px-4 py-3 border-b border-border">
               <h4 className="text-secondary text-sm font-medium">通知中心</h4>
               <button onClick={() => setOpen(false)} className="text-muted hover:text-secondary"><X size={14} /></button>
