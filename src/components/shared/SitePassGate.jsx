@@ -27,7 +27,7 @@ function getISOWeek(d) {
 
 function getWeeklyPassword() {
   const now = new Date()
-  return hashWeek(135792468, getISOWeek(now), now.getFullYear())
+  return hashWeek(246813579, getISOWeek(now), now.getFullYear())
 }
 
 export default function SitePassGate({ children }) {

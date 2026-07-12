@@ -149,7 +149,7 @@ export default function Navbar() {
                               邀请开关
                             </button>
                           </div>
-                            <span className="text-warning text-[10px] font-mono">密码:{(()=>{const n=new Date();const d=new Date(n);d.setHours(0,0,0,0);d.setDate(d.getDate()+3-(d.getDay()+6)%7);const w1=new Date(d.getFullYear(),0,4);const w=1+Math.round(((d-w1)/86400000-3+(w1.getDay()+6)%7)/7);let h=135792468;for(let i=0;i<20;i++)h=((h*1103515245+(w+n.getFullYear())*12345)>>>0)%2147483647;const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let r='';for(let i=0;i<8;i++){h=((h*1103515245+12345)>>>0)%2147483647;r+=c[h%c.length]}return r})()}</span>
+                            <span className="text-warning text-[10px] font-mono">密码:{(()=>{const n=new Date();const d=new Date(n);d.setHours(0,0,0,0);d.setDate(d.getDate()+3-(d.getDay()+6)%7);const w1=new Date(d.getFullYear(),0,4);const w=1+Math.round(((d-w1)/86400000-3+(w1.getDay()+6)%7)/7);let h=246813579;for(let i=0;i<20;i++)h=((h*1103515245+(w+n.getFullYear())*12345)>>>0)%2147483647;const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let r='';for(let i=0;i<8;i++){h=((h*1103515245+12345)>>>0)%2147483647;r+=c[h%c.length]}return r})()}</span>
                           </div>
                           <button onClick={() => setReviewOpen(false)} className="text-muted hover:text-secondary"><X size={14} /></button>
                         </div>
