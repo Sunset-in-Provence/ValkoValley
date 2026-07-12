@@ -16,11 +16,18 @@ function hashWeek(seed, week, year) {
   return result
 }
 
+function getISOWeek(d) {
+  // ISO周：周一为起始，包含1月4日的周为第1周
+  const date = new Date(d)
+  date.setHours(0, 0, 0, 0)
+  date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7)
+  const week1 = new Date(date.getFullYear(), 0, 4)
+  return 1 + Math.round(((date - week1) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7)
+}
+
 function getWeeklyPassword() {
   const now = new Date()
-  const start = new Date(now.getFullYear(), 0, 1)
-  const weekNum = Math.ceil(((now - start) / 86400000 + start.getDay() + 1) / 7)
-  return hashWeek(135792468, weekNum, now.getFullYear())
+  return hashWeek(135792468, getISOWeek(now), now.getFullYear())
 }
 
 export default function SitePassGate({ children }) {
