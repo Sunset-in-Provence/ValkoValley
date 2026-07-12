@@ -14,12 +14,7 @@ export default function GuestbookBanner() {
   // 记录活跃弹幕的 Y 区间 [{top, bottom, until}]
   const activeZones = useRef([])
 
-  const poolRef = useRef([
-    '铃兰花开，幸福归来',
-    '你除了巧克力还喜欢什么',
-    '就算你变成小虫子我也会来找你，我可以把你装在杯子里',
-    '不管结局是什么，我都要亲自去看看',
-  ])
+  const poolRef = useRef([])
 
   useEffect(() => {
     async function load() {

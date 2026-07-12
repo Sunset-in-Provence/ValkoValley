@@ -8,13 +8,6 @@ import { MessageSquare, Send, X, Shield, Check, Trash2, Plus, RefreshCw, AlertTr
 import { loadBannedWords, checkBannedWords } from '@/lib/bannedWords'
 import toast from 'react-hot-toast'
 
-const PRESETS = [
-  '铃兰花开，幸福归来',
-  '你除了巧克力还喜欢什么',
-  '就算你变成小虫子我也会来找你，我可以把你装在杯子里',
-  '不管结局是什么，我都要亲自去看看',
-]
-
 export default function GuestbookCard() {
   const { user, isAdmin } = useAuth()
   const [open, setOpen] = useState(false)
@@ -203,27 +196,6 @@ export default function GuestbookCard() {
                         className="bg-accent text-text-inverse px-3 py-1.5 rounded-button text-xs hover:opacity-90">
                         <Plus size={12} />
                       </button>
-                    </div>
-                  </div>
-
-                  {/* 预设快捷添加 */}
-                  <div>
-                    <h4 className="text-secondary text-xs font-medium mb-1.5">预设弹幕</h4>
-                    <div className="flex flex-wrap gap-1">
-                      {PRESETS.map((p) => (
-                        <button key={p} onClick={async () => {
-                          const words = await loadBannedWords(supabase)
-                          if (checkBannedWords(p, words).length > 0) return
-                          const { error } = await supabase.from('guestbook').insert({
-                            author_id: user.id, content: p, status: 'approved', reviewed_at: new Date().toISOString(),
-                          })
-                          if (error) toast.error('添加失败')
-                          else { toast.success('已添加'); fetchAdmin() }
-                        }}
-                          className="bg-hover text-secondary text-[11px] px-2 py-1 rounded-full hover:bg-accent/10 hover:text-accent transition-colors">
-                          「{p}」
-                        </button>
-                      ))}
                     </div>
                   </div>
 
