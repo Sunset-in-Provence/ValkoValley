@@ -73,6 +73,10 @@
   --font-body: var(--font-body);
 }
 
+/* === 首页hero文字颜色 === */
+.hero-title { color: #2D5A3A; }
+.dark .hero-title { color: #FDE68A; }
+
 body {
   margin: 0;
   font-family: var(--font-body);

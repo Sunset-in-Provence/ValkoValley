@@ -35,16 +35,16 @@ export default function HomePage() {
       <GuestbookCard />
       {/* Hero 区域 */}
       <section className="max-w-4xl mx-auto px-4 pt-16 sm:pt-24 pb-12 sm:pb-16 text-center relative z-10">
-        <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl mb-4"
-          style={{ color: '#2D5A3A', textShadow: '0 4px 8px rgba(46,139,87,0.35), 0 2px 4px rgba(34,139,34,0.25)' }}>
+        <h1 className="hero-title font-display text-5xl sm:text-6xl lg:text-7xl mb-4"
+          style={{ textShadow: '0 4px 8px rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.1)' }}>
           ValkoValley
         </h1>
-        <p className="font-display text-xl sm:text-2xl lg:text-3xl mb-2"
-          style={{ color: '#2D5A3A', textShadow: '0 3px 6px rgba(46,139,87,0.35), 0 2px 3px rgba(34,139,34,0.25)' }}>
+        <p className="hero-title font-display text-xl sm:text-2xl lg:text-3xl mb-2"
+          style={{ textShadow: '0 3px 6px rgba(0,0,0,0.12), 0 2px 3px rgba(0,0,0,0.08)' }}>
           狼和铃兰的幸福归来
         </p>
-        <p className="text-secondary text-base sm:text-lg lg:text-xl mb-6 sm:mb-8 max-w-xl mx-auto"
-          style={{ textShadow: '0 2px 4px rgba(46,139,87,0.4), 0 1px 2px rgba(34,139,34,0.3)' }}>
+        <p className="hero-title text-base sm:text-lg lg:text-xl mb-6 sm:mb-8 max-w-xl mx-auto"
+          style={{ textShadow: '0 2px 4px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06)' }}>
           「敖尹×你」的专属社区
         </p>
 
