@@ -24,6 +24,7 @@ const TABS = [
   { key: 'guestbook', label: '留言审核' },
   { key: 'exams', label: '考试记录' },
   { key: 'library', label: '档案馆审核' },
+  { key: 'banned', label: '违禁词管理' },
   { key: 'users', label: '用户列表' },
 ]
 
@@ -288,6 +289,7 @@ export default function AdminPage() {
 
       {/* ====== 档案馆审核 ====== */}
       {activeTab === 'library' && <LibraryReviewTab />}
+      {activeTab === 'banned' && <BannedWordsTab />}
 
       {/* ====== 用户列表 ====== */}
       {activeTab === 'users' && <UsersTab />}
@@ -414,6 +416,57 @@ function GroupedReports({ reports, onAction }) {
           </div>
         )
       })}
+    </div>
+  )
+}
+
+function BannedWordsTab() {
+  const [words, setWords] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [input, setInput] = useState('')
+  const { user } = useAuth()
+
+  async function fetch() {
+    setLoading(true)
+    const { data } = await supabase.from('banned_words').select('*').order('created_at', { ascending: false })
+    setWords(data || [])
+    setLoading(false)
+  }
+
+  useEffect(() => { fetch() }, [])
+
+  async function handleAdd() {
+    const w = input.trim().toLowerCase()
+    if (!w) return
+    const { error } = await supabase.from('banned_words').insert({ word: w })
+    if (error) toast.error(error.code === '23505' ? '该词已存在' : '添加失败')
+    else { toast.success('已添加'); setInput(''); fetch() }
+  }
+
+  async function handleRemove(id) {
+    await supabase.from('banned_words').delete().eq('id', id)
+    fetch()
+  }
+
+  if (loading) return <div className="flex justify-center py-16"><LoadingSpinner size="lg" /></div>
+
+  return (
+    <div>
+      <div className="flex gap-2 mb-4">
+        <input type="text" value={input} onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') handleAdd() }}
+          placeholder="添加违禁词..." className="flex-1 bg-hover border border-border rounded-input px-3 py-2 text-primary text-sm placeholder:text-muted focus:outline-none focus:border-accent" />
+        <button onClick={handleAdd} className="bg-accent text-text-inverse px-4 py-2 rounded-button text-sm hover:opacity-90 flex items-center gap-1"><Plus size={14} /> 添加</button>
+      </div>
+      <p className="text-muted text-xs mb-3">共 {words.length} 个词</p>
+      <div className="flex flex-wrap gap-1.5">
+        {words.map((w) => (
+          <span key={w.id} className="inline-flex items-center gap-1 bg-hover text-secondary text-xs px-2.5 py-1 rounded-full">
+            {w.word}
+            <button onClick={() => handleRemove(w.id)} className="text-muted hover:text-danger"><X size={12} /></button>
+          </span>
+        ))}
+      </div>
     </div>
   )
 }

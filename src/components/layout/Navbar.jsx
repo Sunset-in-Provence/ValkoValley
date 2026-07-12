@@ -184,17 +184,6 @@ export default function Navbar() {
                           </div>
                         )}
 
-                        {/* 违禁词管理 */}
-                        <div className="border-b border-border px-4 py-2">
-                          <div className="text-secondary text-xs font-medium flex items-center gap-1 mb-2"><Ban size={13} /> 违禁词管理</div>
-                          <div className="flex gap-1.5 mb-2">
-                            <input type="text" value={newBannedWord} onChange={(e) => setNewBannedWord(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') addBannedWord() }} placeholder="添加违禁词…" className="flex-1 bg-hover border border-border rounded-input px-2 py-1 text-primary text-xs focus:outline-none focus:border-accent" />
-                            <button onClick={addBannedWord} className="bg-accent text-text-inverse px-2 py-1 rounded-button text-xs"><Plus size={12} /></button>
-                          </div>
-                          <div className="flex flex-wrap gap-1 max-h-24 overflow-y-auto">{bannedWords.slice(0, 30).map((bw) => (
-                            <span key={bw.id} className="inline-flex items-center gap-0.5 bg-hover text-secondary text-[10px] px-2 py-0.5 rounded-full">{bw.word}<button onClick={() => removeBannedWord(bw.id)} className="text-muted hover:text-danger"><Trash2 size={10} /></button></span>
-                          ))}</div>
-                        </div>
                         {/* 链接 */}
                         <div className="px-4 py-2 space-y-1">
                           <Link to="/admin/invites" className="text-accent text-xs hover:underline block">邀请码管理</Link>
