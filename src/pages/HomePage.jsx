@@ -43,7 +43,7 @@ export default function HomePage() {
           style={{ color: '#2D5A3A', textShadow: '0 3px 6px rgba(46,139,87,0.35), 0 2px 3px rgba(34,139,34,0.25)' }}>
           狼和铃兰的幸福归来
         </p>
-        <p className="text-muted text-base sm:text-lg lg:text-xl mb-6 sm:mb-8 max-w-xl mx-auto"
+        <p className="text-secondary text-base sm:text-lg lg:text-xl mb-6 sm:mb-8 max-w-xl mx-auto"
           style={{ textShadow: '0 2px 4px rgba(46,139,87,0.4), 0 1px 2px rgba(34,139,34,0.3)' }}>
           「敖尹×你」的专属社区
         </p>
