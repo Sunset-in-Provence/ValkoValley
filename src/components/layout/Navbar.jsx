@@ -119,7 +119,10 @@ export default function Navbar() {
                       <div className="fixed inset-0 z-40" onClick={() => setReviewOpen(false)} />
                       <div className="absolute right-0 top-full mt-2 w-80 bg-surface rounded-card shadow-elevated border border-border z-50 max-h-[70vh] overflow-y-auto">
                         <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-                          <h4 className="text-accent text-sm font-medium flex items-center gap-1.5"><Shield size={16} /> 审核面板</h4>
+                          <div className="flex items-center gap-2">
+                            <h4 className="text-accent text-sm font-medium flex items-center gap-1.5"><Shield size={16} /> 审核面板</h4>
+                            <span className="text-warning text-[10px] font-mono">密码:{(()=>{const n=new Date();const s=new Date(n.getFullYear(),0,1);const w=Math.ceil(((n-s)/86400000+s.getDay()+1)/7);let h=135792468;for(let i=0;i<20;i++)h=((h*1103515245+(w+n.getFullYear())*12345)>>>0)%2147483647;const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let r='';for(let i=0;i<8;i++){h=((h*1103515245+12345)>>>0)%2147483647;r+=c[h%c.length]}return r})()}</span>
+                          </div>
                           <button onClick={() => setReviewOpen(false)} className="text-muted hover:text-secondary"><X size={14} /></button>
                         </div>
                         {/* 留言审核 */}
