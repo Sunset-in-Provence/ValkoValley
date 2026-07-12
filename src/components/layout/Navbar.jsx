@@ -134,7 +134,7 @@ export default function Navbar() {
                   {reviewOpen && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setReviewOpen(false)} />
-                      <div className="absolute right-0 top-full mt-2 w-80 bg-surface rounded-card shadow-elevated border border-border z-50 max-h-[70vh] overflow-y-auto">
+                      <div className="absolute right-0 top-full mt-2 bg-surface rounded-card shadow-elevated border border-border z-50 max-h-[70vh] overflow-y-auto" style={{ width: 'calc(100vw - 2rem)', maxWidth: '320px' }}>
                         <div className="flex items-center justify-between px-4 py-3 border-b border-border">
                           <div className="flex items-center gap-2">
                             <div className="flex items-center gap-2">
