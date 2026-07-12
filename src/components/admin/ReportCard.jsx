@@ -54,7 +54,7 @@ export default function ReportCard({ report, onAction }) {
     // 更新举报状态
     const { error } = await supabase.from('reports').update({
       status: actionType === 'dismiss' ? 'dismissed' : 'resolved',
-      action_taken: actionType,
+      action_taken: actionType === 'delete_content' ? 'content_deleted' : actionType === 'ban_user' ? 'user_banned' : actionType === 'dismiss' ? 'dismissed' : actionType,
       reviewer_id: (await supabase.auth.getUser()).data.user?.id,
       resolved_at: new Date().toISOString(),
     }).eq('id', report.id)
