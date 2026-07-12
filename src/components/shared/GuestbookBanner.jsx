@@ -10,10 +10,9 @@ function randomBetween(a, b) {
 
 export default function GuestbookBanner() {
   const [danmaku, setDanmaku] = useState([])
+  const [poolReady, setPoolReady] = useState(false)
   const idRef = useRef(0)
-  // 记录活跃弹幕的 Y 区间 [{top, bottom, until}]
   const activeZones = useRef([])
-
   const poolRef = useRef([])
 
   useEffect(() => {
@@ -26,6 +25,7 @@ export default function GuestbookBanner() {
         .limit(50)
       if (data && data.length > 0) {
         poolRef.current = data.map((m) => m.content)
+        setPoolReady(true)
       }
     }
     load()
@@ -84,22 +84,22 @@ export default function GuestbookBanner() {
 
   // 首屏立即发射
   useEffect(() => {
-    if (poolRef.current.length === 0) return
+    if (!poolReady) return
     for (let i = 0; i < 7; i++) {
       const text = poolRef.current[Math.floor(Math.random() * poolRef.current.length)]
       spawn(text, randomBetween(30, 100))
     }
-  }, [])
+  }, [poolReady])
 
   // 持续发射
   useEffect(() => {
-    if (poolRef.current.length === 0) return
+    if (!poolReady) return
     const interval = setInterval(() => {
       const text = poolRef.current[Math.floor(Math.random() * poolRef.current.length)]
       spawn(text, 100)
     }, 700)
     return () => clearInterval(interval)
-  }, [])
+  }, [poolReady])
 
   // 清理 DOM
   useEffect(() => {
