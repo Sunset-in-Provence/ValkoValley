@@ -172,7 +172,7 @@ export default function MessagesPage() {
           </div>
           <form onSubmit={handleSend} className="p-3 border-t border-border shrink-0 flex gap-2">
             <input type="text" value={text} onChange={(e) => setText(e.target.value)}
-              placeholder="输入消息..." className="flex-1 bg-hover border border-border rounded-input px-3 py-2 text-primary text-sm focus:outline-none focus:border-accent" />
+              placeholder="输入消息..." className="flex-1 bg-hover border border-border rounded-input px-3 py-2 text-sm text-primary dark:text-white focus:outline-none focus:border-accent" />
             <button type="submit" disabled={!text.trim()}
               className="bg-accent text-text-inverse px-4 py-2 rounded-button text-sm hover:opacity-90 disabled:opacity-40 flex items-center gap-1">
               <Send size={14} /> 发送
