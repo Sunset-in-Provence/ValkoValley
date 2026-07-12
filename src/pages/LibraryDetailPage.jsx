@@ -28,9 +28,11 @@ export default function LibraryDetailPage() {
 
   async function handleDelete() {
     if (!window.confirm('确定删除此条目？')) return
-    const { error } = await supabase.rpc('delete_library_entry', { _id: id })
-    if (error) toast.error('删除失败: ' + error.message)
-    else { toast.success('已删除'); navigate('/library') }
+    const { data, error } = await supabase.rpc('delete_library_entry', { _id: id })
+    if (error) { toast.error('删除失败: ' + error.message); return }
+    if (!data) { toast.error('删除失败：无权限或条目不存在'); return }
+    toast.success('已删除')
+    setTimeout(() => navigate('/library'), 300)
   }
 
   useEffect(() => {
