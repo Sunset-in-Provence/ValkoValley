@@ -3,11 +3,13 @@
  * UI 变量映射：bg-surface, text-primary, text-secondary, text-muted, text-accent,
  *   rounded-card, rounded-button, rounded-full, shadow-card, font-display, border-border
  */
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
-import { User, Calendar, Award, Edit3 } from 'lucide-react'
+import { User, Calendar, Award, Edit3, Mail } from 'lucide-react'
 
 export default function ProfileHeader({ profile, isOwn }) {
+  const { user } = useAuth()
+  const navigate = useNavigate()
   const daysSinceExam = profile?.exam_passed_at
     ? Math.floor((Date.now() - new Date(profile.exam_passed_at).getTime()) / (1000 * 60 * 60 * 24))
     : null
@@ -37,6 +39,12 @@ export default function ProfileHeader({ profile, isOwn }) {
               <Link to="?edit=true" className="text-muted hover:text-accent transition-colors shrink-0">
                 <Edit3 size={14} />
               </Link>
+            )}
+            {user && !isOwn && (
+              <button onClick={() => navigate(`/messages?to=${profile.id}`)}
+                className="text-accent hover:text-accent/80 transition-colors shrink-0 flex items-center gap-1 text-xs">
+                <Mail size={14} /> 私信
+              </button>
             )}
           </div>
 

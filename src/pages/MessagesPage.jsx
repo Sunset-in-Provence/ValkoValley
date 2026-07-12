@@ -2,11 +2,14 @@ import { useState, useEffect, useRef } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/context/AuthContext'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
-import { ArrowLeft, Send, User, Clock } from 'lucide-react'
+import { useSearchParams } from 'react-router-dom'
+import { ArrowLeft, Send, User } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function MessagesPage() {
   const { user } = useAuth()
+  const [searchParams] = useSearchParams()
+  const targetUser = searchParams.get('to')
   const [contacts, setContacts] = useState([])
   const [activeChat, setActiveChat] = useState(null)
   const [messages, setMessages] = useState([])
@@ -40,6 +43,8 @@ export default function MessagesPage() {
       })
 
       setContacts(Object.values(convos))
+      // 如果URL带了?to= 参数，自动打开聊天
+      if (targetUser) setActiveChat(targetUser)
       setLoading(false)
     }
     load()
