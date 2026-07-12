@@ -12,7 +12,7 @@
   --color-accent: #5DAF7C;
   --color-text-primary: #1F2937;
   --color-text-secondary: #4B7A5E;
-  --color-text-muted: #5A7A65;
+  --color-text-muted: #3D5A45;
   --color-text-accent: #4EA06A;
   --color-text-inverse: #FFFFFF;
   --color-danger: #EF4444;
@@ -84,6 +84,10 @@ body {
 
 :root { color-scheme: light; }
 .dark { color-scheme: dark; }
+
+/* === 全局placeholder颜色 — 覆盖浏览器默认半透明 === */
+::placeholder { opacity: 1; color: inherit; }
+input::placeholder, textarea::placeholder { opacity: 1; }
 
 /* === Markdown 预览基础样式 === */
 .prose { max-width: none; }
