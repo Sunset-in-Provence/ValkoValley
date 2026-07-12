@@ -186,8 +186,8 @@ export default function RegisterPage() {
       toast.success(`敖尹考试通过！正在创建账户...`)
       setTimeout(async () => {
         await createAccount()
-        toast.success('请前往邮箱点击确认链接完成注册', { duration: 8000 })
         supabase.rpc('increment_invite_usage', { _code: inviteCode.trim().toUpperCase() }).then()
+        window.location.href = '/discussion'
       }, 1000)
     } else {
       localStorage.setItem(COOLDOWN_KEY, String(Date.now() + COOLDOWN_MINUTES * 60000))
