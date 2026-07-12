@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/context/AuthContext'
 import { renderMarkdown } from '@/lib/markdown'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
+import toast from 'react-hot-toast'
 import { ArrowLeft, Eye, Calendar, User, Edit3, Trash2 } from 'lucide-react'
 
 const catLabels = {
