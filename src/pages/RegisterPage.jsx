@@ -95,13 +95,17 @@ export default function RegisterPage() {
     if (username.length < 2 || username.length > 30) {
       toast.error('用户名需 2-30 个字符'); return
     }
-    if (!inviteCode.trim()) { toast.error('请输入邀请码'); return }
+    // 检查邀请开关
+    const { data: settings } = await supabase.from('site_settings').select('value').eq('key', 'invite_only').maybeSingle()
+    const inviteRequired = !settings || settings.value !== 'false'
 
-    // 验证邀请码
-    const { data: codeData } = await supabase.from('invite_codes')
-      .select('*').eq('code', inviteCode.trim().toUpperCase()).eq('is_active', true).single()
-    if (!codeData) { toast.error('邀请码无效'); return }
-    if (codeData.used_count >= codeData.max_uses) { toast.error('邀请码已用完'); return }
+    if (inviteRequired) {
+      if (!inviteCode.trim()) { toast.error('请输入邀请码'); return }
+      const { data: codeData } = await supabase.from('invite_codes')
+        .select('*').eq('code', inviteCode.trim().toUpperCase()).eq('is_active', true).single()
+      if (!codeData) { toast.error('邀请码无效'); return }
+      if (codeData.used_count >= codeData.max_uses) { toast.error('邀请码已用完'); return }
+    }
     if (checkCooldown()) return
 
     if (rulesPool.length < QUESTIONS_PER_STAGE) {

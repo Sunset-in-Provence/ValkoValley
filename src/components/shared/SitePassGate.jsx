@@ -49,6 +49,17 @@ export default function SitePassGate({ children }) {
         setPassed(true)
         return
       }
+      // 检查邀请开关
+      const { data: settings } = await supabase.from('site_settings').select('value').eq('key', 'invite_only').maybeSingle()
+      const inviteRequired = !settings || settings.value !== 'false'
+
+      // 开关关闭 → 所有人都可以通过设备检查
+      if (!inviteRequired) {
+        localStorage.setItem('vv-authorized', '1')
+        setAuthorized(true)
+        return
+      }
+
       // 或者 localStorage 有设备授权记录
       if (localStorage.getItem('vv-authorized') === '1') {
         setAuthorized(true)
