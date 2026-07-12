@@ -53,8 +53,9 @@ export default function MessagesPage() {
       list.sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0) || new Date(b.lastTime) - new Date(a.lastTime))
       setContacts(list)
 
-      // 进入页面就清除铃铛中的私信未读（通过标记已读）
-      supabase.from('messages').update({ is_read: true }).eq('receiver_id', user.id).eq('is_read', false).then()
+      // 进入页面就标记已读
+      await supabase.from('messages').update({ is_read: true }).eq('receiver_id', user.id).eq('is_read', false)
+      window.dispatchEvent(new Event('msg-unread-change'))
 
       if (targetUser) setActiveChat(targetUser)
       setLoading(false)
