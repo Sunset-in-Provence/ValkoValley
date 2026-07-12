@@ -99,7 +99,7 @@ input::placeholder, textarea::placeholder { opacity: 1; }
 
 /* === 弹幕墙颜色 === */
 .danmaku-text { color: #2D5A3A; }
-.dark .danmaku-text { color: #cfe8d5; }
+.dark .danmaku-text { color: #FDE68A; }
 
 /* === 弹幕墙动画 === */
 @keyframes danmaku-scroll { to { transform: translateX(-100%); } }
