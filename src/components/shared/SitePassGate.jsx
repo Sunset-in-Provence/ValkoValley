@@ -70,7 +70,6 @@ export default function SitePassGate({ children }) {
   }, [])
 
   if (authorized === null) return null
-  if (!authorized) return <UninvitedPage />
 
   const currentPassword = getWeeklyPassword()
 
