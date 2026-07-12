@@ -89,6 +89,10 @@ body {
 :root { color-scheme: light; }
 .dark { color-scheme: dark; }
 
+/* === 全局输入框文字颜色 === */
+input, textarea, select { color: #222; }
+.dark input, .dark textarea, .dark select { color: #eee; }
+
 /* === 全局placeholder颜色 — 覆盖浏览器默认半透明 === */
 ::placeholder { opacity: 1; color: inherit; }
 input::placeholder, textarea::placeholder { opacity: 1; }
