@@ -39,6 +39,15 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('')
   const [username, setUsername] = useState('')
   const [inviteCode, setInviteCode] = useState('')
+  const [inviteRequired, setInviteRequired] = useState(true)
+
+  useEffect(() => {
+    async function check() {
+      const { data } = await supabase.from('site_settings').select('value').eq('key', 'invite_only').maybeSingle()
+      setInviteRequired(!data || data.value !== 'false')
+    }
+    check()
+  }, [])
   const [agreed, setAgreed] = useState(false)
 
   // ---- 流程状态 ----
@@ -95,11 +104,7 @@ export default function RegisterPage() {
     if (username.length < 2 || username.length > 30) {
       toast.error('用户名需 2-30 个字符'); return
     }
-    // 检查邀请开关
-    const { data: settings } = await supabase.from('site_settings').select('value').eq('key', 'invite_only').maybeSingle()
-    const inviteRequired = !settings || settings.value !== 'false'
-
-    if (inviteRequired) {
+      if (inviteRequired) {
       if (!inviteCode.trim()) { toast.error('请输入邀请码'); return }
       const { data: codeData } = await supabase.from('invite_codes')
         .select('*').eq('code', inviteCode.trim().toUpperCase()).eq('is_active', true).single()
@@ -190,7 +195,7 @@ export default function RegisterPage() {
       toast.success(`敖尹考试通过！正在创建账户...`)
       setTimeout(async () => {
         await createAccount()
-        supabase.rpc('increment_invite_usage', { _code: inviteCode.trim().toUpperCase() }).then()
+        if (inviteRequired) supabase.rpc('increment_invite_usage', { _code: inviteCode.trim().toUpperCase() }).then()
         window.location.href = '/discussion'
       }, 1000)
     } else {
@@ -390,15 +395,17 @@ export default function RegisterPage() {
             />
           </div>
 
-          {/* 邀请码 */}
-          <div>
-            <label className="text-secondary text-sm font-medium mb-1 block">邀请码</label>
-            <input
-              type="text" value={inviteCode} onChange={(e) => setInviteCode(e.target.value)}
-              placeholder="输入邀请码" required
-              className="w-full bg-hover border border-border rounded-input px-4 py-2.5 text-primary text-sm placeholder:text-muted focus:outline-none focus:border-accent transition-colors"
-            />
-          </div>
+          {/* 邀请码（开关开启时显示） */}
+          {inviteRequired && (
+            <div>
+              <label className="text-secondary text-sm font-medium mb-1 block">邀请码</label>
+              <input
+                type="text" value={inviteCode} onChange={(e) => setInviteCode(e.target.value)}
+                placeholder="输入邀请码" required
+                className="w-full bg-hover border border-border rounded-input px-4 py-2.5 text-primary text-sm placeholder:text-muted focus:outline-none focus:border-accent transition-colors"
+              />
+            </div>
+          )}
 
           {/* 密码 */}
           <div>
