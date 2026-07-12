@@ -125,12 +125,18 @@ export default function MessagesPage() {
                     {c.unread > 0 && <span className="bg-danger text-text-inverse text-[10px] px-1.5 py-0.5 rounded-full shrink-0">{c.unread}</span>}
                   </button>
                   {/* 操作按钮 */}
-                  <div className="hidden group-hover:flex justify-end gap-1 px-3 pb-2">
+                  <div className="flex justify-end gap-2 px-3 pb-2">
                     <button onClick={() => togglePin(c.otherId, c.isPinned)}
                       className="text-muted text-[10px] hover:text-accent flex items-center gap-0.5">
                       {c.isPinned ? <PinOff size={10} /> : <Pin size={10} />}
                       {c.isPinned ? '取消置顶' : '置顶'}
                     </button>
+                    <button onClick={async () => {
+                      await supabase.from('messages').update({ is_read: false }).eq('sender_id', c.otherId).eq('receiver_id', user.id).eq('is_read', true)
+                      toast.success('已标记未读')
+                      setContacts((prev) => prev.map((x) => x.otherId === c.otherId ? { ...x, unread: x.unread + 1 } : x))
+                    }}
+                      className="text-muted text-[10px] hover:text-accent">标记未读</button>
                   </div>
                 </div>
               ))}
