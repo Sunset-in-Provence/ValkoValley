@@ -63,11 +63,6 @@ export default function ProfileHeader({ profile, isOwn }) {
               <Calendar size={12} />
               {new Date(profile.created_at).toLocaleDateString('zh-CN')} 加入
             </span>
-            {profile?.exam_passed_at && (
-              <span className="inline-flex items-center gap-1 bg-hover text-muted text-xs px-2 py-1 rounded-full">
-                考试通过于 {new Date(profile.exam_passed_at).toLocaleDateString('zh-CN')}
-              </span>
-            )}
           </div>
         </div>
       </div>
