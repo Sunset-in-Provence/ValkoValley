@@ -40,9 +40,6 @@ export default function ProfileHeader({ profile, isOwn }) {
             )}
           </div>
 
-          {/* 用户名 */}
-          <p className="text-muted text-sm mb-2">@{profile?.username}</p>
-
           {/* 简介 */}
           {profile?.bio ? (
             <p className="text-secondary text-sm leading-relaxed mb-3">{profile.bio}</p>
