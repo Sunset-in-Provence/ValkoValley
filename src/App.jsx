@@ -48,7 +48,6 @@ export default function App() {
           style: { borderRadius: 'var(--radius-card)', fontFamily: 'var(--font-body)' },
         }}
       />
-      <Routes>
       <SitePassGate>
       <Routes>
         {/* 公开页面 — 立即加载 */}
