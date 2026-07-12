@@ -79,7 +79,7 @@ export default function LibraryPage() {
         <div className="relative max-w-md">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
           <input type="text" placeholder="搜索设定..." value={search} onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-surface border border-border rounded-input pl-9 pr-4 py-2 text-primary text-sm focus:outline-none focus:border-accent" />
+            className="w-full bg-surface border border-border rounded-input pl-9 pr-4 py-2 text-primary text-sm placeholder:text-muted focus:outline-none focus:border-accent" />
         </div>
       </div>
 
