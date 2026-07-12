@@ -56,6 +56,19 @@ export default function Navbar() {
 
   async function handleLogout() { await supabase.auth.signOut(); navigate('/') }
 
+  // 私信未读计数
+  const [msgUnread, setMsgUnread] = useState(0)
+  useEffect(() => {
+    if (!user) return
+    async function fetchMsg() {
+      const { count } = await supabase.from('messages').select('*', { count: 'exact', head: true }).eq('receiver_id', user.id).eq('is_read', false)
+      setMsgUnread(count || 0)
+    }
+    fetchMsg()
+    const t = setInterval(fetchMsg, 15000)
+    return () => clearInterval(t)
+  }, [user])
+
   const totalPending = pendingMsgs.length + pendingReportCount
 
   const navItems = [
@@ -106,8 +119,13 @@ export default function Navbar() {
 
           {user ? (
             <>
-              <Link to="/messages" className="p-1.5 sm:p-2 rounded-button text-secondary hover:bg-hover transition-colors" title="私信">
+              <Link to="/messages" className="relative p-1.5 sm:p-2 rounded-button text-secondary hover:bg-hover transition-colors" title="私信">
                 <Mail size={16} />
+                {msgUnread > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-danger text-text-inverse text-[10px] rounded-full flex items-center justify-center font-bold">
+                    {msgUnread > 9 ? '9+' : msgUnread}
+                  </span>
+                )}
               </Link>
               <NotificationBell />
               {isAdmin && (
