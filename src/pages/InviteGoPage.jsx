@@ -1,7 +1,3 @@
-/**
- * 邀请链接落地页 /go/:token
- * 记录设备 → 授权 → 跳转首页
- */
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabaseClient'
@@ -11,25 +7,23 @@ import LoadingSpinner from '@/components/shared/LoadingSpinner'
 export default function InviteGoPage() {
   const { token } = useParams()
   const navigate = useNavigate()
-  const [status, setStatus] = useState('loading') // loading | success | error
+  const [status, setStatus] = useState('loading')
 
   useEffect(() => {
     async function process() {
-      // 验证邀请链接
-      const { data: link } = await supabase.from('invite_links')
-        .select('*').eq('token', token).eq('is_active', true).maybeSingle()
+      const deviceId = getDeviceId()
 
-      if (!link || link.used_count >= link.max_uses) {
-        setStatus('error')
-        return
-      }
+      // 如果设备已授权，直接跳转
+      const { data: existing } = await supabase.from('authorized_devices')
+        .select('id').eq('device_id', deviceId).maybeSingle()
+      if (existing) { setStatus('success'); setTimeout(() => navigate('/'), 500); return }
+
+      // 校验并扣减邀请链接
+      const { data: ok } = await supabase.rpc('use_invite_link', { _token: token })
+      if (!ok) { setStatus('error'); return }
 
       // 授权设备
-      const deviceId = getDeviceId()
       await supabase.from('authorized_devices').upsert({ device_id: deviceId, invite_token: token }, { onConflict: 'device_id' })
-
-      // 扣减使用次数（RPC绕过RLS）
-      await supabase.rpc('use_invite_link', { _token: token })
 
       setStatus('success')
       setTimeout(() => navigate('/'), 1500)
