@@ -77,7 +77,7 @@ export default function UserProfilePage() {
         <Link to="/discussion" className="flex items-center gap-1 text-muted text-sm no-underline hover:text-accent">
           <ArrowLeft size={14} /> 返回
         </Link>
-        {document.referrer.includes('/admin') && (
+        {searchParams.get('from') === 'admin' && (
           <Link to="/admin" className="flex items-center gap-1 text-accent text-sm no-underline hover:underline">
             返回管理后台
           </Link>

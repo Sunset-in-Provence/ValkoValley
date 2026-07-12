@@ -409,7 +409,7 @@ function UsersTab() {
                 {u.avatar_url ? <img src={u.avatar_url} className="w-8 h-8 rounded-full object-cover" alt="" /> : <User size={14} className="text-muted" />}
               </div>
               <div>
-                <Link to={`/user/${u.username}`} className="text-accent text-sm font-medium no-underline hover:underline">
+                <Link to={`/user/${u.username}?from=admin`} className="text-accent text-sm font-medium no-underline hover:underline">
                   {u.display_name || u.username}
                 </Link>
                 <p className="text-muted text-[10px]">{u.email || u.username}</p>
