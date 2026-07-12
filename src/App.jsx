@@ -12,7 +12,6 @@ import LoginPage from '@/pages/LoginPage'
 import RegisterPage from '@/pages/RegisterPage'
 import RulesPage from '@/pages/RulesPage'
 import AnnouncementsPage from '@/pages/AnnouncementsPage'
-import InviteGoPage from '@/pages/InviteGoPage'
 import NotFoundPage from '@/pages/NotFoundPage'
 
 // 需登录的页面 — 懒加载（路由级代码分割）
@@ -50,9 +49,6 @@ export default function App() {
         }}
       />
       <Routes>
-        {/* 邀请链接 — 不受密码门限制 */}
-        <Route path="/go/:token" element={<InviteGoPage />} />
-      </Routes>
       <SitePassGate>
       <Routes>
         {/* 公开页面 — 立即加载 */}

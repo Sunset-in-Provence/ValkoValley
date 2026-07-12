@@ -4,8 +4,6 @@
 import { useState, useEffect } from 'react'
 import { Lock } from 'lucide-react'
 import { supabase } from '@/lib/supabaseClient'
-import { getDeviceId } from '@/lib/fingerprint'
-import UninvitedPage from '@/pages/UninvitedPage'
 
 const STORAGE_KEY = 'valkovalley-gate-pass'
 
@@ -65,15 +63,8 @@ export default function SitePassGate({ children }) {
         setAuthorized(true)
         return
       }
-      // 新设备：检查是否被邀请链接授权过
-      const deviceId = getDeviceId()
-      const { data } = await supabase.from('authorized_devices').select('id').eq('device_id', deviceId).maybeSingle()
-      if (data) {
-        localStorage.setItem('vv-authorized', '1')
-        setAuthorized(true)
-      } else {
-        setAuthorized(false)
-      }
+      // 直接放行到密码门
+      setAuthorized(true)
     }
     check()
   }, [])
