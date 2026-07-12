@@ -73,9 +73,16 @@ export default function UserProfilePage() {
 
   return (
     <div>
-      <Link to="/discussion" className="flex items-center gap-1 text-muted text-sm mb-4 no-underline hover:text-accent">
-        <ArrowLeft size={14} /> 返回
-      </Link>
+      <div className="flex items-center gap-3 mb-4">
+        <Link to="/discussion" className="flex items-center gap-1 text-muted text-sm no-underline hover:text-accent">
+          <ArrowLeft size={14} /> 返回
+        </Link>
+        {document.referrer.includes('/admin') && (
+          <Link to="/admin" className="flex items-center gap-1 text-accent text-sm no-underline hover:underline">
+            返回管理后台
+          </Link>
+        )}
+      </div>
 
       {/* 编辑模式 */}
       {isEditing ? (
