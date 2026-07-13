@@ -39,44 +39,38 @@ export default function SitePassGate({ children }) {
   const [error, setError] = useState(false)
 
   useEffect(() => {
+    // 已经输过密码就跳过检查
+    if (passed) { setAuthorized(true); return }
+
+    let timeout = setTimeout(() => setAuthorized(true), 4000) // 4秒兜底
+
     async function check() {
-      // 本地开发环境直接放行
-      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        setAuthorized(true)
-        setPassed(true)
-        return
-      }
-      // 老用户：检查本地是否有登录过的痕迹
-      const { data: { session } } = await supabase.auth.getSession()
-      const hasLocalAuth = localStorage.getItem('sb-' + 'vajcfjmhxphxsxshqtac' + '-auth-token')
-      if (session?.user || hasLocalAuth) {
-        setAuthorized(true)
-        setPassed(true)
-        return
-      }
-      // 检查邀请开关
-      const { data: settings } = await supabase.from('site_settings').select('value').eq('key', 'invite_only').maybeSingle()
-      const inviteRequired = !settings || settings.value !== 'false'
+      try {
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          setAuthorized(true); setPassed(true); return
+        }
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session?.user) { setAuthorized(true); setPassed(true); return }
 
-      // 开关关闭 → 所有人都可以通过设备检查
-      if (!inviteRequired) {
-        localStorage.setItem('vv-authorized', '1')
-        setAuthorized(true)
-        return
-      }
-
-      // 或者 localStorage 有设备授权记录
-      if (localStorage.getItem('vv-authorized') === '1') {
-        setAuthorized(true)
-        return
-      }
-      // 直接放行到密码门
+        const { data: settings } = await supabase.from('site_settings').select('value').eq('key', 'invite_only').maybeSingle()
+        const inviteRequired = !settings || settings.value !== 'false'
+        if (!inviteRequired || localStorage.getItem('vv-authorized') === '1') {
+          localStorage.setItem('vv-authorized', '1')
+        }
+      } catch {}
       setAuthorized(true)
     }
     check()
+    return () => clearTimeout(timeout)
   }, [])
 
-  if (authorized === null) return null
+  if (authorized === null) {
+    return (
+      <div className="min-h-screen bg-primary flex items-center justify-center">
+        <p className="text-muted text-sm">加载中...</p>
+      </div>
+    )
+  }
 
   const currentPassword = getWeeklyPassword()
 
