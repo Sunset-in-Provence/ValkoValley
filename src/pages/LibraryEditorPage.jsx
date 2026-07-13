@@ -305,7 +305,7 @@ export default function LibraryEditorPage() {
             <label className="flex items-center gap-1 bg-hover border border-border text-secondary px-4 py-2 rounded-button text-sm cursor-pointer hover:bg-accent hover:text-text-inverse">
               {videoUploading ? <Loader2 size={14} className="animate-spin" /> : <Video size={14} />}
               {videoUploading ? '上传中' : '本地上传'}
-              <input type="file" accept="video/mp4,video/webm" onChange={handleVideoUpload} hidden />
+              <input type="file" accept="video/mp4,video/webm,video/quicktime,video/x-msvideo" onChange={handleVideoUpload} hidden />
             </label>
             <span className="text-muted text-xs ml-2">最大 50MB</span>
           </div>

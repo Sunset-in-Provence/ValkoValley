@@ -1,7 +1,7 @@
 import { supabase } from './supabaseClient'
 
 const ALLOWED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/webp']
-const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm']
+const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime', 'video/x-msvideo', 'video/x-matroska']
 const ALLOWED_AUDIO_TYPES = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/flac']
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024
 const MAX_VIDEO_SIZE = 50 * 1024 * 1024
