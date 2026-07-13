@@ -2,7 +2,7 @@ import { useState, useRef } from 'react'
 import { uploadImage } from '@/lib/upload'
 import { Upload, X, Loader2, GripVertical } from 'lucide-react'
 
-export default function MediaUploader({ images = [], onImagesChange, maxFiles = 9 }) {
+export default function MediaUploader({ images = [], onImagesChange, maxFiles = 99 }) {
   const [uploading, setUploading] = useState(false)
   const dragItem = useRef(null)
   const dragOverItem = useRef(null)
