@@ -23,7 +23,7 @@ import {
 
 export default function DiscussionDetailPage() {
   const { id } = useParams()
-  const { user, isAdmin } = useAuth()
+  const { user, isAdmin, profile } = useAuth()
   const navigate = useNavigate()
 
   const [post, setPost] = useState(null)
@@ -194,7 +194,10 @@ export default function DiscussionDetailPage() {
             postId={id}
             onSuccess={() => {
               fetchData()
-              if (post.author_id !== user.id) supabase.rpc('notify_user', { _user_id: post.author_id, _title: '新评论', _content: '有人评论了你的帖子', _link: `/discussion/${id}` }).then()
+              if (post.author_id !== user.id) {
+                const displayName = profile?.display_name || profile?.username || '用户'
+                supabase.rpc('notify_user', { _user_id: post.author_id, _title: '新评论', _content: `${displayName} 评论了你的作品「${post.title}」`, _link: `/discussion/${id}` }).then()
+              }
             }}
           />
         </div>

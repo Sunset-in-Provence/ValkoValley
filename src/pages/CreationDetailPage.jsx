@@ -26,7 +26,7 @@ const contentTypeColors = {
 
 export default function CreationDetailPage() {
   const { id } = useParams()
-  const { user, isAdmin } = useAuth()
+  const { user, isAdmin, profile } = useAuth()
   const navigate = useNavigate()
   const [creation, setCreation] = useState(null)
   const [comments, setComments] = useState([])
@@ -186,7 +186,10 @@ export default function CreationDetailPage() {
         <div className="mb-6 pb-6 border-b border-border">
           <CommentForm creationId={id} onSuccess={() => {
               fetchData()
-              if (creation?.author_id !== user.id) supabase.rpc('notify_user', { _user_id: creation.author_id, _title: '新评论', _content: '有人评论了你的创作', _link: `/creation/${id}` }).then()
+              if (creation?.author_id !== user.id) {
+                const displayName = profile?.display_name || profile?.username || '用户'
+                supabase.rpc('notify_user', { _user_id: creation.author_id, _title: '新评论', _content: `${displayName} 评论了你的作品「${creation.title}」`, _link: `/creation/${id}` }).then()
+              }
             }} />
         </div>
         {topLevelComments.length === 0 ? (
