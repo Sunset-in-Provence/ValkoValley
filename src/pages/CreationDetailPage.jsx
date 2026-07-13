@@ -146,7 +146,17 @@ export default function CreationDetailPage() {
           {/* 视频 */}
           {creation.video_urls?.length > 0 && (
             <div className="mb-8">
-              <VideoEmbed urls={creation.video_urls} />
+              <div className="space-y-3">
+                {creation.video_urls.map((url, i) => {
+                  const isLocal = url.includes('supabase.co') || url.endsWith('.mp4') || url.endsWith('.webm')
+                  if (isLocal) {
+                    return <video key={i} controls className="w-full rounded-card" style={{ maxHeight: 400 }}>
+                      <source src={url} />您的浏览器不支持视频播放</video>
+                  }
+                  return null
+                })}
+              </div>
+              <VideoEmbed urls={creation.video_urls.filter((u) => !u.includes('supabase.co') && !u.endsWith('.mp4') && !u.endsWith('.webm'))} />
             </div>
           )}
 
