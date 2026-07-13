@@ -162,7 +162,7 @@ export default function CreationDetailPage() {
 
           {/* 操作栏 */}
           <div className="flex items-center gap-3 pt-4 border-t border-border">
-            <LikeButton targetType="creation" targetId={id} size="lg" />
+            <LikeButton targetType="creation" targetId={id} size="lg" ownerId={creation.author_id} title={creation.title} />
             {isOwn && (
               <>
                 <button onClick={() => navigate(`/creation/${id}/edit`)}
