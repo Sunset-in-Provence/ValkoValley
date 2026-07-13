@@ -49,6 +49,9 @@ export default function App() {
           style: { borderRadius: 'var(--radius-card)', fontFamily: 'var(--font-body)' },
         }}
       />
+      <Routes>
+        <Route path="/auth-device/:token" element={<AuthDevicePage />} />
+      </Routes>
       <SitePassGate>
       <Routes>
         {/* 公开页面 — 立即加载 */}

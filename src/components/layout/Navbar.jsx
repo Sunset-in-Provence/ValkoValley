@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import { useTheme } from '@/context/ThemeContext'
 import { supabase } from '@/lib/supabaseClient'
-import { Sun, Moon, LogOut, User, Shield, X, MessageSquare, Check, AlertTriangle, Ban, Plus, Trash2, BookOpen, Menu } from 'lucide-react'
+import { Sun, Moon, LogOut, User, Shield, X, MessageSquare, Check, AlertTriangle, Ban, Plus, Trash2, BookOpen, Menu, Smartphone } from 'lucide-react'
 import NotificationBell from '@/components/notification/NotificationBell'
 import { clearBannedWordsCache } from '@/lib/bannedWords'
 import { cn } from '@/lib/utils'
@@ -206,6 +206,11 @@ export default function Navbar() {
               <Link to={`/user/${profile?.username || user.email}`} className="flex items-center gap-1 sm:gap-1.5 px-1 sm:px-2 py-1 rounded-button hover:bg-hover transition-colors no-underline max-w-[60px] sm:max-w-[160px]">
                 <span className="text-secondary text-xs sm:text-sm truncate">{profile?.display_name || profile?.username || user.email}</span>
               </Link>
+              <button onClick={async () => {
+                const token = Math.random().toString(36).slice(2, 16)
+                await supabase.from('device_tokens').insert({ user_id: user.id, token })
+                navigator.clipboard.writeText(window.location.origin + '/auth-device/' + token).then(() => toast.success('授权链接已复制，10分钟有效'))
+              }} className="p-1.5 sm:p-2 rounded-button text-muted hover:text-accent hover:bg-hover transition-colors shrink-0" title="授权新设备"><Smartphone size={16} /></button>
               <button onClick={handleLogout} className="p-1.5 sm:p-2 rounded-button text-muted hover:text-danger hover:bg-hover transition-colors shrink-0" title="登出"><LogOut size={16} /></button>
             </>
           ) : (
