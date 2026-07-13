@@ -34,7 +34,7 @@ export default function ContributionWidget({ userId, isOwn }) {
         <div className="flex-1 bg-hover rounded-full h-2 overflow-hidden">
           <div className="bg-accent h-full rounded-full transition-all" style={{ width: `${progress}%` }} />
         </div>
-        <span className="text-muted text-[10px]">{sacrificed}🌼</span>
+        <span className="text-muted text-[10px]">{sacrificed} 株铃兰</span>
       </div>
     </div>
   )
