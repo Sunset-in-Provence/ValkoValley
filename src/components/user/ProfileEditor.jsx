@@ -25,7 +25,7 @@ export default function ProfileEditor({ profile, onClose }) {
     const file = e.target.files?.[0]
     if (!file) return
     setAvatarUploading(true)
-    const { url, error } = await uploadImage(file, 'avatars')
+    const { url, error } = await uploadImage(file, 'images')
     if (error) { toast.error('头像上传失败: ' + error.message) }
     else { setAvatarUrl(url) }
     setAvatarUploading(false)

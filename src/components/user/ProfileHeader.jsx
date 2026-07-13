@@ -6,6 +6,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import { User, Calendar, Award, Edit3, Mail } from 'lucide-react'
+import FollowButton from './FollowButton'
 
 export default function ProfileHeader({ profile, isOwn }) {
   const { user } = useAuth()
@@ -41,10 +42,13 @@ export default function ProfileHeader({ profile, isOwn }) {
               </Link>
             )}
             {user && !isOwn && (
-              <button onClick={() => navigate(`/messages?to=${profile.id}`)}
-                className="text-accent hover:text-accent/80 transition-colors shrink-0 flex items-center gap-1 text-xs">
-                <Mail size={14} /> 私信
-              </button>
+              <>
+                <FollowButton targetUserId={profile.id} targetUserName={profile.display_name || profile.username} />
+                <button onClick={() => navigate(`/messages?to=${profile.id}`)}
+                  className="text-accent hover:text-accent/80 transition-colors shrink-0 flex items-center gap-1 text-xs">
+                  <Mail size={14} /> 私信
+                </button>
+              </>
             )}
           </div>
 
