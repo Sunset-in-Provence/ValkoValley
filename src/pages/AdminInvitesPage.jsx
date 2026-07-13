@@ -156,7 +156,6 @@ function LilyExchangeLog() {
     load()
   }, [])
 
-  if (items.length === 0) return null
 
   return (
     <div className="mb-4">
@@ -165,6 +164,7 @@ function LilyExchangeLog() {
       </button>
       {show && (
         <div className="mt-2 space-y-1 max-h-64 overflow-y-auto">
+          {items.length === 0 && <p className="text-muted text-xs py-3 text-center">暂无兑换记录</p>}
           {items.map((e) => (
             <div key={e.id} className="bg-hover rounded-card p-2 text-xs">
               <div className="flex items-center justify-between mb-1">
