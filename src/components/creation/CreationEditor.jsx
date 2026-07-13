@@ -13,6 +13,8 @@ import MediaUploader from './MediaUploader'
 import VideoEmbed from './VideoEmbed'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import { loadBannedWords, checkBannedWords } from '@/lib/bannedWords'
+import { uploadVideo } from '@/lib/upload'
+import { Loader2, Video } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function CreationEditor() {
@@ -28,6 +30,7 @@ export default function CreationEditor() {
   const [customTags, setCustomTags] = useState([])
   const [imageUrls, setImageUrls] = useState([])
   const [videoUrls, setVideoUrls] = useState([])
+  const [videoUploading, setVideoUploading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [loadingData, setLoadingData] = useState(isEditing)
 
@@ -57,6 +60,17 @@ export default function CreationEditor() {
     }
     load()
   }, [id, user.id, navigate])
+
+  async function handleVideoUpload(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = ''
+    setVideoUploading(true)
+    const { url, error } = await uploadVideo(file)
+    if (error) toast.error('视频上传失败: ' + error.message)
+    else setVideoUrls((prev) => [...prev, url])
+    setVideoUploading(false)
+  }
 
   async function handleSubmit() {
     if (!title.trim()) { toast.error('请填写标题'); return }
@@ -117,10 +131,17 @@ export default function CreationEditor() {
         <MediaUploader images={imageUrls} onImagesChange={setImageUrls} />
       </div>
 
-      {/* 视频链接 */}
+      {/* 视频 */}
       <div>
         <label className="text-secondary text-sm font-medium mb-2 block">视频链接</label>
         <VideoEmbed urls={videoUrls} onUrlsChange={setVideoUrls} editable />
+        <div className="mt-2">
+          <label className="flex items-center gap-1 bg-hover border border-border text-secondary px-4 py-2 rounded-button text-sm cursor-pointer hover:bg-accent hover:text-text-inverse w-fit">
+            {videoUploading ? <Loader2 size={14} className="animate-spin" /> : <Video size={14} />}
+            {videoUploading ? '上传中...' : '本地上传视频'}
+            <input type="file" accept="video/mp4,video/webm" onChange={handleVideoUpload} hidden />
+          </label>
+        </div>
       </div>
 
       {/* 操作 */}
