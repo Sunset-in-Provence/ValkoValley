@@ -1,108 +1,114 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { X, Check, ZoomIn, ZoomOut } from 'lucide-react'
 
-const CROP_SIZE = 200
-const PREVIEW_SIZE = 300
-
 export default function AvatarCropper({ file, onCrop, onCancel }) {
-  const [imgSrc, setImgSrc] = useState('')
-  const [imgNatural, setImgNatural] = useState({ w: 0, h: 0 })
-  const [crop, setCrop] = useState({ x: 0, y: 0 })
+  const [img, setImg] = useState(null)
+  const [pos, setPos] = useState({ x: 0, y: 0 })
   const [scale, setScale] = useState(1)
-  const [dragging, setDragging] = useState(false)
-  const dragRef = useRef({ x: 0, y: 0 })
   const canvasRef = useRef(null)
+  const dragRef = useRef(null)
+  const areaSize = 280
 
   useEffect(() => {
     const reader = new FileReader()
     reader.onload = (e) => {
-      const img = new Image()
-      img.onload = () => {
-        setImgNatural({ w: img.naturalWidth, h: img.naturalHeight })
-        const minDim = Math.min(img.naturalWidth, img.naturalHeight)
-        const initScale = Math.max(CROP_SIZE / minDim, 0.5)
-        setScale(initScale)
-        setCrop({ x: (img.naturalWidth - CROP_SIZE / initScale) / 2, y: (img.naturalHeight - CROP_SIZE / initScale) / 2 })
+      const i = new Image()
+      i.onload = () => {
+        const minDim = Math.min(i.naturalWidth, i.naturalHeight)
+        const s = Math.max(areaSize / minDim, 0.5)
+        setScale(s)
+        setImg(i)
+        setPos({ x: (i.naturalWidth * s - areaSize) / 2, y: (i.naturalHeight * s - areaSize) / 2 })
       }
-      img.src = e.target.result; setImgSrc(e.target.result)
+      i.src = e.target.result
     }
     reader.readAsDataURL(file)
   }, [file])
 
-  const drawPreview = useCallback(() => {
+  // 绘制预览
+  useEffect(() => {
+    if (!img) return
     const canvas = canvasRef.current
-    if (!canvas || !imgSrc) return
-    const img = new Image()
-    img.onload = () => {
-      const ctx = canvas.getContext('2d'); canvas.width = PREVIEW_SIZE; canvas.height = PREVIEW_SIZE
-      ctx.clearRect(0, 0, PREVIEW_SIZE, PREVIEW_SIZE)
-      ctx.drawImage(img, crop.x, crop.y, CROP_SIZE / scale, CROP_SIZE / scale, 0, 0, PREVIEW_SIZE, PREVIEW_SIZE)
-    }
-    img.src = imgSrc
-  }, [imgSrc, crop, scale])
+    const ctx = canvas.getContext('2d')
+    canvas.width = 200; canvas.height = 200
+    const s = areaSize / 200
+    ctx.clearRect(0, 0, 200, 200)
+    ctx.beginPath(); ctx.arc(100, 100, 100, 0, Math.PI * 2); ctx.clip()
+    ctx.drawImage(img, -pos.x / s / scale, -pos.y / s / scale, img.naturalWidth / s, img.naturalHeight / s)
+  }, [img, pos, scale])
 
-  useEffect(() => { drawPreview() }, [drawPreview])
-
-  const displayScale = Math.min(280 / imgNatural.w, 280 / imgNatural.h, 1) * scale
-  const displayW = imgNatural.w * displayScale / scale
-  const displayH = imgNatural.h * displayScale / scale
-  const cropDisplay = CROP_SIZE * displayScale / scale
-
-  function getEventPos(e) {
-    const rect = e.currentTarget.getBoundingClientRect()
-    return { x: (e.clientX || e.touches?.[0]?.clientX || 0) - rect.left, y: (e.clientY || e.touches?.[0]?.clientY || 0) - rect.top }
-  }
-
-  function handleStart(e) { e.preventDefault(); setDragging(true); const p = getEventPos(e); dragRef.current = { x: p.x, y: p.y, cx: crop.x, cy: crop.y } }
-  function handleMove(e) {
-    if (!dragging) return
-    const p = getEventPos(e); const f = scale / displayScale
-    const dx = (p.x - dragRef.current.x) * f; const dy = (p.y - dragRef.current.y) * f
-    setCrop({ x: Math.max(0, Math.min(imgNatural.w - CROP_SIZE / scale, dragRef.current.cx - dx)), y: Math.max(0, Math.min(imgNatural.h - CROP_SIZE / scale, dragRef.current.cy - dy)) })
-  }
-  function handleEnd() { setDragging(false) }
-  function handleWheel(e) {
-    e.preventDefault()
-    setScale((prev) => { const n = prev + (e.deltaY > 0 ? -0.1 : 0.1); return Math.min(3, Math.max(Math.max(CROP_SIZE / imgNatural.w, CROP_SIZE / imgNatural.h, 0.2), n)) })
-  }
   function handleConfirm() {
     const canvas = canvasRef.current
     canvas.toBlob((blob) => { if (blob) onCrop(new File([blob], 'avatar.jpg', { type: 'image/jpeg' })) }, 'image/jpeg', 0.9)
   }
 
+  function getXY(e) {
+    const rect = e.currentTarget.getBoundingClientRect()
+    return { x: (e.touches?.[0]?.clientX || e.clientX) - rect.left, y: (e.touches?.[0]?.clientY || e.clientY) - rect.top }
+  }
+
+  function onStart(e) {
+    e.preventDefault()
+    dragRef.current = { ...getXY(e), px: pos.x, py: pos.y }
+  }
+
+  function onMove(e) {
+    if (!dragRef.current) return
+    const { x, y } = getXY(e)
+    const maxX = Math.max(0, img.naturalWidth * scale - areaSize)
+    const maxY = Math.max(0, img.naturalHeight * scale - areaSize)
+    setPos({
+      x: Math.max(0, Math.min(maxX, dragRef.current.px - (x - dragRef.current.x))),
+      y: Math.max(0, Math.min(maxY, dragRef.current.py - (y - dragRef.current.y))),
+    })
+  }
+
+  function onEnd() { dragRef.current = null }
+
+  if (!img) return null
+
   const zoomPct = Math.round(scale * 100)
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50" onClick={onCancel} />
-      <div className="relative bg-surface rounded-card shadow-elevated p-5 w-full max-w-lg">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-accent text-sm font-medium">裁剪头像 — 拖拽 + 滚轮缩放</h3>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2" onTouchMove={(e) => e.preventDefault()}>
+      <div className="absolute inset-0 bg-black/60" onClick={onCancel} />
+      <div className="relative bg-surface rounded-card shadow-elevated p-4 w-full max-w-md">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-accent text-sm font-medium">裁剪头像</h3>
           <button onClick={onCancel} className="text-muted hover:text-primary"><X size={18} /></button>
         </div>
-        <div className="flex flex-col items-center gap-4">
-          <div className="relative bg-black/5 rounded overflow-hidden cursor-move select-none" style={{ width: 280, height: 280 }}
-            onMouseDown={handleStart} onMouseMove={handleMove} onMouseUp={handleEnd} onMouseLeave={handleEnd}
-            onWheel={handleWheel} onTouchStart={handleStart} onTouchMove={handleMove} onTouchEnd={handleEnd}>
-            <img src={imgSrc} alt="" className="absolute block opacity-25"
-              style={{ width: displayW, height: displayH, left: -(crop.x * displayScale / scale), top: -(crop.y * displayScale / scale) }} />
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="border-2 border-white shadow-lg rounded-full" style={{ width: cropDisplay, height: cropDisplay }} />
-            </div>
+
+        <div className="flex flex-col items-center gap-3">
+          {/* 拖拽区 */}
+          <div className="relative rounded-full overflow-hidden bg-black/10 border-2 border-accent"
+            style={{ width: areaSize, height: areaSize }}
+            onMouseDown={onStart} onMouseMove={onMove} onMouseUp={onEnd} onMouseLeave={onEnd}
+            onTouchStart={onStart} onTouchMove={onMove} onTouchEnd={onEnd}>
+            <img src={img.src} alt="" className="absolute select-none"
+              style={{ width: img.naturalWidth * scale, height: img.naturalHeight * scale, left: -pos.x, top: -pos.y, maxWidth: 'none' }}
+              draggable={false} />
           </div>
-          <div className="flex items-center gap-2 w-64">
-            <ZoomOut size={14} className="text-muted" />
-            <input type="range" min={Math.round(Math.max(CROP_SIZE / imgNatural.w, CROP_SIZE / imgNatural.h, 0.2) * 100)} max={300} value={zoomPct}
-              onChange={(e) => setScale(Number(e.target.value) / 100)} className="flex-1 accent-accent h-1.5" />
-            <ZoomIn size={14} className="text-muted" />
+
+          {/* 缩放 */}
+          <div className="flex items-center gap-2 w-full max-w-[220px]">
+            <ZoomOut size={14} className="text-muted shrink-0" />
+            <input type="range" min={Math.round(Math.max(areaSize / img.naturalWidth, areaSize / img.naturalHeight, 0.3) * 100)}
+              max={300} value={zoomPct} onChange={(e) => setScale(Number(e.target.value) / 100)}
+              className="flex-1 accent-accent" />
+            <ZoomIn size={14} className="text-muted shrink-0" />
             <span className="text-muted text-[10px] w-10 text-right">{zoomPct}%</span>
           </div>
-          <div><p className="text-muted text-xs mb-1 text-center">预览</p>
-            <canvas ref={canvasRef} className="w-20 h-20 rounded-full border-2 border-border" /></div>
+
+          {/* 预览 */}
+          <div className="text-center">
+            <p className="text-muted text-[10px] mb-1">预览</p>
+            <canvas ref={canvasRef} className="w-16 h-16 rounded-full border-2 border-border" />
+          </div>
         </div>
-        <div className="flex justify-end gap-2 mt-4 pt-3 border-t border-border">
-          <button onClick={onCancel} className="border border-border text-secondary px-4 py-1.5 rounded-button text-sm hover:bg-hover">取消</button>
-          <button onClick={handleConfirm} className="bg-accent text-text-inverse px-4 py-1.5 rounded-button text-sm hover:opacity-90 flex items-center gap-1"><Check size={14} /> 确认</button>
+
+        <div className="flex justify-end gap-2 mt-3 pt-3 border-t border-border">
+          <button onClick={onCancel} className="border border-border text-secondary px-4 py-1.5 rounded-button text-xs hover:bg-hover">取消</button>
+          <button onClick={handleConfirm} className="bg-accent text-text-inverse px-4 py-1.5 rounded-button text-xs hover:opacity-90 flex items-center gap-1"><Check size={14} /> 确认</button>
         </div>
       </div>
     </div>
