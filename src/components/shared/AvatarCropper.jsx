@@ -31,10 +31,10 @@ export default function AvatarCropper({ file, onCrop, onCancel }) {
     const canvas = canvasRef.current
     const ctx = canvas.getContext('2d')
     canvas.width = 200; canvas.height = 200
-    const s = areaSize / 200
     ctx.clearRect(0, 0, 200, 200)
     ctx.beginPath(); ctx.arc(100, 100, 100, 0, Math.PI * 2); ctx.clip()
-    ctx.drawImage(img, -pos.x / s / scale, -pos.y / s / scale, img.naturalWidth / s, img.naturalHeight / s)
+    const srcW = areaSize / scale; const srcH = areaSize / scale
+    ctx.drawImage(img, pos.x / scale, pos.y / scale, srcW, srcH, 0, 0, 200, 200)
   }, [img, pos, scale])
 
   function handleConfirm() {
