@@ -34,6 +34,8 @@ const AdminInvitesPage = lazy(() => import('@/pages/AdminInvitesPage'))
 const AdminChangelogPage = lazy(() => import('@/pages/AdminChangelogPage'))
 const AdminContactsPage = lazy(() => import('@/pages/AdminContactsPage'))
 const MessagesPage = lazy(() => import('@/pages/MessagesPage'))
+const LilyGardenPage = lazy(() => import('@/pages/LilyGardenPage'))
+const LilyValleyPage = lazy(() => import('@/pages/LilyValleyPage'))
 const ContactPage = lazy(() => import('@/pages/ContactPage'))
 
 function Lazy({ children }) {
@@ -78,6 +80,8 @@ export default function App() {
         <Route path="/library/:id" element={<Lazy><ProtectedRoute><AppLayout><LibraryDetailPage /></AppLayout></ProtectedRoute></Lazy>} />
         <Route path="/library/:id/edit" element={<Lazy><ProtectedRoute><AppLayout><LibraryEditorPage /></AppLayout></ProtectedRoute></Lazy>} />
         <Route path="/help" element={<Lazy><ProtectedRoute><AppLayout><HelpCenterPage /></AppLayout></ProtectedRoute></Lazy>} />
+        <Route path="/lily-garden" element={<Lazy><ProtectedRoute><AppLayout><LilyGardenPage /></AppLayout></ProtectedRoute></Lazy>} />
+        <Route path="/lily-valley" element={<Lazy><ProtectedRoute><AppLayout><LilyValleyPage /></AppLayout></ProtectedRoute></Lazy>} />
         <Route path="/messages" element={<Lazy><ProtectedRoute><AppLayout><MessagesPage /></AppLayout></ProtectedRoute></Lazy>} />
         <Route path="/contact" element={<Lazy><ProtectedRoute><AppLayout><ContactPage /></AppLayout></ProtectedRoute></Lazy>} />
 
