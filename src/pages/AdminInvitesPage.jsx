@@ -145,7 +145,13 @@ function LilyExchangeLog() {
   useEffect(() => {
     async function load() {
       const { data } = await supabase.from('lily_mailbox').select('*, user:profiles!lily_mailbox_user_id_fkey(display_name, username)').order('created_at', { ascending: false }).limit(50)
-      setItems(data || [])
+      if (!data) { setItems([]); return }
+      // 查每个码的使用状态
+      const codes = data.map((e) => e.code)
+      const { data: ic } = await supabase.rpc('get_invite_code_status', { _codes: codes })
+      const statusMap = {}
+      ic?.forEach((r) => { statusMap[r.code] = r })
+      setItems(data.map((e) => ({ ...e, status: statusMap[e.code] })))
     }
     load()
   }, [])
@@ -158,12 +164,20 @@ function LilyExchangeLog() {
         <Flower size={14} /> 铃兰兑换记录 ({items.length}) {show ? '收起' : '展开'}
       </button>
       {show && (
-        <div className="mt-2 space-y-1 max-h-48 overflow-y-auto">
+        <div className="mt-2 space-y-1 max-h-64 overflow-y-auto">
           {items.map((e) => (
-            <div key={e.id} className="bg-hover rounded-card p-2 text-xs flex items-center justify-between">
-              <span className="text-secondary">{e.user?.display_name || e.user?.username || '用户'}</span>
-              <span className="text-primary font-mono font-bold">{e.code}</span>
-              <span className="text-muted">{new Date(e.created_at).toLocaleDateString('zh-CN')}</span>
+            <div key={e.id} className="bg-hover rounded-card p-2 text-xs">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-secondary">{e.user?.display_name || e.user?.username || '用户'}</span>
+                <span className="text-primary font-mono font-bold">{e.code}</span>
+                <span className="text-muted">{new Date(e.created_at).toLocaleDateString('zh-CN')}</span>
+              </div>
+              <div className="flex items-center gap-2 text-[10px]">
+                <span className={`px-1.5 py-0.5 rounded-full ${e.status?.used ? 'bg-danger/10 text-danger' : 'bg-success/10 text-success'}`}>
+                  {e.status?.used ? '已使用' : '未使用'}
+                </span>
+                {e.status?.used_by_email && <span className="text-muted">使用邮箱：{e.status.used_by_email}</span>}
+              </div>
             </div>
           ))}
         </div>

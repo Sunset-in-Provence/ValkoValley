@@ -195,7 +195,10 @@ export default function RegisterPage() {
       toast.success(`敖尹考试通过！正在创建账户...`)
       setTimeout(async () => {
         await createAccount()
-        if (inviteRequired) supabase.rpc('increment_invite_usage', { _code: inviteCode.trim().toUpperCase() }).then()
+        if (inviteRequired) {
+          supabase.rpc('increment_invite_usage', { _code: inviteCode.trim().toUpperCase() }).then()
+          supabase.from('invite_codes').update({ used_by_email: email }).eq('code', inviteCode.trim().toUpperCase()).then()
+        }
         window.location.href = '/discussion'
       }, 1000)
     } else {
