@@ -6,7 +6,7 @@
 import { useState } from 'react'
 import { renderMarkdown } from '@/lib/markdown'
 
-export default function MarkdownPreview({ content, onChange, readOnly = false, placeholder = '支持 Markdown 格式...', rows = 10 }) {
+export default function MarkdownPreview({ content, onChange, readOnly = false, placeholder = '输入正文...', rows = 10 }) {
   const [tab, setTab] = useState(readOnly ? 'preview' : 'edit')
 
   if (readOnly) {
