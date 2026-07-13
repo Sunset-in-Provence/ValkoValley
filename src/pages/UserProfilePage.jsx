@@ -94,6 +94,9 @@ export default function UserProfilePage() {
         <ProfileHeader profile={profile} isOwn={isOwn} />
       )}
 
+      {/* 贡献值 */}
+      <ContributionWidget userId={profile.id} isOwn={isOwn} />
+
       {/* Tab 切换 */}
       <div className="flex items-center gap-1 mt-6 mb-4 border-b border-border pb-2">
         {TABS.map(({ key, label, icon: Icon }) => (
