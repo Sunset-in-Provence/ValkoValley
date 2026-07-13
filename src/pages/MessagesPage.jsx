@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/context/AuthContext'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import { ArrowLeft, Send, User, Pin, PinOff } from 'lucide-react'
+import { loadBannedWords, checkBannedWords } from '@/lib/bannedWords'
 import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
 
@@ -87,6 +88,9 @@ export default function MessagesPage() {
   async function handleSend(e) {
     e.preventDefault()
     if (!text.trim() || !activeChat) return
+    const words = await loadBannedWords(supabase)
+    const hits = checkBannedWords(text, words)
+    if (hits.length > 0) { toast.error(`包含违规词：${hits.slice(0, 3).join('、')}`); return }
     const { error } = await supabase.from('messages').insert({ sender_id: user.id, receiver_id: activeChat, content: text.trim() })
     if (error) toast.error('发送失败')
     else {
