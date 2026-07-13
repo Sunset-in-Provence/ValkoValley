@@ -47,6 +47,8 @@ export default function DiscussionDetailPage() {
       return
     }
     setPost(postData)
+    // 增加阅读量
+    supabase.rpc('increment_post_view', { _post_id: id }).then()
 
     // 获取评论（含作者信息）
     const { data: commentData } = await supabase
@@ -157,7 +159,7 @@ export default function DiscussionDetailPage() {
 
           {/* 操作按钮 */}
           <div className="flex items-center gap-3 mt-6 pt-4 border-t border-border">
-            <LikeButton targetType="post" targetId={id} size="lg" />
+            <LikeButton targetType="post" targetId={id} size="lg" ownerId={post.author_id} />
             {isOwn && (
               <>
                 <button

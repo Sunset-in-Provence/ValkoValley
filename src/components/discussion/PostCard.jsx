@@ -30,7 +30,7 @@ export default function PostCard({ post }) {
         <span className="flex items-center gap-1">
           <MessageSquare size={12} /> {commentCount}
         </span>
-        <LikeButton targetType="post" targetId={post.id} initialCount={post.like_count || 0} />
+        <LikeButton targetType="post" targetId={post.id} initialCount={post.like_count || 0} ownerId={post.author_id} />
       </div>
     </div>
   )

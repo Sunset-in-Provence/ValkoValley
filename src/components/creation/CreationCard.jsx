@@ -68,7 +68,7 @@ export default function CreationCard({ creation }) {
           <span className="flex items-center gap-1"><User size={11} /> {author.display_name || author.username || '未知'}</span>
           <span className="flex items-center gap-1"><Clock size={11} /> {new Date(creation.created_at).toLocaleDateString('zh-CN')}</span>
           <span className="flex items-center gap-1"><Eye size={11} /> {creation.view_count || 0}</span>
-          <LikeButton targetType="creation" targetId={creation.id} initialCount={creation.like_count || 0} />
+          <LikeButton targetType="creation" targetId={creation.id} initialCount={creation.like_count || 0} ownerId={creation.author_id} />
         </div>
       </div>
     </Link>

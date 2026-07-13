@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext'
 import { Heart } from 'lucide-react'
 import toast from 'react-hot-toast'
 
-export default function LikeButton({ targetType, targetId, initialCount = 0 }) {
+export default function LikeButton({ targetType, targetId, initialCount = 0, ownerId }) {
   const { user } = useAuth()
   const [liked, setLiked] = useState(false)
   const [count, setCount] = useState(initialCount)
@@ -23,8 +23,15 @@ export default function LikeButton({ targetType, targetId, initialCount = 0 }) {
     if (!user) { toast.error('请先登录'); return }
     const { data, error } = await supabase.rpc('toggle_like', { _target_type: targetType, _target_id: targetId })
     if (error) { toast.error('操作失败'); return }
-    // data = true (liked) or false (unliked)
-    if (data) { setLiked(true); setCount((c) => c + 1) }
+    if (data) {
+      setLiked(true); setCount((c) => c + 1)
+      // 通知内容作者
+      if (ownerId && ownerId !== user.id) {
+        supabase.from('notifications').insert({
+          user_id: ownerId, type: 'system', title: '新的点赞', content: '有人赞了你的内容',
+        }).then()
+      }
+    }
     else { setLiked(false); setCount((c) => Math.max(0, c - 1)) }
   }
 
