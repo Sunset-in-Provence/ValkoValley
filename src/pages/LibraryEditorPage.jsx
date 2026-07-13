@@ -307,6 +307,7 @@ export default function LibraryEditorPage() {
               {videoUploading ? '上传中' : '本地上传'}
               <input type="file" accept="video/mp4,video/webm" onChange={handleVideoUpload} hidden />
             </label>
+            <span className="text-muted text-xs ml-2">最大 50MB</span>
           </div>
           {videoUrls.length > 0 && (
             <div className="flex flex-col gap-1 mt-2">
