@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
-import { X, MessageSquare, Palette, BookOpen, Megaphone, HelpCircle, ArrowRight, Menu, MessageCircle } from 'lucide-react'
+import { X, MessageSquare, Palette, BookOpen, Megaphone, HelpCircle, ArrowRight, Menu, MessageCircle, Flower } from 'lucide-react'
 
 const STORAGE_KEY = 'vv-onboarding-done'
 
@@ -29,6 +29,10 @@ const STEPS = [
   {
     icon: Megaphone, title: '公告中心',
     desc: '查看社区总公告、更新公告和违规公示。新公告发布时会有强制弹窗提醒，滚动到底部确认即表示已阅读。',
+  },
+  {
+    icon: Flower, title: '铃兰养成系统',
+    desc: '通过每日浇水、发帖、评论、点赞积累贡献值，养大一株铃兰需要400贡献值。成熟的铃兰可以贡献到铃兰谷，兑换邀请码邀请朋友加入。',
   },
   {
     icon: HelpCircle, title: '内容审核机制',
