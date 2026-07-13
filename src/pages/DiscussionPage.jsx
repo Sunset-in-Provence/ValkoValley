@@ -17,11 +17,14 @@ export default function DiscussionPage() {
   const [timeOrder, setTimeOrder] = useState('desc') // 'desc' | 'asc'
   const [search, setSearch] = useState('')
 
+  useEffect(() => { fetchPosts() }, [sort, timeOrder])
+
+  // 数据加载完后恢复滚动位置
   useEffect(() => {
-    fetchPosts()
+    if (loading) return
     const y = sessionStorage.getItem('scroll-discussion')
-    if (y) { setTimeout(() => window.scrollTo(0, parseInt(y)), 100); sessionStorage.removeItem('scroll-discussion') }
-  }, [sort, timeOrder])
+    if (y) { requestAnimationFrame(() => { window.scrollTo(0, parseInt(y)); sessionStorage.removeItem('scroll-discussion') }) }
+  }, [loading])
 
   async function fetchPosts() {
     setLoading(true)

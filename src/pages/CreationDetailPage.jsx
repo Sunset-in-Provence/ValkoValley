@@ -184,7 +184,10 @@ export default function CreationDetailPage() {
           <MessageSquare size={18} /> 评论 ({comments.length})
         </h2>
         <div className="mb-6 pb-6 border-b border-border">
-          <CommentForm creationId={id} onSuccess={fetchData} />
+          <CommentForm creationId={id} onSuccess={() => {
+              fetchData()
+              if (creation?.author_id !== user.id) supabase.rpc('notify_like', { _user_id: creation.author_id, _title: '新评论', _content: '有人评论了你的创作' }).then()
+            }} />
         </div>
         {topLevelComments.length === 0 ? (
           <p className="text-muted text-sm text-center py-8">暂无评论，来发表第一条评论吧</p>

@@ -192,7 +192,10 @@ export default function DiscussionDetailPage() {
         <div className="mb-6 pb-6 border-b border-border">
           <CommentForm
             postId={id}
-            onSuccess={fetchData}
+            onSuccess={() => {
+              fetchData()
+              if (post.author_id !== user.id) supabase.rpc('notify_like', { _user_id: post.author_id, _title: '新评论', _content: '有人评论了你的帖子' }).then()
+            }}
           />
         </div>
 
