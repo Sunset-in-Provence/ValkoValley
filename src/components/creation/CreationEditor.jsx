@@ -128,6 +128,9 @@ export default function CreationEditor() {
 
       {/* 图片上传 */}
       <div>
+        {contentType === 'video' && imageUrls.length === 0 && (
+          <p className="text-warning text-xs mb-2">建议上传封面图，第一张图将作为视频封面展示</p>
+        )}
         <MediaUploader images={imageUrls} onImagesChange={setImageUrls} />
       </div>
 
