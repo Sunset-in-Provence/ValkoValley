@@ -42,8 +42,12 @@ export default function AdminInvitesPage() {
     fetch()
   }
 
-  function copyCode(code) {
-    navigator.clipboard.writeText(code).then(() => toast.success('已复制: ' + code))
+  function copyCode(code, id) {
+    navigator.clipboard.writeText(code).then(async () => {
+      toast.success('已复制: ' + code)
+      await supabase.rpc('increment_copy_count', { _id: id })
+      fetch()
+    })
   }
 
   async function handleToggle(id, active) {
@@ -107,9 +111,10 @@ export default function AdminInvitesPage() {
               {codes.map((c) => (
                 <div key={c.id} className="border border-border rounded-card p-2.5 flex items-center justify-between flex-wrap gap-2">
                   <div className="flex items-center gap-2">
-                    <button onClick={() => copyCode(c.code)}
+                    <button onClick={() => copyCode(c.code, c.id)}
                       className="text-primary text-sm font-mono font-bold hover:text-accent flex items-center gap-1">
                       {c.code} <Copy size={12} className="text-muted" />
+                      {c.copy_count > 0 && <span className="text-muted text-[10px] ml-1">复制{c.copy_count}次</span>}
                     </button>
                     <span className={cn('text-xs px-1.5 py-0.5 rounded-full',
                       c.used_count >= c.max_uses ? 'bg-danger/10 text-danger' : c.is_active ? 'bg-success/10 text-success' : 'bg-hover text-muted')}>
