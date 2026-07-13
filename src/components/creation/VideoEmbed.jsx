@@ -27,21 +27,18 @@ export default function VideoEmbed({ urls = [], onUrlsChange, editable = false }
       {urls.map((url, i) => {
         const info = parseVideoUrl(url)
         const embedUrl = info?.embedUrl
+        const isLocal = url.includes('supabase.co') || url.endsWith('.mp4') || url.endsWith('.webm')
         return (
           <div key={i} className="relative bg-surface rounded-card overflow-hidden border border-border">
-            <div className="aspect-video">
-              {embedUrl ? (
-                <iframe
-                  src={embedUrl}
-                  title={`video-${i}`}
-                  className="w-full h-full"
-                  allowFullScreen
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                />
+            <div className={isLocal ? '' : 'aspect-video'}>
+              {isLocal ? (
+                <video controls className="w-full" style={{ maxHeight: 400 }}>
+                  <source src={url} />您的浏览器不支持视频播放</video>
+              ) : embedUrl ? (
+                <iframe src={embedUrl} title={`video-${i}`} className="w-full h-full aspect-video"
+                  allowFullScreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-muted text-sm">
-                  无法加载视频：{url}
-                </div>
+                <div className="w-full h-full flex items-center justify-center text-muted text-sm">无法加载视频：{url}</div>
               )}
             </div>
             {editable && (
