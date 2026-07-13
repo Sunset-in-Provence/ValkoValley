@@ -89,6 +89,7 @@ export default function App() {
         <Route path="/admin/exam" element={<Lazy><ProtectedRoute adminOnly><AdminExamPage /></ProtectedRoute></Lazy>} />
         <Route path="/admin/announcements" element={<Lazy><ProtectedRoute adminOnly><AdminAnnouncePage /></ProtectedRoute></Lazy>} />
         <Route path="/admin/invites" element={<Lazy><ProtectedRoute adminOnly><AdminInvitesPage /></ProtectedRoute></Lazy>} />
+        <Route path="/admin/changelog" element={<Lazy><ProtectedRoute adminOnly><AdminChangelogPage /></ProtectedRoute></Lazy>} />
         <Route path="/admin/contacts" element={<Lazy><ProtectedRoute adminOnly><AdminContactsPage /></ProtectedRoute></Lazy>} />
 
         <Route path="*" element={<NotFoundPage />} />
