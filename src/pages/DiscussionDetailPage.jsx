@@ -194,7 +194,7 @@ export default function DiscussionDetailPage() {
             postId={id}
             onSuccess={() => {
               fetchData()
-              if (post.author_id !== user.id) supabase.rpc('notify_like', { _user_id: post.author_id, _title: '新评论', _content: '有人评论了你的帖子' }).then()
+              if (post.author_id !== user.id) supabase.rpc('notify_user', { _user_id: post.author_id, _title: '新评论', _content: '有人评论了你的帖子', _link: `/discussion/${id}` }).then()
             }}
           />
         </div>

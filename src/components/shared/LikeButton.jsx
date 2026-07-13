@@ -27,7 +27,7 @@ export default function LikeButton({ targetType, targetId, initialCount = 0, own
       setLiked(true); setCount((c) => c + 1)
       // 通知内容作者
       if (ownerId && ownerId !== user.id) {
-        supabase.rpc('notify_like', { _user_id: ownerId, _title: '新的点赞', _content: '有人赞了你的内容' }).then()
+        supabase.rpc('notify_user', { _user_id: ownerId, _title: '新的点赞', _content: '有人赞了你的内容', _link: targetType === 'post' ? `/discussion/${targetId}` : `/creation/${targetId}` }).then()
       }
     }
     else { setLiked(false); setCount((c) => Math.max(0, c - 1)) }
