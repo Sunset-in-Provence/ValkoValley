@@ -12,7 +12,12 @@ import { sanitize } from './sanitize'
  * @returns {JSX.Element}
  */
 export function renderMarkdown(content) {
+  if (!content) return null
   const cleaned = sanitize(content)
+  return <div className="whitespace-pre-wrap break-words">{cleaned}</div>
+}
+
+function _oldRenderMarkdown(content) {
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}

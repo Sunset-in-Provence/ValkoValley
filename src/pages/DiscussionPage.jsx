@@ -52,6 +52,8 @@ export default function DiscussionPage() {
       return { ...p, comment_count: c, like_count: l, hotness }
     })
 
+    // 置顶优先
+    enriched.sort((a, b) => (b.is_pinned ? 1 : 0) - (a.is_pinned ? 1 : 0))
     if (sort === 'time') {
       enriched.sort((a, b) => timeOrder === 'desc'
         ? new Date(b.created_at) - new Date(a.created_at)

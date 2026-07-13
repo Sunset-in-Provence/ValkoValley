@@ -18,7 +18,7 @@ import EmptyState from '@/components/shared/EmptyState'
 import toast from 'react-hot-toast'
 import {
   ArrowLeft, User, Clock, MessageSquare,
-  Edit3, Trash2
+  Edit3, Trash2, Pin
 } from 'lucide-react'
 
 export default function DiscussionDetailPage() {
@@ -173,6 +173,16 @@ export default function DiscussionDetailPage() {
                 >
                   <Trash2 size={12} /> 删除
                 </button>
+                {isAdmin && (
+                  <button onClick={async () => {
+                    await supabase.from('posts').update({ is_pinned: !post.is_pinned }).eq('id', id)
+                    setPost((p) => ({ ...p, is_pinned: !p.is_pinned }))
+                    toast.success(post.is_pinned ? '已取消置顶' : '已置顶')
+                  }}
+                    className="flex items-center gap-1 text-muted text-xs hover:text-accent transition-colors">
+                    <Pin size={12} /> {post.is_pinned ? '取消置顶' : '置顶'}
+                  </button>
+                )}
               </>
             )}
             {/* 举报按钮 */}
