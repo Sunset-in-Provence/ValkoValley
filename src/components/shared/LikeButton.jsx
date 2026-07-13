@@ -25,6 +25,7 @@ export default function LikeButton({ targetType, targetId, initialCount = 0, own
     if (error) { toast.error('操作失败'); return }
     if (data) {
       setLiked(true); setCount((c) => c + 1)
+      supabase.rpc('add_contribution', { _user_id: user.id, _action: '点赞', _points: 10 }).then()
       // 通知内容作者
       if (ownerId && ownerId !== user.id) {
         const myName = profile?.display_name || profile?.username || '用户'

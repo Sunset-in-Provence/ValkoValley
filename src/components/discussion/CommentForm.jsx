@@ -38,6 +38,7 @@ export default function CommentForm({ postId = null, creationId = null, parentId
       toast.error('评论失败: ' + error.message)
     } else {
       toast.success(parentId ? '回复成功' : '评论成功')
+    supabase.rpc('add_contribution', { _user_id: user.id, _action: '评论', _points: 10 }).then()
       setContent('')
       if (onSuccess) onSuccess()
       if (onCancel) onCancel() // 关闭回复框

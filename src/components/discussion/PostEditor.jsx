@@ -81,6 +81,7 @@ export default function PostEditor() {
       if (error) { toast.error('发布失败: ' + error.message) }
       else {
         toast.success('帖子发布成功！')
+        supabase.rpc('add_contribution', { _user_id: user.id, _action: '发帖', _points: 10 }).then()
         navigate(`/discussion/${data.id}`)
       }
     }
