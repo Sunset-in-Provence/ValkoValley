@@ -157,7 +157,7 @@ export default function DiscussionDetailPage() {
 
           {/* 操作按钮 */}
           <div className="flex items-center gap-3 mt-6 pt-4 border-t border-border">
-            <LikeButton targetType="post" targetId={id} size="lg" ownerId={post.author_id} />
+            <LikeButton targetType="post" targetId={id} size="lg" ownerId={post.author_id} title={post.title} />
             {isOwn && (
               <>
                 <button
