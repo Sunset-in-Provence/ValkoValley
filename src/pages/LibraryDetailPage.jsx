@@ -8,7 +8,7 @@ import { useAuth } from '@/context/AuthContext'
 import { renderMarkdown } from '@/lib/markdown'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import toast from 'react-hot-toast'
-import { ArrowLeft, Eye, Calendar, User, Edit3, Trash2 } from 'lucide-react'
+import { ArrowLeft, Eye, Calendar, User, Edit3, Trash2, Download } from 'lucide-react'
 
 const catLabels = {
   lore_official: '官方设定', lore_rumor: '坊间传闻',
@@ -97,9 +97,14 @@ export default function LibraryDetailPage() {
             <div className="mb-6">
               <div className="flex flex-wrap gap-2">
                 {entry.image_urls.map((url, i) => (
-                  <img key={i} src={url} alt={`附图 ${i + 1}`}
-                    className="rounded-card w-24 h-24 md:w-32 md:h-32 object-cover cursor-pointer hover:opacity-90"
-                    loading="lazy" onClick={() => window.open(url, '_blank')} />
+                  <div key={i} className="relative group">
+                    <img src={url} alt={`附图 ${i + 1}`}
+                      className="rounded-card w-24 h-24 md:w-32 md:h-32 object-cover cursor-pointer hover:opacity-90"
+                      loading="lazy" onClick={() => window.open(url, '_blank')} />
+                    <a href={url} download className="absolute bottom-1 right-1 bg-surface/80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity sm:opacity-100" title="下载">
+                      <Download size={12} className="text-muted" />
+                    </a>
+                  </div>
                 ))}
               </div>
             </div>

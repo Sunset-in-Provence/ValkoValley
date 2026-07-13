@@ -150,7 +150,8 @@ export default function DiscussionDetailPage() {
             <div className="flex flex-wrap gap-2 mt-4">
               {post.image_urls.map((url, i) => (
                 <img key={i} src={url} alt={`附图 ${i + 1}`}
-                  className="max-w-xs max-h-48 object-cover rounded-card" loading="lazy" />
+                  className="max-w-xs max-h-48 object-cover rounded-card cursor-pointer hover:opacity-90" loading="lazy"
+                  onClick={() => window.open(url, '_blank')} />
               ))}
             </div>
           )}
