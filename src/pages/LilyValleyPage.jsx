@@ -42,7 +42,6 @@ export default function LilyValleyPage() {
       </h1>
       <p className="text-muted text-sm mb-6">
         这里是所有用户分株移入的成年铃兰，共 {lilies.length} 株。
-        每株铃兰都代表一位园丁的 45 天精心养护。
       </p>
 
       <div className="bg-gradient-to-b from-green-900/20 via-green-800/10 to-green-900/20 rounded-card shadow-card relative overflow-hidden"
