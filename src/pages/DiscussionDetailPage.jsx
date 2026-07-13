@@ -47,8 +47,6 @@ export default function DiscussionDetailPage() {
       return
     }
     setPost(postData)
-    // 增加阅读量
-    supabase.rpc('increment_post_view', { _post_id: id }).then()
 
     // 获取评论（含作者信息）
     const { data: commentData } = await supabase

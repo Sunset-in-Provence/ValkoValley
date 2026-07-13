@@ -4,7 +4,7 @@
  *   rounded-card, rounded-full, shadow-card, font-display, border-border
  */
 import { Link } from 'react-router-dom'
-import { Eye, User, Clock, Image } from 'lucide-react'
+import { User, Clock, Image } from 'lucide-react'
 import LikeButton from '@/components/shared/LikeButton'
 import { cn } from '@/lib/utils'
 
@@ -67,7 +67,6 @@ export default function CreationCard({ creation }) {
         <div className="flex items-center gap-3 text-xs text-muted" onClick={(e) => e.preventDefault()}>
           <span className="flex items-center gap-1"><User size={11} /> {author.display_name || author.username || '未知'}</span>
           <span className="flex items-center gap-1"><Clock size={11} /> {new Date(creation.created_at).toLocaleDateString('zh-CN')}</span>
-          <span className="flex items-center gap-1"><Eye size={11} /> {creation.view_count || 0}</span>
           <LikeButton targetType="creation" targetId={creation.id} initialCount={creation.like_count || 0} ownerId={creation.author_id} />
         </div>
       </div>
