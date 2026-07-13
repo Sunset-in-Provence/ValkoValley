@@ -121,14 +121,12 @@ export default function LilyGardenPage() {
       )}
 
       {/* 铃兰谷入口 */}
-      {sacrificed > 0 && (
-        <a href="/lily-valley" className="block mt-4 bg-surface rounded-card shadow-card p-4 no-underline hover:shadow-elevated transition-shadow">
-          <div className="flex items-center justify-between">
-            <span className="text-accent text-sm font-medium flex items-center gap-2"><Flower size={18} /> 铃兰谷</span>
-            <span className="text-muted text-xs">{sacrificed} 株 →</span>
-          </div>
-        </a>
-      )}
+      <a href="/lily-valley" className="block mt-4 bg-surface rounded-card shadow-card p-4 no-underline hover:shadow-elevated transition-shadow">
+        <div className="flex items-center justify-between">
+          <span className="text-accent text-sm font-medium flex items-center gap-2"><Flower size={18} /> 铃兰谷</span>
+          <span className="text-muted text-xs">{sacrificed} 株 {sacrificed === 0 ? '还没有铃兰' : '→'}</span>
+        </div>
+      </a>
     </div>
   )
 }
