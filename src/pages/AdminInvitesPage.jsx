@@ -114,7 +114,7 @@ export default function AdminInvitesPage() {
                     <button onClick={() => copyCode(c.code, c.id)}
                       className="text-primary text-sm font-mono font-bold hover:text-accent flex items-center gap-1">
                       {c.code} <Copy size={12} className="text-muted" />
-                      {c.copy_count > 0 && <span className="text-muted text-[10px] ml-1">复制{c.copy_count}次</span>}
+                      <span className="text-muted text-[10px] ml-1">{(c.copy_count || 0) > 0 ? `复制${c.copy_count}次` : '未复制'}</span>
                     </button>
                     <span className={cn('text-xs px-1.5 py-0.5 rounded-full',
                       c.used_count >= c.max_uses ? 'bg-danger/10 text-danger' : c.is_active ? 'bg-success/10 text-success' : 'bg-hover text-muted')}>
