@@ -10,9 +10,10 @@ export default function PostCard({ post }) {
   const commentCount = post.comment_count || 0
 
   return (
-    <div className="bg-surface rounded-card shadow-card p-5 hover:shadow-elevated transition-shadow group">
+    <div className={`bg-surface rounded-card shadow-card p-5 hover:shadow-elevated transition-shadow group ${post.is_pinned ? 'border-l-4 border-accent' : ''}`}>
       <Link to={`/discussion/${post.id}`} className="no-underline" onClick={() => sessionStorage.setItem('scroll-discussion', window.scrollY)}>
         <h3 className="font-display text-accent text-base mb-2 group-hover:underline line-clamp-1">
+          {post.is_pinned && <span className="text-accent mr-1">置顶</span>}
           {post.title}
         </h3>
         <p className="text-secondary text-sm line-clamp-2 mb-3">
