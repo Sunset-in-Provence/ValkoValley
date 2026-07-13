@@ -11,7 +11,7 @@ export default function PostCard({ post }) {
 
   return (
     <div className="bg-surface rounded-card shadow-card p-5 hover:shadow-elevated transition-shadow group">
-      <Link to={`/discussion/${post.id}`} className="no-underline">
+      <Link to={`/discussion/${post.id}`} className="no-underline" onClick={() => sessionStorage.setItem('scroll-discussion', window.scrollY)}>
         <h3 className="font-display text-accent text-base mb-2 group-hover:underline line-clamp-1">
           {post.title}
         </h3>

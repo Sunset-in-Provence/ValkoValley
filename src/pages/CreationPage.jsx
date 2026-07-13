@@ -18,7 +18,11 @@ export default function CreationPage() {
   const [sort, setSort] = useState('time')
   const [timeOrder, setTimeOrder] = useState('desc')
   const [search, setSearch] = useState('')
-  useEffect(() => { fetchData() }, [contentFilter, sort, timeOrder])
+  useEffect(() => {
+    fetchData()
+    const y = sessionStorage.getItem('scroll-creation')
+    if (y) { setTimeout(() => window.scrollTo(0, parseInt(y)), 100); sessionStorage.removeItem('scroll-creation') }
+  }, [contentFilter, sort, timeOrder])
 
   async function fetchData() {
     setLoading(true)

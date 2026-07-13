@@ -17,7 +17,11 @@ export default function DiscussionPage() {
   const [timeOrder, setTimeOrder] = useState('desc') // 'desc' | 'asc'
   const [search, setSearch] = useState('')
 
-  useEffect(() => { fetchPosts() }, [sort, timeOrder])
+  useEffect(() => {
+    fetchPosts()
+    const y = sessionStorage.getItem('scroll-discussion')
+    if (y) { setTimeout(() => window.scrollTo(0, parseInt(y)), 100); sessionStorage.removeItem('scroll-discussion') }
+  }, [sort, timeOrder])
 
   async function fetchPosts() {
     setLoading(true)

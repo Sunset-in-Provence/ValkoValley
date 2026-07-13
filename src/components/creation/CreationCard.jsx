@@ -29,6 +29,7 @@ export default function CreationCard({ creation }) {
   return (
     <Link
       to={`/creation/${creation.id}`}
+      onClick={() => sessionStorage.setItem('scroll-creation', window.scrollY)}
       className="block bg-surface rounded-card shadow-card overflow-hidden no-underline hover:shadow-elevated transition-shadow group"
     >
       {/* 封面图 */}
