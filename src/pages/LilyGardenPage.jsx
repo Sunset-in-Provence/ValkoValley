@@ -56,13 +56,16 @@ export default function LilyGardenPage() {
     setTimeout(() => setAnimating(false), 1500)
   }
 
-  async function handleSacrifice() {
+  async function doSacrifice(getCode) {
     if (matureCount < 1) { toast.error('还没有成熟的铃兰可以贡献'); return }
-    if (!confirm('贡献一株成熟的铃兰到铃兰谷，系统将自动发放一个邀请码到你的信箱。确定吗？')) return
+    const msg = getCode ? '贡献铃兰并兑换一个邀请码？' : '贡献铃兰到铃兰谷？'
+    if (!confirm(msg)) return
 
-    // 生成邀请码
-    const code = 'VV' + Math.random().toString(36).slice(2, 8).toUpperCase()
-    await supabase.from('invite_codes').insert({ code, created_by: user.id, max_uses: 1 })
+    let code = null
+    if (getCode) {
+      code = 'VV' + Math.random().toString(36).slice(2, 8).toUpperCase()
+      await supabase.from('invite_codes').insert({ code, created_by: user.id, max_uses: 1 })
+    }
 
     const { error } = await supabase.from('lily_garden').update({
       propagated_count: sacrificed + 1,
@@ -70,15 +73,21 @@ export default function LilyGardenPage() {
 
     if (error) toast.error('操作失败')
     else {
-      await Promise.all([
-        supabase.from('valley_lilies').insert({ owner_id: user.id, name: `铃兰 #${sacrificed + 1}` }),
-        supabase.from('lily_mailbox').insert({ user_id: user.id, code }),
-      ])
+      const tasks = [supabase.from('valley_lilies').insert({ owner_id: user.id, name: `铃兰 #${sacrificed + 1}` })]
+      if (code) tasks.push(supabase.from('lily_mailbox').insert({ user_id: user.id, code }))
+      await Promise.all(tasks)
       setSacrificed((s) => s + 1)
-      setMessages((prev) => [{ code, created_at: new Date().toISOString(), copied: false }, ...prev])
-      toast.success('🌱 铃兰已移入铃兰谷！邀请码已发放到信箱')
+      if (code) {
+        setMessages((prev) => [{ code, created_at: new Date().toISOString(), copied: false }, ...prev])
+        toast.success('🌱 铃兰已移入铃兰谷！邀请码已发放到信箱')
+      } else {
+        toast.success('🌱 铃兰已移入铃兰谷！')
+      }
     }
   }
+
+  function handleSacrifice() { doSacrifice(false) }
+  function handleExchange() { doSacrifice(true) }
 
   return (
     <div className="max-w-lg mx-auto">
@@ -122,12 +131,18 @@ export default function LilyGardenPage() {
         </div>
       </div>
 
-      {/* 贡献兑换 */}
+      {/* 贡献 + 兑换 */}
       {matureCount > 0 && (
-        <button onClick={handleSacrifice}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-button font-medium text-sm bg-warning/10 text-warning border border-warning/30 hover:bg-warning/20">
-          <Gift size={18} /> 贡献铃兰兑换邀请码（还有 {matureCount} 次机会）
-        </button>
+        <div className="flex gap-3">
+          <button onClick={handleSacrifice}
+            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-button font-medium text-sm bg-accent/10 text-accent border border-accent/30 hover:bg-accent/20">
+            <Flower size={18} /> 贡献铃兰
+          </button>
+          <button onClick={handleExchange}
+            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-button font-medium text-sm bg-warning/10 text-warning border border-warning/30 hover:bg-warning/20">
+            <Gift size={18} /> 兑换邀请码
+          </button>
+        </div>
       )}
 
       {/* 信箱 */}
