@@ -13,6 +13,7 @@ import CommentItem from '@/components/discussion/CommentItem'
 import CommentForm from '@/components/discussion/CommentForm'
 import ReportButton from '@/components/report/ReportButton'
 import LikeButton from '@/components/shared/LikeButton'
+import ImageViewer from '@/components/shared/ImageViewer'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import EmptyState from '@/components/shared/EmptyState'
 import toast from 'react-hot-toast'
@@ -29,6 +30,8 @@ export default function DiscussionDetailPage() {
   const [post, setPost] = useState(null)
   const [comments, setComments] = useState([])
   const [loading, setLoading] = useState(true)
+  const [viewerOpen, setViewerOpen] = useState(false)
+  const [viewerIndex, setViewerIndex] = useState(0)
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -151,7 +154,7 @@ export default function DiscussionDetailPage() {
               {post.image_urls.map((url, i) => (
                 <img key={i} src={url} alt={`附图 ${i + 1}`}
                   className="max-w-xs max-h-48 object-cover rounded-card cursor-pointer hover:opacity-90" loading="lazy"
-                  onClick={() => window.open(url, '_blank')} />
+                  onClick={() => { setViewerOpen(true); setViewerIndex(i) }} />
               ))}
             </div>
           )}
@@ -233,6 +236,12 @@ export default function DiscussionDetailPage() {
           </div>
         )}
       </section>
+      {viewerOpen && post.image_urls?.length > 0 && (
+        <ImageViewer images={post.image_urls} current={viewerIndex}
+          onClose={() => setViewerOpen(false)}
+          onPrev={() => setViewerIndex((i) => (i - 1 + post.image_urls.length) % post.image_urls.length)}
+          onNext={() => setViewerIndex((i) => (i + 1) % post.image_urls.length)} />
+      )}
     </div>
   )
 }
