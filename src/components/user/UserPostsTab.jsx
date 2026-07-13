@@ -27,9 +27,11 @@ export default function UserPostsTab({ userId }) {
         const { data: counts } = await supabase
           .from('comments')
           .select('post_id').in('post_id', postIds).eq('is_deleted', false)
-        const countMap = {}
+        const countMap = {}; const likeMap = {}
         counts?.forEach((c) => { countMap[c.post_id] = (countMap[c.post_id] || 0) + 1 })
-        setPosts(data.map((p) => ({ ...p, comment_count: countMap[p.id] || 0 })))
+        const { data: likes } = await supabase.from('likes').select('target_id').eq('target_type', 'post').in('target_id', postIds)
+        likes?.forEach((l) => { likeMap[l.target_id] = (likeMap[l.target_id] || 0) + 1 })
+        setPosts(data.map((p) => ({ ...p, comment_count: countMap[p.id] || 0, like_count: likeMap[p.id] || 0 })))
       }
       setLoading(false)
     }
