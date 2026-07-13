@@ -19,7 +19,7 @@ export default function UserCreationsTab({ userId }) {
         .select('*, author:profiles!creations_author_id_fkey(username, display_name, avatar_url)')
         .eq('author_id', userId).eq('is_deleted', false)
         .order('created_at', { ascending: false })
-      if (data) setCreations(data)
+      if (data) { const ids = data.map((c) => c.id); const likeMap = {}; const { data: likes } = await supabase.from('likes').select('target_id').eq('target_type', 'creation').in('target_id', ids); likes?.forEach((l) => { likeMap[l.target_id] = (likeMap[l.target_id] || 0) + 1 }); setCreations(data.map((c) => ({ ...c, like_count: likeMap[c.id] || 0 }))) }
       setLoading(false)
     }
     fetch()
