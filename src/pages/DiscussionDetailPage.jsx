@@ -178,9 +178,13 @@ export default function DiscussionDetailPage() {
                 </button>
                 {isAdmin && (
                   <button onClick={async () => {
+                    if (!post.is_pinned) {
+                      // 新置顶：先取消所有旧置顶
+                      await supabase.from('posts').update({ is_pinned: false }).eq('is_pinned', true)
+                    }
                     await supabase.from('posts').update({ is_pinned: !post.is_pinned }).eq('id', id)
                     setPost((p) => ({ ...p, is_pinned: !p.is_pinned }))
-                    toast.success(post.is_pinned ? '已取消置顶' : '已置顶')
+                    toast.success(post.is_pinned ? '已取消置顶' : '已置顶（替换旧置顶）')
                   }}
                     className="flex items-center gap-1 text-muted text-xs hover:text-accent transition-colors">
                     <Pin size={12} /> {post.is_pinned ? '取消置顶' : '置顶'}
