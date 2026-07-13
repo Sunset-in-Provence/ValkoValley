@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/context/AuthContext'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
-import { Droplets, Flower, Gift, ArrowRight } from 'lucide-react'
+import { Droplets, Flower, Gift, ArrowRight, Mail, Copy } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const MATURE_POINTS = 400
@@ -11,6 +11,8 @@ export default function LilyGardenPage() {
   const { user } = useAuth()
   const [total, setTotal] = useState(0)
   const [sacrificed, setSacrificed] = useState(0)
+  const [messages, setMessages] = useState([])
+  const [showMailbox, setShowMailbox] = useState(false)
   const [watered, setWatered] = useState(false)
   const [posted, setPosted] = useState(false)
   const [commented, setCommented] = useState(false)
@@ -29,7 +31,8 @@ export default function LilyGardenPage() {
       setPosted(data?.some((r) => r.action === '发帖' && r.created_at >= today))
       setCommented(data?.some((r) => r.action === '评论' && r.created_at >= today))
       setLiked(data?.some((r) => r.action === '点赞' && r.created_at >= today))
-      // 读取牺牲次数
+      const { data: mailbox } = await supabase.from('lily_mailbox').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
+      setMessages(mailbox || [])
       const { data: garden } = await supabase.from('lily_garden').select('propagated_count').eq('user_id', user.id).maybeSingle()
       setSacrificed(garden?.propagated_count || 0)
       if (!garden) await supabase.from('lily_garden').insert({ user_id: user.id })
@@ -55,18 +58,25 @@ export default function LilyGardenPage() {
 
   async function handleSacrifice() {
     if (matureCount < 1) { toast.error('还没有成熟的铃兰可以贡献'); return }
-    if (!confirm('贡献一株成熟的铃兰到铃兰谷，可以兑换一次邀请码机会。确定吗？')) return
+    if (!confirm('贡献一株成熟的铃兰到铃兰谷，系统将自动发放一个邀请码到你的信箱。确定吗？')) return
+
+    // 生成邀请码
+    const code = 'VV' + Math.random().toString(36).slice(2, 8).toUpperCase()
+    await supabase.from('invite_codes').insert({ code, created_by: user.id, max_uses: 1 })
+
     const { error } = await supabase.from('lily_garden').update({
       propagated_count: sacrificed + 1,
     }).eq('user_id', user.id)
+
     if (error) toast.error('操作失败')
     else {
-      await supabase.from('valley_lilies').insert({ owner_id: user.id, name: `铃兰 #${sacrificed + 1}` })
-      const newSac = sacrificed + 1
-      setSacrificed(newSac)
-      // 自动申请邀请码
-      await supabase.from('invite_requests').insert({ user_id: user.id })
-      toast.success('🌱 铃兰已移入铃兰谷！一次邀请码申请已提交，审核后发放')
+      await Promise.all([
+        supabase.from('valley_lilies').insert({ owner_id: user.id, name: `铃兰 #${sacrificed + 1}` }),
+        supabase.from('lily_mailbox').insert({ user_id: user.id, code }),
+      ])
+      setSacrificed((s) => s + 1)
+      setMessages((prev) => [{ code, created_at: new Date().toISOString(), copied: false }, ...prev])
+      toast.success('🌱 铃兰已移入铃兰谷！邀请码已发放到信箱')
     }
   }
 
@@ -119,6 +129,40 @@ export default function LilyGardenPage() {
           <Gift size={18} /> 贡献铃兰兑换邀请码（还有 {matureCount} 次机会）
         </button>
       )}
+
+      {/* 信箱 */}
+      <div className="mt-4 bg-surface rounded-card shadow-card">
+        <button onClick={() => setShowMailbox(!showMailbox)} className="w-full p-4 flex items-center justify-between">
+          <span className="text-secondary text-sm font-medium flex items-center gap-2">
+            <Mail size={16} className="text-accent" /> 邀请码信箱
+            {messages.length > 0 && <span className="bg-accent/10 text-accent text-xs px-1.5 py-0.5 rounded-full">{messages.length}</span>}
+          </span>
+          <span className="text-muted text-xs">{showMailbox ? '收起' : '展开'}</span>
+        </button>
+        {showMailbox && (
+          <div className="px-4 pb-4 space-y-2">
+            {messages.length === 0 ? <p className="text-muted text-xs py-3 text-center">信箱是空的，贡献铃兰获取邀请码</p> : (
+              messages.map((m) => (
+                <div key={m.id} className="flex items-center justify-between bg-hover rounded-card p-2.5">
+                  <span className="text-primary text-sm font-mono font-bold">{m.code}</span>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => {
+                      navigator.clipboard.writeText(m.code)
+                      supabase.from('lily_mailbox').update({ copied: true }).eq('id', m.id).then()
+                      setMessages((prev) => prev.map((x) => x.id === m.id ? { ...x, copied: true } : x))
+                      toast.success('已复制')
+                    }}
+                      className="text-accent text-xs hover:underline flex items-center gap-1">
+                      <Copy size={12} /> {m.copied ? '已复制' : '复制'}
+                    </button>
+                    <span className="text-muted text-[10px]">{new Date(m.created_at).toLocaleDateString('zh-CN')}</span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+      </div>
 
       {/* 铃兰谷入口 */}
       <a href="/lily-valley" className="block mt-4 bg-surface rounded-card shadow-card p-4 no-underline hover:shadow-elevated transition-shadow">
