@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/context/AuthContext'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
-import { ArrowLeft, Plus, Shuffle, Copy } from 'lucide-react'
+import { ArrowLeft, Plus, Shuffle, Copy, Flower } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
 
@@ -90,6 +90,9 @@ export default function AdminInvitesPage() {
               </button>
             </div>
 
+            {/* 铃兰兑换记录 */}
+            <LilyExchangeLog />
+
             {/* 统计 */}
             <div className="grid grid-cols-3 gap-3 mb-4">
               <div className="bg-hover rounded-card p-3 text-center">
@@ -131,6 +134,40 @@ export default function AdminInvitesPage() {
           </>
         )}
       </div>
+    </div>
+  )
+}
+
+function LilyExchangeLog() {
+  const [items, setItems] = useState([])
+  const [show, setShow] = useState(false)
+
+  useEffect(() => {
+    async function load() {
+      const { data } = await supabase.from('lily_mailbox').select('*, user:profiles!lily_mailbox_user_id_fkey(display_name, username)').order('created_at', { ascending: false }).limit(50)
+      setItems(data || [])
+    }
+    load()
+  }, [])
+
+  if (items.length === 0) return null
+
+  return (
+    <div className="mb-4">
+      <button onClick={() => setShow(!show)} className="text-warning text-sm font-medium flex items-center gap-1 hover:underline">
+        <Flower size={14} /> 铃兰兑换记录 ({items.length}) {show ? '收起' : '展开'}
+      </button>
+      {show && (
+        <div className="mt-2 space-y-1 max-h-48 overflow-y-auto">
+          {items.map((e) => (
+            <div key={e.id} className="bg-hover rounded-card p-2 text-xs flex items-center justify-between">
+              <span className="text-secondary">{e.user?.display_name || e.user?.username || '用户'}</span>
+              <span className="text-primary font-mono font-bold">{e.code}</span>
+              <span className="text-muted">{new Date(e.created_at).toLocaleDateString('zh-CN')}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
