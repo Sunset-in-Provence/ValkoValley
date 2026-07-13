@@ -8,6 +8,7 @@
  */
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { Flower } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import GuestbookBanner from '@/components/shared/GuestbookBanner'
 import GuestbookCard from '@/components/shared/GuestbookCard'
@@ -31,6 +32,9 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-primary">
+      <Link to="/lily-garden" className="fixed bottom-24 right-6 z-30 w-12 h-12 bg-accent text-text-inverse rounded-full shadow-elevated flex items-center justify-center hover:opacity-90 transition-all hover:scale-105" title="铃兰花园">
+        <Flower size={20} />
+      </Link>
       <GuestbookBanner />
       <GuestbookCard />
       {/* Hero 区域 */}

@@ -2,26 +2,37 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/context/AuthContext'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
-import { Droplets, Flower, ArrowRight } from 'lucide-react'
+import { Droplets, Flower, Gift, ArrowRight } from 'lucide-react'
 import toast from 'react-hot-toast'
 
-const MATURE_DAYS = 45
+const MATURE_POINTS = 400
 
 export default function LilyGardenPage() {
   const { user } = useAuth()
-  const [garden, setGarden] = useState(null)
+  const [total, setTotal] = useState(0)
+  const [sacrificed, setSacrificed] = useState(0)
+  const [watered, setWatered] = useState(false)
+  const [posted, setPosted] = useState(false)
+  const [commented, setCommented] = useState(false)
+  const [liked, setLiked] = useState(false)
   const [loading, setLoading] = useState(true)
   const [animating, setAnimating] = useState(false)
 
   useEffect(() => {
     if (!user) return
     async function load() {
-      let { data } = await supabase.from('lily_garden').select('*').eq('user_id', user.id).maybeSingle()
-      if (!data) {
-        await supabase.from('lily_garden').insert({ user_id: user.id })
-        data = { user_id: user.id, water_count: 0, propagated_count: 0 }
-      }
-      setGarden(data)
+      const { data } = await supabase.from('contribution_log').select('points, action, created_at').eq('user_id', user.id)
+      const today = new Date().toISOString().slice(0, 10)
+      const pts = data?.reduce((s, r) => s + (r.points || 0), 0) || 0
+      setTotal(pts)
+      setWatered(data?.some((r) => r.action === 'daily_water' && r.created_at >= today))
+      setPosted(data?.some((r) => r.action === '发帖' && r.created_at >= today))
+      setCommented(data?.some((r) => r.action === '评论' && r.created_at >= today))
+      setLiked(data?.some((r) => r.action === '点赞' && r.created_at >= today))
+      // 读取牺牲次数
+      const { data: garden } = await supabase.from('lily_garden').select('propagated_count').eq('user_id', user.id).maybeSingle()
+      setSacrificed(garden?.propagated_count || 0)
+      if (!garden) await supabase.from('lily_garden').insert({ user_id: user.id })
       setLoading(false)
     }
     load()
@@ -29,92 +40,92 @@ export default function LilyGardenPage() {
 
   if (loading) return <div className="flex justify-center py-24"><LoadingSpinner size="lg" /></div>
 
-  const g = garden
-  const wateredToday = g.last_watered === new Date().toISOString().slice(0, 10)
-  const progress = Math.min((g.water_count || 0) / MATURE_DAYS * 100, 100)
-  const isMature = (g.water_count || 0) >= MATURE_DAYS
-  const stage = (g.water_count || 0) === 0 ? 'seed' : (g.water_count || 0) < 15 ? 'sprout' : (g.water_count || 0) < 30 ? 'bud' : (g.water_count || 0) < 45 ? 'bloom' : 'mature'
+  const progress = Math.min(total / MATURE_POINTS * 100, 100)
+  const matureCount = Math.floor(total / MATURE_POINTS) - sacrificed
+  const stage = total < 80 ? 'seed' : total < 160 ? 'sprout' : total < 240 ? 'bud' : total < 320 ? 'bloom' : 'mature'
+  const stageEmoji = { seed: '🌰', sprout: '🌱', bud: '🌿', bloom: '🌼', mature: '🌸' }
 
   async function handleWater() {
-    if (wateredToday) { toast('今天已经浇过水了'); return }
+    if (watered) { toast('今天已经浇过水了'); return }
     setAnimating(true)
-    const { error } = await supabase.from('lily_garden').update({
-      water_count: (g.water_count || 0) + 1,
-      last_watered: new Date().toISOString().slice(0, 10),
-    }).eq('user_id', user.id)
-    if (error) toast.error('浇水失败')
-    else {
-      const newCount = (g.water_count || 0) + 1
-      setGarden({ ...g, water_count: newCount, last_watered: new Date().toISOString().slice(0, 10) })
-      if (newCount % 10 === 0) toast.success(`铃兰又长大了一点！已浇 ${newCount} 天`)
-      else toast.success('铃兰喝饱了水 +10')
-      // 同步贡献值
-      supabase.rpc('add_contribution', { _user_id: user.id, _action: 'daily_water', _points: 10 }).then()
-    }
+    await supabase.from('contribution_log').insert({ user_id: user.id, action: 'daily_water', points: 10 })
+    setTotal((p) => p + 10); setWatered(true); toast.success('浇灌铃兰 +10 🌸')
     setTimeout(() => setAnimating(false), 1500)
   }
 
-  async function handlePropagate() {
-    if (!isMature) return
-    const newCount = (g.propagated_count || 0) + 1
-    await Promise.all([
-      supabase.from('lily_garden').update({ water_count: 0, last_watered: null, propagated_count: newCount }).eq('user_id', user.id),
-      supabase.from('valley_lilies').insert({ owner_id: user.id, name: `铃兰 #${newCount}` }),
-    ])
-    setGarden({ ...g, water_count: 0, last_watered: null, propagated_count: newCount })
-    toast.success('🌱 分株成功！成年铃兰已移入铃兰谷，新幼苗开始生长')
+  async function handleSacrifice() {
+    if (matureCount < 1) { toast.error('还没有成熟的铃兰可以贡献'); return }
+    if (!confirm('贡献一株成熟的铃兰到铃兰谷，可以兑换一次邀请码机会。确定吗？')) return
+    const { error } = await supabase.from('lily_garden').update({
+      propagated_count: sacrificed + 1,
+    }).eq('user_id', user.id)
+    if (error) toast.error('操作失败')
+    else {
+      await supabase.from('valley_lilies').insert({ owner_id: user.id, name: `铃兰 #${sacrificed + 1}` })
+      const newSac = sacrificed + 1
+      setSacrificed(newSac)
+      // 自动申请邀请码
+      await supabase.from('invite_requests').insert({ user_id: user.id })
+      toast.success('🌱 铃兰已移入铃兰谷！一次邀请码申请已提交，审核后发放')
+    }
   }
-
-  const stageEmoji = { seed: '🌰', sprout: '🌱', bud: '🌿', bloom: '🌼', mature: '🌸' }
 
   return (
     <div className="max-w-lg mx-auto">
-      <h1 className="font-display text-accent text-2xl mb-2 flex items-center gap-2">
-        <Flower size={28} /> 铃兰花园
-      </h1>
-      <p className="text-muted text-sm mb-6">
-        每天浇水养护你的铃兰，{(MATURE_DAYS - (g.water_count || 0))} 天后成熟可分株。
-        已分株 {g.propagated_count || 0} 次。
+      <h1 className="font-display text-accent text-2xl mb-2 flex items-center gap-2"><Flower size={28} /> 铃兰花园</h1>
+      <p className="text-muted text-sm mb-4">
+        通过每日浇水、发帖、评论、点赞积累贡献值({total}/400)，养大铃兰后可贡献到铃兰谷兑换邀请码。
+        已兑换 {sacrificed} 次，可兑换 {matureCount} 次。
       </p>
 
-      {/* 铃兰生长展示 */}
+      {/* 铃兰展示 */}
       <div className="bg-surface rounded-card shadow-card p-8 mb-4 text-center">
         <div className={`text-8xl mb-4 transition-all duration-1000 ${animating ? 'scale-125' : ''}`}
-          style={{ filter: `drop-shadow(0 0 ${progress}px rgba(94,174,124,${progress/200}))` }}>
+          style={{ filter: `drop-shadow(0 0 ${Math.min(progress, 100)}px rgba(94,174,124,${Math.min(progress/100, 1)}))` }}>
           {stageEmoji[stage]}
         </div>
         <div className="w-full bg-hover rounded-full h-3 mb-2 overflow-hidden">
           <div className="bg-accent h-full rounded-full transition-all duration-1000"
-            style={{ width: `${progress}%` }} />
+            style={{ width: `${progress % 100}%` }} />
         </div>
-        <p className="text-muted text-xs">{Math.round(progress)}% 成长中</p>
+        <div className="flex items-center justify-between text-xs text-muted mt-1">
+          <span>{Math.round(progress % 100)}% 至成熟</span>
+          <span>{total}/{MATURE_POINTS} 贡献值</span>
+        </div>
+        {matureCount > 0 && <p className="text-accent text-xs mt-2">🌼 {matureCount} 株待贡献</p>}
       </div>
 
-      {/* 操作按钮 */}
-      <div className="flex gap-3">
-        <button onClick={handleWater} disabled={wateredToday}
-          className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-button font-medium text-sm transition-all ${
-            wateredToday ? 'bg-hover text-muted cursor-default' : 'bg-accent text-text-inverse hover:opacity-90 active:scale-95'
-          }`}>
-          <Droplets size={18} className={animating ? 'animate-bounce' : ''} />
-          {wateredToday ? '今日已浇水' : '浇水施肥'}
+      {/* 每日任务 */}
+      <div className="bg-surface rounded-card shadow-card p-4 mb-4 grid grid-cols-2 gap-2">
+        <button onClick={handleWater} disabled={watered}
+          className={`flex items-center gap-2 text-xs px-3 py-2 rounded-button border transition-colors ${watered ? 'bg-hover text-muted cursor-default' : 'border-accent/30 text-accent hover:bg-accent/10'}`}>
+          <Droplets size={14} /> {watered ? '已浇水 +10' : '浇水 +10'}
         </button>
-        {isMature && (
-          <button onClick={handlePropagate}
-            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-button font-medium text-sm bg-warning/10 text-warning border border-warning/30 hover:bg-warning/20">
-            <ArrowRight size={18} /> 分株移入铃兰谷
-          </button>
-        )}
+        <div className={`flex items-center gap-2 text-xs px-3 py-2 rounded-button border ${posted ? 'bg-hover text-muted' : 'bg-hover text-secondary'}`}>
+          📝 {posted ? '已发帖 +10' : '发帖 +10'}
+        </div>
+        <div className={`flex items-center gap-2 text-xs px-3 py-2 rounded-button border ${commented ? 'bg-hover text-muted' : 'bg-hover text-secondary'}`}>
+          💬 {commented ? '已评论 +10' : '评论 +10'}
+        </div>
+        <div className={`flex items-center gap-2 text-xs px-3 py-2 rounded-button border ${liked ? 'bg-hover text-muted' : 'bg-hover text-secondary'}`}>
+          ❤️ {liked ? '已点赞 +10' : '点赞 +10'}
+        </div>
       </div>
+
+      {/* 贡献兑换 */}
+      {matureCount > 0 && (
+        <button onClick={handleSacrifice}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-button font-medium text-sm bg-warning/10 text-warning border border-warning/30 hover:bg-warning/20">
+          <Gift size={18} /> 贡献铃兰兑换邀请码（还有 {matureCount} 次机会）
+        </button>
+      )}
 
       {/* 铃兰谷入口 */}
-      {(g.propagated_count || 0) > 0 && (
+      {sacrificed > 0 && (
         <a href="/lily-valley" className="block mt-4 bg-surface rounded-card shadow-card p-4 no-underline hover:shadow-elevated transition-shadow">
           <div className="flex items-center justify-between">
-            <span className="text-accent text-sm font-medium flex items-center gap-2">
-              <Flower size={18} /> 铃兰谷
-            </span>
-            <span className="text-muted text-xs">{g.propagated_count} 株成年铃兰</span>
+            <span className="text-accent text-sm font-medium flex items-center gap-2"><Flower size={18} /> 铃兰谷</span>
+            <span className="text-muted text-xs">{sacrificed} 株 →</span>
           </div>
         </a>
       )}
