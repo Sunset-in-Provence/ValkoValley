@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/context/AuthContext'
 import { uploadImage } from '@/lib/upload'
+import AvatarCropper from '@/components/shared/AvatarCropper'
 import toast from 'react-hot-toast'
 import { Upload, User, Loader2 } from 'lucide-react'
 
@@ -18,18 +19,27 @@ export default function ProfileEditor({ profile, onClose }) {
   const [displayName, setDisplayName] = useState(profile?.display_name || profile?.username || '')
   const [bio, setBio] = useState(profile?.bio || '')
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || '')
+  const [cropFile, setCropFile] = useState(null)
   const [avatarUploading, setAvatarUploading] = useState(false)
   const [saving, setSaving] = useState(false)
 
   async function handleAvatarUpload(e) {
     const file = e.target.files?.[0]
     if (!file) return
+    e.target.value = ''
+    setCropFile(file)
+  }
+
+  async function handleCropped(file) {
+    setCropFile(null)
     setAvatarUploading(true)
     const { url, error } = await uploadImage(file, 'images')
     if (error) { toast.error('头像上传失败: ' + error.message) }
     else { setAvatarUrl(url) }
     setAvatarUploading(false)
   }
+
+  if (cropFile) return <AvatarCropper file={cropFile} onCrop={handleCropped} onCancel={() => setCropFile(null)} />
 
   async function handleSave(e) {
     e.preventDefault()

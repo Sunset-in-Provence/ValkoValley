@@ -13,7 +13,9 @@ const MAIN = [
     { key: 'lore_official', label: '官方设定' }, { key: 'lore_rumor', label: '坊间传闻' }
   ]},
   { key: 'gallery', label: '图鉴', subs: [
-    { key: 'gallery_promo', label: '宣图' }, { key: 'gallery_card', label: '卡面' }, { key: 'gallery_text', label: '文案' }
+    { key: 'gallery_promo', label: '宣图' }, { key: 'gallery_card', label: '卡面', children: [
+      { key: 'gallery_card_day', label: '日卡' }, { key: 'gallery_card_month', label: '月卡' }
+    ]}, { key: 'gallery_text', label: '文案' }
   ]},
   { key: 'video', label: '视频', subs: [
     { key: 'video_pv', label: '个人PV', children: [

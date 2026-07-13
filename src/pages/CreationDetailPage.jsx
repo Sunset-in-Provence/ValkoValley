@@ -10,6 +10,7 @@ import VideoEmbed from '@/components/creation/VideoEmbed'
 import CommentItem from '@/components/discussion/CommentItem'
 import CommentForm from '@/components/discussion/CommentForm'
 import LikeButton from '@/components/shared/LikeButton'
+import ImageViewer from '@/components/shared/ImageViewer'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import EmptyState from '@/components/shared/EmptyState'
 import toast from 'react-hot-toast'
@@ -31,6 +32,8 @@ export default function CreationDetailPage() {
   const [creation, setCreation] = useState(null)
   const [comments, setComments] = useState([])
   const [loading, setLoading] = useState(true)
+  const [viewerOpen, setViewerOpen] = useState(false)
+  const [viewerIndex, setViewerIndex] = useState(0)
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -136,7 +139,7 @@ export default function CreationDetailPage() {
                 {creation.image_urls.map((url, i) => (
                   <img key={i} src={url} alt={`附图 ${i + 1}`}
                     className="rounded-card w-full aspect-square object-cover cursor-pointer hover:opacity-90"
-                    loading="lazy" onClick={() => window.open(url, '_blank')} />
+                    loading="lazy" onClick={() => { setViewerIndex(i); setViewerOpen(true) }} />
                 ))}
               </div>
             </div>
@@ -176,6 +179,12 @@ export default function CreationDetailPage() {
           </div>
         </div>
       </article>
+      {viewerOpen && creation.image_urls?.length > 0 && (
+        <ImageViewer images={creation.image_urls} current={viewerIndex}
+          onClose={() => setViewerOpen(false)}
+          onPrev={() => setViewerIndex((i) => (i - 1 + creation.image_urls.length) % creation.image_urls.length)}
+          onNext={() => setViewerIndex((i) => (i + 1) % creation.image_urls.length)} />
+      )}
 
       {/* 评论区 */}
       <section className="bg-surface rounded-card shadow-card p-6">

@@ -58,10 +58,10 @@ export default function MediaUploader({ images = [], onImagesChange, maxFiles = 
           </div>
         ))}
         {images.length < maxFiles && (
-          <label className="w-20 h-20 border-2 border-dashed border-border rounded-card flex flex-col items-center justify-center cursor-pointer hover:border-accent transition-colors">
+          <label className="flex items-center gap-1.5 bg-hover border border-border text-secondary px-4 py-2 rounded-button text-sm cursor-pointer hover:bg-accent hover:text-text-inverse transition-colors">
             <input type="file" accept="image/png,image/jpeg,image/webp" multiple onChange={handleUpload} hidden />
-            {uploading ? <Loader2 size={20} className="text-muted animate-spin" /> : <Upload size={20} className="text-muted" />}
-            <span className="text-muted text-[10px] mt-0.5">上传</span>
+            {uploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+            {uploading ? '上传中...' : '上传图片'}
           </label>
         )}
       </div>
