@@ -257,10 +257,10 @@ export default function LibraryEditorPage() {
 
         {/* 正文 */}
         <div className="mb-4">
-          <label className="text-secondary text-sm font-medium mb-1.5 block">正文（Markdown）</label>
+          <label className="text-secondary text-sm font-medium mb-1.5 block">正文</label>
           <textarea
             value={content} onChange={(e) => setContent(e.target.value)}
-            placeholder="支持 Markdown 格式..." rows={12} required
+            placeholder="输入正文..." rows={12} required
             className="w-full bg-hover border border-border rounded-input px-4 py-2.5 text-primary text-sm focus:outline-none focus:border-accent resize-vertical"
           />
         </div>

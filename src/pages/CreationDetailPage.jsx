@@ -119,7 +119,6 @@ export default function CreationDetailPage() {
               </Link>
             </span>
             <span className="flex items-center gap-1"><Clock size={12} /> {new Date(creation.created_at).toLocaleString('zh-CN')}</span>
-            <span className="flex items-center gap-1"><Eye size={12} /> {creation.view_count || 0}</span>
           </div>
 
           {/* 标题 */}
