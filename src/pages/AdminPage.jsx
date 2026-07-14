@@ -16,7 +16,7 @@ import { useAuth } from '@/context/AuthContext'
 import ReportCard from '@/components/admin/ReportCard'
 import EmptyState from '@/components/shared/EmptyState'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
-import { Shield, Filter, RefreshCw, BookOpen, Palette as PaletteIcon, MessageSquare, Check, X, Clock, ArrowLeft, Ticket, User, Plus, Sparkles } from 'lucide-react'
+import { Shield, Filter, RefreshCw, BookOpen, Palette as PaletteIcon, MessageSquare, Check, X, Clock, ArrowLeft, Ticket, User, Plus, Sparkles, Mail } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
 
@@ -141,6 +141,10 @@ export default function AdminPage() {
           <Link to="/admin/changelog"
             className="flex items-center gap-1 text-muted text-sm no-underline hover:text-accent px-3 py-1.5 rounded-button border border-border">
             <Sparkles size={14} /> 版本日志
+          </Link>
+          <Link to="/admin/applications"
+            className="flex items-center gap-1 text-muted text-sm no-underline hover:text-accent px-3 py-1.5 rounded-button border border-border">
+            <Mail size={14} /> 入站审核
           </Link>
           <button onClick={() => activeTab === 'reports' ? fetchReports() : fetchMessages()}
             className="flex items-center gap-1 text-muted text-sm hover:text-accent px-3 py-1.5 rounded-button border border-border">

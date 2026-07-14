@@ -110,6 +110,10 @@ export default function RegisterPage() {
         .select('*').eq('code', inviteCode.trim().toUpperCase()).eq('is_active', true).single()
       if (!codeData) { toast.error('邀请码无效'); return }
       if (codeData.used_count >= codeData.max_uses) { toast.error('邀请码已用完'); return }
+      if (codeData.bound_email && codeData.bound_email.toLowerCase() !== email.trim().toLowerCase()) {
+        toast.error('该邀请码已绑定邮箱，请使用与申请时相同的邮箱注册')
+        return
+      }
     }
     if (checkCooldown()) return
 

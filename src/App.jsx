@@ -32,6 +32,7 @@ const AdminAnnouncePage = lazy(() => import('@/pages/AdminAnnouncePage'))
 const HelpCenterPage = lazy(() => import('@/pages/HelpCenterPage'))
 const AdminInvitesPage = lazy(() => import('@/pages/AdminInvitesPage'))
 const AdminChangelogPage = lazy(() => import('@/pages/AdminChangelogPage'))
+const AdminApplicationsPage = lazy(() => import('@/pages/AdminApplicationsPage'))
 const AdminContactsPage = lazy(() => import('@/pages/AdminContactsPage'))
 const MessagesPage = lazy(() => import('@/pages/MessagesPage'))
 const LilyGardenPage = lazy(() => import('@/pages/LilyGardenPage'))
@@ -52,6 +53,9 @@ export default function App() {
           style: { borderRadius: 'var(--radius-card)', fontFamily: 'var(--font-body)' },
         }}
       />
+      <Routes>
+        <Route path="/apply" element={<ApplyPage />} />
+      </Routes>
       <SitePassGate>
       <Routes>
         {/* 公开页面 — 立即加载 */}
@@ -95,6 +99,7 @@ export default function App() {
         <Route path="/admin/announcements" element={<Lazy><ProtectedRoute adminOnly><AdminAnnouncePage /></ProtectedRoute></Lazy>} />
         <Route path="/admin/invites" element={<Lazy><ProtectedRoute adminOnly><AdminInvitesPage /></ProtectedRoute></Lazy>} />
         <Route path="/admin/changelog" element={<Lazy><ProtectedRoute adminOnly><AdminChangelogPage /></ProtectedRoute></Lazy>} />
+        <Route path="/admin/applications" element={<Lazy><ProtectedRoute adminOnly><AdminApplicationsPage /></ProtectedRoute></Lazy>} />
         <Route path="/admin/contacts" element={<Lazy><ProtectedRoute adminOnly><AdminContactsPage /></ProtectedRoute></Lazy>} />
 
         <Route path="*" element={<NotFoundPage />} />
