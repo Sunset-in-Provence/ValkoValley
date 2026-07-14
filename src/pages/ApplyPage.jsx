@@ -119,6 +119,10 @@ export default function ApplyPage() {
             <Send size={16} /> {submitting ? '提交中...' : '提交审核'}
           </button>
         </form>
+
+        <div className="mt-6 pt-6 border-t border-border">
+          <QueryCode />
+        </div>
       </div>
     </div>
   )
