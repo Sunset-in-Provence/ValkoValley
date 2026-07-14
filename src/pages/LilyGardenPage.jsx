@@ -45,6 +45,7 @@ export default function LilyGardenPage() {
 
   const progress = Math.min(total / MATURE_POINTS * 100, 100)
   const matureCount = Math.floor(total / MATURE_POINTS) - sacrificed
+  const canExchange = matureCount >= 3
   const stage = total < 80 ? 'seed' : total < 160 ? 'sprout' : total < 240 ? 'bud' : total < 320 ? 'bloom' : 'mature'
   const stageEmoji = { seed: '🌰', sprout: '🌱', bud: '🌿', bloom: '🌼', mature: '🌸' }
 
@@ -57,14 +58,14 @@ export default function LilyGardenPage() {
   }
 
   async function handleSacrifice() {
-    if (matureCount < 1) { toast.error('还没有成熟的铃兰可以贡献'); return }
-    if (!confirm('贡献一株成熟的铃兰到铃兰谷，系统将自动发放一个邀请码到你的信箱。确定吗？')) return
+    if (matureCount < 3) { toast.error(`还需要 ${3 - matureCount} 株成熟铃兰才能兑换邀请码`); return }
+    if (!confirm('贡献 3 株成熟的铃兰到铃兰谷，兑换一个邀请码。确定吗？')) return
 
     const code = 'VV' + Math.random().toString(36).slice(2, 8).toUpperCase()
     await supabase.from('invite_codes').insert({ code, created_by: user.id, max_uses: 1 })
 
     const { error } = await supabase.from('lily_garden').update({
-      propagated_count: sacrificed + 1,
+      propagated_count: sacrificed + 3,
     }).eq('user_id', user.id)
 
     if (error) toast.error('操作失败')
@@ -122,12 +123,10 @@ export default function LilyGardenPage() {
       </div>
 
       {/* 贡献兑换 */}
-      {matureCount > 0 && (
-        <button onClick={handleSacrifice}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-button font-medium text-sm bg-warning/10 text-warning border border-warning/30 hover:bg-warning/20">
-          <Gift size={18} /> 贡献铃兰兑换邀请码（还有 {matureCount} 次机会）
-        </button>
-      )}
+      <button onClick={handleSacrifice} disabled={!canExchange}
+        className={`w-full flex items-center justify-center gap-2 py-3 rounded-button font-medium text-sm ${canExchange ? 'bg-warning/10 text-warning border border-warning/30 hover:bg-warning/20' : 'bg-hover text-muted cursor-default'}`}>
+        <Gift size={18} /> 贡献 3 株铃兰兑换邀请码（{matureCount}/3）
+      </button>
 
       {/* 信箱 */}
       <div className="mt-4 bg-surface rounded-card shadow-card">

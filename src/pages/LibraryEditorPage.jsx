@@ -191,7 +191,7 @@ export default function LibraryEditorPage() {
         <ArrowLeft size={14} /> 返回档案馆
       </Link>
 
-      <div className="bg-surface rounded-card shadow-card p-6 md:p-8">
+      <div className="bg-surface rounded-card shadow-card p-4 sm:p-6 md:p-8">
         <h1 className="font-display text-accent text-2xl mb-6">
           {isEditing ? '编辑条目' : (isAdmin ? '添加条目' : '投稿')}
         </h1>

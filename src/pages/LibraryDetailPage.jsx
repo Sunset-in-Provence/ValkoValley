@@ -83,7 +83,6 @@ export default function LibraryDetailPage() {
             <span className="bg-accent/10 text-accent px-2 py-0.5 rounded-full">{catLabels[entry.category] || entry.category}</span>
             <span className="flex items-center gap-1"><Calendar size={12} /> {new Date(entry.created_at).toLocaleDateString('zh-CN')}</span>
             <span className="flex items-center gap-1"><User size={12} /> {entry.author?.display_name || entry.author?.username || '管理员'}</span>
-            <span className="flex items-center gap-1"><Eye size={12} /> {entry.view_count || 0} 次阅读</span>
           </div>
 
           <h1 className="font-display text-accent text-2xl mb-6">{entry.title}</h1>
@@ -143,9 +142,14 @@ export default function LibraryDetailPage() {
                   const isLocal = url.includes('supabase.co') || url.endsWith('.mp4') || url.endsWith('.webm')
                   if (isLocal) {
                     return (
-                      <video key={i} controls className="w-full rounded-card" style={{ maxHeight: 400 }}>
-                        <source src={url} /> 您的浏览器不支持视频播放
-                      </video>
+                      <div key={i}>
+                        <video controls className="w-full rounded-card" style={{ maxHeight: 400 }}>
+                          <source src={url} /> 您的浏览器不支持视频播放
+                        </video>
+                        <a href={url} download className="inline-flex items-center gap-1 text-accent text-xs mt-1 hover:underline">
+                          <Download size={12} /> 下载视频
+                        </a>
+                      </div>
                     )
                   }
                   return (
