@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/context/AuthContext'
+import ImageViewer from '@/components/shared/ImageViewer'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import { ArrowLeft, Check, X, Mail, ExternalLink, Gift, Clock } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -11,6 +12,9 @@ export default function AdminApplicationsPage() {
   const [apps, setApps] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('pending')
+  const [viewerOpen, setViewerOpen] = useState(false)
+  const [viewerIndex, setViewerIndex] = useState(0)
+  const [viewerImages, setViewerImages] = useState([])
 
   async function fetch() {
     setLoading(true)
@@ -87,7 +91,8 @@ export default function AdminApplicationsPage() {
                     {app.image_urls?.length > 0 && (
                       <div className="flex gap-1.5 mt-2">
                         {app.image_urls.map((url, i) => (
-                          <img key={i} src={url} alt="" className="w-14 h-14 object-cover rounded-card border border-border cursor-pointer hover:opacity-80" onClick={() => window.open(url, '_blank')} />
+                          <img key={i} src={url} alt="" className="w-14 h-14 object-cover rounded-card border border-border cursor-pointer hover:opacity-80"
+                            onClick={() => { setViewerImages(app.image_urls); setViewerIndex(i); setViewerOpen(true) }} />
                         ))}
                       </div>
                     )}
@@ -126,6 +131,12 @@ export default function AdminApplicationsPage() {
           </div>
         )}
       </div>
+      {viewerOpen && viewerImages.length > 0 && (
+        <ImageViewer images={viewerImages} current={viewerIndex}
+          onClose={() => setViewerOpen(false)}
+          onPrev={() => setViewerIndex((i) => (i - 1 + viewerImages.length) % viewerImages.length)}
+          onNext={() => setViewerIndex((i) => (i + 1) % viewerImages.length)} />
+      )}
     </div>
   )
 }
