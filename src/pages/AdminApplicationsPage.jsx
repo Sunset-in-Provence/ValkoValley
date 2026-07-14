@@ -82,6 +82,13 @@ export default function AdminApplicationsPage() {
                       </a>
                     )}
                     {app.extra_info && <p className="text-secondary text-xs mt-1">{app.extra_info}</p>}
+                    {app.image_urls?.length > 0 && (
+                      <div className="flex gap-1.5 mt-2">
+                        {app.image_urls.map((url, i) => (
+                          <img key={i} src={url} alt="" className="w-14 h-14 object-cover rounded-card border border-border cursor-pointer hover:opacity-80" onClick={() => window.open(url, '_blank')} />
+                        ))}
+                      </div>
+                    )}
 
                     {/* 已通过：显示邀请码信息 */}
                     {app.status === 'approved' && (
