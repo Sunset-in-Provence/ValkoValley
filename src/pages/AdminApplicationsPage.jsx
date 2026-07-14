@@ -32,9 +32,10 @@ export default function AdminApplicationsPage() {
     setProcessing(app.id)
     const code = 'VV' + Math.random().toString(36).slice(2, 8).toUpperCase()
     await supabase.from('invite_codes').insert({ code, created_by: user.id, max_uses: 1, bound_email: app.email })
-    await supabase.from('registration_applications').update({
+    const { error: updateErr } = await supabase.from('registration_applications').update({
       status: 'approved', reviewer_id: user.id, invite_code: code, invite_sent_at: new Date().toISOString(),
     }).eq('id', app.id)
+    if (updateErr) { toast.error('更新失败: ' + updateErr.message); setProcessing(null); return }
     toast.success(`已通过，邀请码 ${code}`)
     setProcessing(null)
     setFilter('approved')
