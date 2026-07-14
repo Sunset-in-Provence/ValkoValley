@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/context/AuthContext'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
-import { ArrowLeft, Plus, Shuffle, Copy, Flower } from 'lucide-react'
+import { ArrowLeft, Plus, Shuffle, Copy, Flower, Mail } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
 
@@ -93,6 +93,9 @@ export default function AdminInvitesPage() {
             {/* 铃兰兑换记录 */}
             <LilyExchangeLog />
 
+            {/* 审批发放的邀请码 */}
+            <AppBoundCodes />
+
             {/* 统计 */}
             <div className="grid grid-cols-3 gap-3 mb-4">
               <div className="bg-hover rounded-card p-3 text-center">
@@ -134,6 +137,42 @@ export default function AdminInvitesPage() {
           </>
         )}
       </div>
+    </div>
+  )
+}
+
+function AppBoundCodes() {
+  const [codes, setCodes] = useState([])
+  const [show, setShow] = useState(false)
+
+  useEffect(() => {
+    async function load() {
+      const { data } = await supabase.from('invite_codes').select('*').not('bound_email', 'is', null).order('created_at', { ascending: false })
+      setCodes(data || [])
+    }
+    load()
+  }, [])
+
+  if (codes.length === 0) return null
+
+  return (
+    <div className="mb-4 pb-4 border-b border-border">
+      <button onClick={() => setShow(!show)} className="text-accent text-sm font-medium flex items-center gap-1 hover:underline">
+        <Mail size={14} /> 审批发放 ({codes.length}) {show ? '收起' : '展开'}
+      </button>
+      {show && (
+        <div className="mt-2 space-y-1 max-h-48 overflow-y-auto">
+          {codes.map((c) => (
+            <div key={c.id} className="bg-hover rounded-card p-2 text-xs flex items-center justify-between">
+              <span className="text-primary font-mono font-bold">{c.code}</span>
+              <span className="text-muted">{c.bound_email}</span>
+              <span className={`px-1.5 py-0.5 rounded-full ${c.used_count >= c.max_uses ? 'bg-danger/10 text-danger' : 'bg-success/10 text-success'}`}>
+                {c.used_count >= c.max_uses ? '已使用' : '可用'}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
