@@ -12,6 +12,7 @@ import LoginPage from '@/pages/LoginPage'
 import RegisterPage from '@/pages/RegisterPage'
 import RulesPage from '@/pages/RulesPage'
 import AnnouncementsPage from '@/pages/AnnouncementsPage'
+import ApplyPage from '@/pages/ApplyPage'
 import NotFoundPage from '@/pages/NotFoundPage'
 
 // 需登录的页面 — 懒加载（路由级代码分割）
