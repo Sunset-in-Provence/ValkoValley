@@ -33,7 +33,8 @@ export default function AdminApplicationsPage() {
     await supabase.from('registration_applications').update({
       status: 'approved', reviewer_id: user.id, invite_code: code, invite_sent_at: new Date().toISOString(),
     }).eq('id', app.id)
-    toast.success(`已通过，邀请码 ${code}。请手动发送到 ${app.email}`)
+    toast.success(`已通过，邀请码 ${code}`)
+    setFilter('approved')
     fetch()
   }
 
@@ -42,6 +43,7 @@ export default function AdminApplicationsPage() {
       status: 'rejected', reviewer_id: user.id,
     }).eq('id', app.id)
     toast.success('已拒绝')
+    setFilter('rejected')
     fetch()
   }
 
