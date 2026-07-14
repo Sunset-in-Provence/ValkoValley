@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/context/AuthContext'
 import ImageViewer from '@/components/shared/ImageViewer'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
-import { ArrowLeft, Check, X, Mail, ExternalLink, Gift, Clock } from 'lucide-react'
+import { ArrowLeft, Check, X, Mail, ExternalLink, Gift, Clock, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function AdminApplicationsPage() {
@@ -12,6 +12,7 @@ export default function AdminApplicationsPage() {
   const [apps, setApps] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('pending')
+  const [processing, setProcessing] = useState(null)
   const [viewerOpen, setViewerOpen] = useState(false)
   const [viewerIndex, setViewerIndex] = useState(0)
   const [viewerImages, setViewerImages] = useState([])
@@ -28,6 +29,7 @@ export default function AdminApplicationsPage() {
   useEffect(() => { fetch() }, [filter])
 
   async function handleApprove(app) {
+    setProcessing(app.id)
     const code = 'VV' + Math.random().toString(36).slice(2, 8).toUpperCase()
     await supabase.from('invite_codes').insert({ code, created_by: user.id, max_uses: 1, bound_email: app.email })
     await supabase.from('registration_applications').update({
@@ -35,16 +37,20 @@ export default function AdminApplicationsPage() {
     }).eq('id', app.id)
     toast.success(`已通过，邀请码 ${code}`)
     setFilter('approved')
-    fetch()
+    setProcessing(null)
+    // 移除旧记录
+    setApps((prev) => prev.filter((a) => a.id !== app.id))
   }
 
   async function handleReject(app) {
+    setProcessing(app.id)
     await supabase.from('registration_applications').update({
       status: 'rejected', reviewer_id: user.id,
     }).eq('id', app.id)
     toast.success('已拒绝')
     setFilter('rejected')
-    fetch()
+    setProcessing(null)
+    setApps((prev) => prev.filter((a) => a.id !== app.id))
   }
 
   return (
@@ -117,12 +123,12 @@ export default function AdminApplicationsPage() {
 
                   {app.status === 'pending' && (
                     <div className="flex gap-1.5 ml-3">
-                      <button onClick={() => handleApprove(app)}
-                        className="bg-success/10 text-success text-xs px-3 py-1.5 rounded-button hover:bg-success/20 flex items-center gap-1">
-                        <Check size={12} /> 通过
+                      <button onClick={() => handleApprove(app)} disabled={processing === app.id}
+                        className="bg-success/10 text-success text-xs px-3 py-1.5 rounded-button hover:bg-success/20 disabled:opacity-30 flex items-center gap-1">
+                        {processing === app.id ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />} 通过
                       </button>
-                      <button onClick={() => handleReject(app)}
-                        className="bg-danger/10 text-danger text-xs px-3 py-1.5 rounded-button hover:bg-danger/20 flex items-center gap-1">
+                      <button onClick={() => handleReject(app)} disabled={processing === app.id}
+                        className="bg-danger/10 text-danger text-xs px-3 py-1.5 rounded-button hover:bg-danger/20 disabled:opacity-30 flex items-center gap-1">
                         <X size={12} /> 拒绝
                       </button>
                     </div>
