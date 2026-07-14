@@ -35,7 +35,7 @@ export default function ApplyPage() {
     if (images.length < 1) { toast.error('请至少上传 1 张图片证据'); return }
     setSubmitting(true)
     const { error } = await supabase.from('registration_applications').insert({
-      email: email.trim(), xhs_nickname: xhsNickname.trim(), xhs_id: xhsId.trim(),
+      email: email.trim().toLowerCase(), xhs_nickname: xhsNickname.trim(), xhs_id: xhsId.trim(),
       xhs_link: xhsLink.trim(), extra_info: extraInfo.trim(), image_urls: images,
     })
     setSubmitting(false)
@@ -137,7 +137,7 @@ function QueryCode() {
     e.preventDefault()
     if (!queryEmail.trim()) return
     setChecking(true)
-    const { data } = await supabase.from('registration_applications').select('*').eq('email', queryEmail.trim()).eq('status', 'approved').maybeSingle()
+    const { data } = await supabase.from('registration_applications').select('*').eq('status', 'approved').eq('email', queryEmail.trim().toLowerCase()).maybeSingle()
     setResult(data)
     setChecking(false)
   }

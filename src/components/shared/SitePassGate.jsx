@@ -38,6 +38,9 @@ export default function SitePassGate({ children }) {
   const [input, setInput] = useState('')
   const [error, setError] = useState(false)
 
+  // /apply 页面放行，不拦截
+  if (window.location.pathname === '/apply') return children
+
   useEffect(() => {
     // 已经输过密码就跳过检查
     if (passed) { setAuthorized(true); return }
