@@ -54,11 +54,9 @@ export default function App() {
           style: { borderRadius: 'var(--radius-card)', fontFamily: 'var(--font-body)' },
         }}
       />
-      <Routes>
-        <Route path="/apply" element={<ApplyPage />} />
-      </Routes>
       <SitePassGate>
       <Routes>
+        <Route path="/apply" element={<ApplyPage />} />
         {/* 公开页面 — 立即加载 */}
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
