@@ -94,7 +94,7 @@ export default function ApplyPage() {
               className="w-full bg-hover border border-border rounded-input px-4 py-2.5 text-primary text-sm placeholder:text-muted resize-none focus:outline-none focus:border-accent" />
           </div>
           <div>
-            <label className="text-secondary text-sm font-medium mb-1 block">图片证据 *（至少 1 张）</label>
+            <label className="text-secondary text-sm font-medium mb-1 block">图片证据 *（至少 1 张，仅支持 JPG/PNG/WebP）</label>
             <div className="flex flex-wrap gap-2 mb-2">
               {images.map((url, i) => (
                 <div key={i} className="relative">
@@ -111,7 +111,10 @@ export default function ApplyPage() {
               )}
             </div>
           </div>
-          <button type="submit" disabled={submitting}
+          {images.length > 0 && (
+          <p className="text-warning text-xs">请确认上方图片都能正常显示后再提交。如有破损图请删除重新上传。</p>
+        )}
+        <button type="submit" disabled={submitting}
             className="w-full bg-accent text-text-inverse py-2.5 rounded-button font-medium text-sm hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-1.5">
             <Send size={16} /> {submitting ? '提交中...' : '提交审核'}
           </button>
