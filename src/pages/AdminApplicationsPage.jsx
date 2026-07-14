@@ -37,9 +37,7 @@ export default function AdminApplicationsPage() {
     }).eq('id', app.id)
     toast.success(`已通过，邀请码 ${code}`)
     setProcessing(null)
-    setApps((prev) => prev.filter((a) => a.id !== app.id))
-    // 切换到已通过标签查看
-    setTimeout(() => { setFilter('approved') }, 300)
+    setFilter('approved')
   }
 
   async function handleReject(app) {
@@ -49,8 +47,7 @@ export default function AdminApplicationsPage() {
     }).eq('id', app.id)
     toast.success('已拒绝')
     setProcessing(null)
-    setApps((prev) => prev.filter((a) => a.id !== app.id))
-    setTimeout(() => { setFilter('rejected') }, 300)
+    setFilter('rejected')
   }
 
   return (
