@@ -36,10 +36,10 @@ export default function AdminApplicationsPage() {
       status: 'approved', reviewer_id: user.id, invite_code: code, invite_sent_at: new Date().toISOString(),
     }).eq('id', app.id)
     toast.success(`已通过，邀请码 ${code}`)
-    setFilter('approved')
     setProcessing(null)
-    // 移除旧记录
     setApps((prev) => prev.filter((a) => a.id !== app.id))
+    // 切换到已通过标签查看
+    setTimeout(() => { setFilter('approved') }, 300)
   }
 
   async function handleReject(app) {
@@ -48,9 +48,9 @@ export default function AdminApplicationsPage() {
       status: 'rejected', reviewer_id: user.id,
     }).eq('id', app.id)
     toast.success('已拒绝')
-    setFilter('rejected')
     setProcessing(null)
     setApps((prev) => prev.filter((a) => a.id !== app.id))
+    setTimeout(() => { setFilter('rejected') }, 300)
   }
 
   return (
