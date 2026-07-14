@@ -6,6 +6,8 @@ import toast from 'react-hot-toast'
 
 export default function ApplyPage() {
   const [email, setEmail] = useState('')
+  const [xhsNickname, setXhsNickname] = useState('')
+  const [xhsId, setXhsId] = useState('')
   const [xhsLink, setXhsLink] = useState('')
   const [extraInfo, setExtraInfo] = useState('')
   const [images, setImages] = useState([])
@@ -26,9 +28,14 @@ export default function ApplyPage() {
   async function handleSubmit(e) {
     e.preventDefault()
     if (!email.trim()) { toast.error('请填写邮箱'); return }
+    if (!xhsNickname.trim()) { toast.error('请填写小红书昵称'); return }
+    if (!xhsId.trim()) { toast.error('请填写小红书号'); return }
+    if (!xhsLink.trim()) { toast.error('请填写小红书主页链接'); return }
+    if (images.length < 1) { toast.error('请至少上传 1 张图片证据'); return }
     setSubmitting(true)
     const { error } = await supabase.from('registration_applications').insert({
-      email: email.trim(), xhs_link: xhsLink.trim(), extra_info: extraInfo.trim(), image_urls: images,
+      email: email.trim(), xhs_nickname: xhsNickname.trim(), xhs_id: xhsId.trim(),
+      xhs_link: xhsLink.trim(), extra_info: extraInfo.trim(), image_urls: images,
     })
     setSubmitting(false)
     if (error) toast.error('提交失败: ' + error.message)
@@ -61,9 +68,21 @@ export default function ApplyPage() {
               className="w-full bg-hover border border-border rounded-input px-4 py-2.5 text-primary text-sm placeholder:text-muted focus:outline-none focus:border-accent" />
           </div>
           <div>
-            <label className="text-secondary text-sm font-medium mb-1 block">小红书主页链接</label>
+            <label className="text-secondary text-sm font-medium mb-1 block">小红书昵称 *</label>
+            <input type="text" value={xhsNickname} onChange={(e) => setXhsNickname(e.target.value)}
+              placeholder="你在小红书群聊里的昵称" required
+              className="w-full bg-hover border border-border rounded-input px-4 py-2.5 text-primary text-sm placeholder:text-muted focus:outline-none focus:border-accent" />
+          </div>
+          <div>
+            <label className="text-secondary text-sm font-medium mb-1 block">小红书号 *</label>
+            <input type="text" value={xhsId} onChange={(e) => setXhsId(e.target.value)}
+              placeholder="你的小红书ID" required
+              className="w-full bg-hover border border-border rounded-input px-4 py-2.5 text-primary text-sm placeholder:text-muted focus:outline-none focus:border-accent" />
+          </div>
+          <div>
+            <label className="text-secondary text-sm font-medium mb-1 block">小红书主页链接 *</label>
             <input type="url" value={xhsLink} onChange={(e) => setXhsLink(e.target.value)}
-              placeholder="https://www.xiaohongshu.com/..."
+              placeholder="https://www.xiaohongshu.com/..." required
               className="w-full bg-hover border border-border rounded-input px-4 py-2.5 text-primary text-sm placeholder:text-muted focus:outline-none focus:border-accent" />
           </div>
           <div>
@@ -73,7 +92,7 @@ export default function ApplyPage() {
               className="w-full bg-hover border border-border rounded-input px-4 py-2.5 text-primary text-sm placeholder:text-muted resize-none focus:outline-none focus:border-accent" />
           </div>
           <div>
-            <label className="text-secondary text-sm font-medium mb-1 block">图片证据（选填）</label>
+            <label className="text-secondary text-sm font-medium mb-1 block">图片证据 *（至少 1 张）</label>
             <div className="flex flex-wrap gap-2 mb-2">
               {images.map((url, i) => (
                 <div key={i} className="relative">

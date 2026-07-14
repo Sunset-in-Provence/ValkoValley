@@ -75,10 +75,12 @@ export default function AdminApplicationsPage() {
                         {{pending: '待审核', approved: '已通过', rejected: '已拒绝'}[app.status]}
                       </span>
                     </div>
+                    {app.xhs_nickname && <p className="text-secondary text-xs">昵称：{app.xhs_nickname}</p>}
+                    {app.xhs_id && <p className="text-secondary text-xs">小红书号：{app.xhs_id}</p>}
                     {app.xhs_link && (
                       <a href={app.xhs_link} target="_blank" rel="noopener noreferrer"
                         className="text-accent text-xs hover:underline flex items-center gap-1 mb-1">
-                        <ExternalLink size={11} /> {app.xhs_link}
+                        <ExternalLink size={11} /> 主页链接
                       </a>
                     )}
                     {app.extra_info && <p className="text-secondary text-xs mt-1">{app.extra_info}</p>}
