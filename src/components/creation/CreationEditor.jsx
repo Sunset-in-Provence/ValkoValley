@@ -13,9 +13,73 @@ import MediaUploader from './MediaUploader'
 import VideoEmbed from './VideoEmbed'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import { loadBannedWords, checkBannedWords } from '@/lib/bannedWords'
-import { uploadVideo } from '@/lib/upload'
-import { Loader2, Video } from 'lucide-react'
+import { uploadVideo, uploadImage } from '@/lib/upload'
+import { Loader2, Video, Image as ImageIcon } from 'lucide-react'
 import toast from 'react-hot-toast'
+
+// 生成文字封面
+async function generateTextCover(title, content) {
+  const canvas = document.createElement('canvas')
+  canvas.width = 800; canvas.height = 450
+  const ctx = canvas.getContext('2d')
+  // 渐变背景
+  const grad = ctx.createLinearGradient(0, 0, 800, 450)
+  grad.addColorStop(0, '#5DAF7C'); grad.addColorStop(1, '#2D5A3A')
+  ctx.fillStyle = grad; ctx.fillRect(0, 0, 800, 450)
+  // 标题
+  ctx.fillStyle = '#fff'; ctx.font = 'bold 36px serif'
+  ctx.fillText(title.slice(0, 20), 40, 140)
+  // 正文预览
+  ctx.font = '18px serif'; ctx.fillStyle = 'rgba(255,255,255,0.8)'
+  const lines = content.replace(/\s+/g, ' ').slice(0, 200).match(/.{1,35}/g) || []
+  lines.slice(0, 6).forEach((line, i) => ctx.fillText(line, 40, 200 + i * 30))
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => {
+      if (!blob) { resolve(null); return }
+      const file = new File([blob], 'cover.png', { type: 'image/png' })
+      uploadImage(file, 'images').then(({ url }) => resolve(url || null))
+    }, 'image/png')
+  })
+}
+
+// 视频帧截取
+function captureVideoFrames(file, count = 4) {
+  return new Promise((resolve) => {
+    const video = document.createElement('video')
+    video.preload = 'metadata'; video.muted = true; video.crossOrigin = 'anonymous'
+    video.style.position = 'fixed'; video.style.top = '-9999px'
+    document.body.appendChild(video)
+    const url = URL.createObjectURL(file)
+    video.src = url
+    video.onloadedmetadata = () => {
+      const duration = video.duration
+      const frames = []
+      let loaded = 0
+      for (let i = 0; i < count; i++) {
+        const t = (i + 1) / (count + 1) * Math.min(duration, 10)
+        setTimeout(() => {
+          video.currentTime = t
+        }, i * 2000)
+      }
+      video.onseeked = () => {
+        const c = document.createElement('canvas')
+        c.width = 320; c.height = 180
+        c.getContext('2d').drawImage(video, 0, 0, 320, 180)
+        c.toBlob((blob) => {
+          if (blob) frames.push(URL.createObjectURL(blob))
+          loaded++
+          if (loaded >= count) {
+            URL.revokeObjectURL(url)
+            document.body.removeChild(video)
+            resolve(frames)
+          }
+        }, 'image/jpeg', 0.7)
+      }
+    }
+    video.onerror = () => { URL.revokeObjectURL(url); document.body.removeChild(video); resolve([]) }
+    setTimeout(() => { if (frames.length === 0) { URL.revokeObjectURL(url); document.body.removeChild(video); resolve([]) } }, 15000)
+  })
+}
 
 export default function CreationEditor() {
   const { user } = useAuth()
@@ -31,6 +95,8 @@ export default function CreationEditor() {
   const [imageUrls, setImageUrls] = useState([])
   const [videoUrls, setVideoUrls] = useState([])
   const [videoUploading, setVideoUploading] = useState(false)
+  const [videoFrames, setVideoFrames] = useState([])
+  const [selectedFrame, setSelectedFrame] = useState(null)
   const [submitting, setSubmitting] = useState(false)
   const [loadingData, setLoadingData] = useState(isEditing)
 
@@ -68,7 +134,13 @@ export default function CreationEditor() {
     setVideoUploading(true)
     const { url, error } = await uploadVideo(file)
     if (error) toast.error('视频上传失败: ' + error.message)
-    else setVideoUrls((prev) => [...prev, url])
+    else {
+      setVideoUrls((prev) => [...prev, url])
+      if (contentType === 'video') {
+        const frames = await captureVideoFrames(file)
+        setVideoFrames(frames)
+      }
+    }
     setVideoUploading(false)
   }
 
@@ -84,9 +156,17 @@ export default function CreationEditor() {
     const allTags = [type, ...customTags]
 
     setSubmitting(true)
+
+    // 纯文字创作无图时自动生成文字封面
+    let finalImageUrls = imageUrls
+    if (contentType === 'text' && imageUrls.length === 0 && content.trim()) {
+      const coverUrl = await generateTextCover(title.trim(), content.trim())
+      if (coverUrl) finalImageUrls = [coverUrl]
+    }
+
     const payload = {
       author_id: user.id, title: title.trim(), content,
-      content_type: contentType, tags: allTags, image_urls: imageUrls, video_urls: videoUrls,
+      content_type: contentType, tags: allTags, image_urls: finalImageUrls, video_urls: videoUrls,
     }
 
     if (isEditing) {
