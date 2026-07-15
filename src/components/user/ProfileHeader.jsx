@@ -45,7 +45,6 @@ export default function ProfileHeader({ profile, isOwn }) {
                   className="text-accent hover:text-accent/80 transition-colors shrink-0 flex items-center gap-1 text-xs">
                   <Mail size={14} /> 私信
                 </button>
-              </>
             )}
           </div>
 
