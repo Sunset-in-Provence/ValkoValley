@@ -123,7 +123,7 @@ export default function CommentItem({ comment, postId = null, creationId = null,
               creationId={creationId}
               parentId={comment.depth >= 1 ? (comment.parent_id || comment.id) : comment.id}
               replyToId={comment.id}
-              depth={comment.depth === 0 ? 1 : Math.min(comment.depth, MAX_DEPTH)}
+              depth={Math.min(comment.depth + 1, MAX_DEPTH)}
               onSuccess={() => { setShowReply(false); if (onRefresh) onRefresh() }}
               onCancel={() => setShowReply(false)}
             />
