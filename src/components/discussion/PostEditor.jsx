@@ -22,6 +22,7 @@ export default function PostEditor() {
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [imageUrls, setImageUrls] = useState([])
+  const [visibility, setVisibility] = useState('public')
   const [submitting, setSubmitting] = useState(false)
   const [loadingPost, setLoadingPost] = useState(isEditing)
 
@@ -112,6 +113,17 @@ export default function PostEditor() {
 
       {/* Markdown 编辑器 */}
       <MarkdownPreview content={content} onChange={setContent} rows={12} />
+
+      {/* 可见性 */}
+      <div className="flex items-center gap-2">
+        <span className="text-secondary text-sm">可见范围：</span>
+        <select value={visibility} onChange={(e) => setVisibility(e.target.value)}
+          className="bg-hover border border-border rounded-input px-3 py-1.5 text-primary text-sm">
+          <option value="public">所有人可见</option>
+          <option value="mutual">仅互相关注可见</option>
+          <option value="private">仅自己可见</option>
+        </select>
+      </div>
 
       {/* 附图 */}
       <MediaUploader images={imageUrls} onImagesChange={setImageUrls} />
