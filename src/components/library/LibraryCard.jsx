@@ -12,8 +12,7 @@ const catLabels = {
 
 export default function LibraryCard({ entry, isAdmin, onReorder }) {
   async function move(delta) {
-    const newOrder = (entry.sort_order || 0) + delta
-    await supabase.from('library_entries').update({ sort_order: newOrder }).eq('id', entry.id)
+    await supabase.rpc('move_library_entry', { _id: entry.id, _direction: delta })
     if (onReorder) onReorder()
   }
 
