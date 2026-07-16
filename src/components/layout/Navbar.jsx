@@ -79,6 +79,7 @@ export default function Navbar() {
     { to: '/discussion', label: '讨论区' },
     { to: '/creation', label: '创作区' },
     { to: '/library', label: '档案馆' },
+    { to: '/recommend', label: '外网推荐' },
   ]
 
   const HamburgerMenu = () => (

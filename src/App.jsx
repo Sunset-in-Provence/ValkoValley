@@ -38,6 +38,7 @@ const AdminContactsPage = lazy(() => import('@/pages/AdminContactsPage'))
 const MessagesPage = lazy(() => import('@/pages/MessagesPage'))
 const LilyGardenPage = lazy(() => import('@/pages/LilyGardenPage'))
 const LilyValleyPage = lazy(() => import('@/pages/LilyValleyPage'))
+const RecommendPage = lazy(() => import('@/pages/RecommendPage'))
 const ContactPage = lazy(() => import('@/pages/ContactPage'))
 
 function Lazy({ children }) {
@@ -67,6 +68,8 @@ export default function App() {
         {/* 讨论区 */}
         <Route path="/discussion" element={<Lazy><ProtectedRoute><AppLayout><DiscussionPage /></AppLayout></ProtectedRoute></Lazy>} />
         <Route path="/discussion/:id" element={<Lazy><ProtectedRoute><AppLayout><DiscussionDetailPage /></AppLayout></ProtectedRoute></Lazy>} />
+        <Route path="/recommend" element={<Lazy><ProtectedRoute><AppLayout><RecommendPage /></AppLayout></ProtectedRoute></Lazy>} />
+        <Route path="/recommend/new" element={<Lazy><ProtectedRoute><AppLayout><PostEditor /></AppLayout></ProtectedRoute></Lazy>} />
         <Route path="/discussion/new" element={<Lazy><ProtectedRoute><AppLayout><PostEditor /></AppLayout></ProtectedRoute></Lazy>} />
         <Route path="/discussion/:id/edit" element={<Lazy><ProtectedRoute><AppLayout><PostEditor /></AppLayout></ProtectedRoute></Lazy>} />
 
