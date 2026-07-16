@@ -74,7 +74,7 @@ export default function PostEditor() {
     } else {
       const { data, error } = await supabase
         .from('posts')
-        .insert({ author_id: user.id, title: title.trim(), content, image_urls: imageUrls })
+        .insert({ author_id: user.id, title: title.trim(), content, image_urls: imageUrls, category: window.location.pathname.includes('recommend') ? 'recommend' : 'discussion' })
         .select('id')
         .single()
 
