@@ -574,7 +574,7 @@ function UsersTab() {
               {u.is_banned && <span className="bg-danger/10 text-danger px-1.5 py-0.5 rounded-full">已封禁</span>}
               <button onClick={async () => {
                 if (!u.email) { toast.error('该用户无邮箱记录'); return }
-                const { error } = await supabase.auth.resetPasswordForEmail(u.email)
+                const { error } = await supabase.auth.resetPasswordForEmail(u.email, { redirectTo: window.location.origin + '/reset-password' })
                 if (error) toast.error(error.message)
                 else toast.success('重置邮件已发送到 ' + u.email)
               }}

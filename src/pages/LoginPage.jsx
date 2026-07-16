@@ -85,7 +85,7 @@ export default function LoginPage() {
             </Link>
             <button onClick={async () => {
               if (!email.trim()) { toast.error('请先输入邮箱'); return }
-              const { error } = await supabase.auth.resetPasswordForEmail(email.trim())
+              const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: window.location.origin + '/reset-password' })
               if (error) toast.error(error.message)
               else toast.success('重置邮件已发送，请查看邮箱')
             }} className="text-muted hover:text-accent no-underline">

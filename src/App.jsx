@@ -13,6 +13,7 @@ import RegisterPage from '@/pages/RegisterPage'
 import RulesPage from '@/pages/RulesPage'
 import AnnouncementsPage from '@/pages/AnnouncementsPage'
 import ApplyPage from '@/pages/ApplyPage'
+import ResetPasswordPage from '@/pages/ResetPasswordPage'
 import NotFoundPage from '@/pages/NotFoundPage'
 
 // 需登录的页面 — 懒加载（路由级代码分割）
@@ -58,6 +59,7 @@ export default function App() {
       <SitePassGate>
       <Routes>
         <Route path="/apply" element={<ApplyPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         {/* 公开页面 — 立即加载 */}
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />

@@ -64,8 +64,8 @@ export default function SitePassGate({ children }) {
     return () => clearTimeout(timeout)
   }, [])
 
-  // /apply 页面跳过密码门
-  if (window.location.pathname === '/apply') return children
+  // /apply 和 /reset-password 页面跳过密码门
+  if (window.location.pathname === '/apply' || window.location.pathname === '/reset-password') return children
 
   if (authorized === null) {
     return (
