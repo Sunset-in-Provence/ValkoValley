@@ -572,6 +572,13 @@ function UsersTab() {
             </div>
             <div className="flex items-center gap-3 text-xs text-muted">
               {u.is_banned && <span className="bg-danger/10 text-danger px-1.5 py-0.5 rounded-full">已封禁</span>}
+              <button onClick={async () => {
+                if (!u.email) { toast.error('该用户无邮箱记录'); return }
+                const { error } = await supabase.auth.resetPasswordForEmail(u.email)
+                if (error) toast.error(error.message)
+                else toast.success('重置邮件已发送到 ' + u.email)
+              }}
+                className="text-accent hover:underline">重置密码</button>
               <span>{new Date(u.created_at).toLocaleDateString('zh-CN')}</span>
             </div>
           </div>

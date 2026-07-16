@@ -83,6 +83,14 @@ export default function LoginPage() {
             <Link to="/register" className="text-accent no-underline hover:underline">
               还没有账号？立即注册
             </Link>
+            <button onClick={async () => {
+              if (!email.trim()) { toast.error('请先输入邮箱'); return }
+              const { error } = await supabase.auth.resetPasswordForEmail(email.trim())
+              if (error) toast.error(error.message)
+              else toast.success('重置邮件已发送，请查看邮箱')
+            }} className="text-muted hover:text-accent no-underline">
+              忘记密码？
+            </button>
           </div>
         </div>
       </div>
