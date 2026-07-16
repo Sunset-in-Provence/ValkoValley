@@ -69,7 +69,6 @@ export default function CreationPage() {
             <button key={f.key} onClick={() => setContentFilter(f.key)} className={cn('px-3 py-1.5 rounded-full text-xs transition-colors', contentFilter === f.key ? 'bg-accent text-text-inverse' : 'bg-surface text-secondary border border-border hover:bg-hover')}>{f.label}</button>
           ))}
           <button onClick={() => { if (sort === 'time') setTimeOrder((p) => p === 'desc' ? 'asc' : 'desc'); else { setSort('time'); setTimeOrder('desc') } }} className={cn('flex items-center gap-1 px-3 py-1.5 rounded-full text-xs', sort === 'time' ? 'bg-accent text-text-inverse' : 'bg-surface text-secondary border border-border hover:bg-hover')}><Clock size={12} /> 按时间{sort === 'time' && (timeOrder === 'desc' ? <ArrowDown size={10} /> : <ArrowUp size={10} />)}</button>
-          <button onClick={() => setSort('hot')} className={cn('flex items-center gap-1 px-3 py-1.5 rounded-full text-xs', sort === 'hot' ? 'bg-accent text-text-inverse' : 'bg-surface text-secondary border border-border hover:bg-hover')}><Flame size={12} /> 按热度</button>
         </div>
       </div>
 

@@ -38,7 +38,7 @@ export default function LikeButton({ targetType, targetId, initialCount = 0, own
   return (
     <button onClick={toggle} className={`flex items-center gap-1 text-xs transition-colors ${liked ? 'text-danger' : 'text-muted hover:text-danger'}`}>
       <Heart size={14} fill={liked ? 'currentColor' : 'none'} />
-      {count > 0 && <span>{count}</span>}
+      {(ownerId === user?.id) && count > 0 && <span>{count}</span>}
     </button>
   )
 }

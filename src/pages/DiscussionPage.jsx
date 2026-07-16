@@ -94,11 +94,6 @@ export default function DiscussionPage() {
             <Clock size={12} /> 按时间排序
             {sort === 'time' && (timeOrder === 'desc' ? <ArrowDown size={10} /> : <ArrowUp size={10} />)}
           </button>
-          <button onClick={() => setSort('hot')}
-            className={cn('flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-colors',
-              sort === 'hot' ? 'bg-accent text-text-inverse' : 'bg-surface text-secondary border border-border hover:bg-hover')}>
-            <Flame size={12} /> 按热度排序
-          </button>
         </div>
         {/* 搜索 */}
         <div className="relative">
