@@ -31,7 +31,7 @@ export default function DiscussionPage() {
     const { data, error } = await supabase
       .from('posts')
       .select('*, author:profiles!posts_author_id_fkey(username, display_name, avatar_url)')
-      .eq('is_deleted', false)
+      .eq('is_deleted', false).neq('category', 'recommend')
 
     if (error || !data) { setLoading(false); return }
 
