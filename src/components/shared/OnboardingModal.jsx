@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
-import { X, MessageSquare, Palette, BookOpen, Megaphone, HelpCircle, ArrowRight, Menu, MessageCircle, Flower } from 'lucide-react'
+import { X, MessageSquare, Palette, BookOpen, Megaphone, HelpCircle, ArrowRight, Menu, MessageCircle, Flower, ExternalLink } from 'lucide-react'
 
 const STORAGE_KEY = 'vv-onboarding-done'
 
