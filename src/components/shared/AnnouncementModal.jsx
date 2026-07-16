@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/context/AuthContext'
 import { renderMarkdown } from '@/lib/markdown'
@@ -8,25 +8,33 @@ export default function AnnouncementModal() {
   const { user } = useAuth()
   const [announcements, setAnnouncements] = useState([])
   const [current, setCurrent] = useState(0)
-  const [scrolledBottom, setScrolledBottom] = useState(false)
-  const contentRef = useRef(null)
+  const [countdown, setCountdown] = useState(5)
 
+  // 每个公告重置倒计时
+  useEffect(() => {
+    setCountdown(5)
+  }, [current])
+
+  // 倒计时
+  useEffect(() => {
+    if (countdown <= 0) return
+    const t = setInterval(() => setCountdown((c) => c - 1), 1000)
+    return () => clearInterval(t)
+  }, [countdown])
+
+  // 加载未读公告
   useEffect(() => {
     if (!user) return
     async function load() {
       const { data: all } = await supabase
-        .from('announcements')
-        .select('*')
-        .eq('is_published', true)
-        .lte('publish_at', new Date().toISOString())
+        .from('announcements').select('*')
+        .eq('is_published', true).lte('publish_at', new Date().toISOString())
         .order('created_at', { ascending: false })
 
       if (!all || all.length === 0) return
 
       const { data: viewed } = await supabase
-        .from('announcement_views')
-        .select('announcement_id')
-        .eq('user_id', user.id)
+        .from('announcement_views').select('announcement_id').eq('user_id', user.id)
 
       const viewedIds = new Set((viewed || []).map((v) => v.announcement_id))
       const unread = all.filter((a) => !viewedIds.has(a.id))
@@ -35,23 +43,15 @@ export default function AnnouncementModal() {
     load()
   }, [user])
 
-  useEffect(() => {
-    const timer = setTimeout(() => setScrolledBottom(true), 5000)
-    return () => clearTimeout(timer)
-  }, [announcements])
-
   async function handleConfirm() {
-    if (!scrolledBottom) return
+    if (countdown > 0) return
     const ann = announcements[current]
     await supabase.from('announcement_views').upsert({
-      announcement_id: ann.id,
-      user_id: user.id,
-      confirmed_at: new Date().toISOString(),
+      announcement_id: ann.id, user_id: user.id, confirmed_at: new Date().toISOString(),
     }, { onConflict: 'announcement_id,user_id' })
 
     if (current + 1 < announcements.length) {
       setCurrent((c) => c + 1)
-      setScrolledBottom(false)
     } else {
       setAnnouncements([])
     }
@@ -79,17 +79,12 @@ export default function AnnouncementModal() {
           <p className="text-muted text-xs mt-4">
             发布于 {new Date(ann.publish_at).toLocaleString('zh-CN')}
           </p>
-          {!scrolledBottom && (
-            <div className="text-center py-4 text-muted text-xs animate-pulse">
-              请在 5 秒阅读时间结束后确认
-            </div>
-          )}
         </div>
 
         <div className="p-4 border-t border-border shrink-0">
-          <button onClick={handleConfirm} disabled={!scrolledBottom}
-            className="w-full bg-accent text-text-inverse py-2.5 rounded-button font-medium text-sm hover:opacity-90 disabled:opacity-30 transition-all">
-            {scrolledBottom ? '我已阅读并确认' : '请等待 5 秒'}
+          <button onClick={handleConfirm} disabled={countdown > 0}
+            className={`w-full py-2.5 rounded-button font-medium text-sm transition-all ${countdown > 0 ? 'bg-hover text-muted cursor-not-allowed' : 'bg-accent text-text-inverse hover:opacity-90'}`}>
+            {countdown > 0 ? `${countdown} 秒后可确认` : '我已阅读并确认公告内容'}
           </button>
         </div>
       </div>
