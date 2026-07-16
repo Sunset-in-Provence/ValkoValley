@@ -44,6 +44,7 @@ export default function LibraryPage() {
       .select('*, author:profiles!library_entries_author_id_fkey(username, display_name)')
       .eq('status', 'published')
       .order('is_pinned', { ascending: false })
+      .order('sort_order', { ascending: true })
       .order('created_at', { ascending: false })
     setEntries(data || [])
     setLoading(false)
@@ -199,14 +200,14 @@ export default function LibraryPage() {
                           <div key={c.key} id={'sub-' + c.key} className="mb-4 scroll-mt-20">
                             <h4 className="text-muted text-xs font-medium mb-2">{c.label}</h4>
                             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                              {ci.map((e) => <LibraryCard key={e.id} entry={e} />)}
+                              {ci.map((e) => <LibraryCard key={e.id} entry={e} isAdmin={isAdmin} onReorder={fetch} />)}
                             </div>
                           </div>
                         )
                       })}
                       {items.length > 0 && (
                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                          {items.map((e) => <LibraryCard key={e.id} entry={e} />)}
+                          {items.map((e) => <LibraryCard key={e.id} entry={e} isAdmin={isAdmin} onReorder={fetch} />)}
                         </div>
                       )}
                     </div>
