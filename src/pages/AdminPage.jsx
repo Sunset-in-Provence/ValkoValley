@@ -16,13 +16,14 @@ import { useAuth } from '@/context/AuthContext'
 import ReportCard from '@/components/admin/ReportCard'
 import EmptyState from '@/components/shared/EmptyState'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
-import { Shield, Filter, RefreshCw, BookOpen, Palette as PaletteIcon, MessageSquare, Check, X, Clock, ArrowLeft, Ticket, User, Plus, Sparkles, Mail } from 'lucide-react'
+import { Shield, Filter, RefreshCw, BookOpen, Palette as PaletteIcon, MessageSquare, Check, X, Clock, ArrowLeft, Ticket, User, Plus, Sparkles, Mail, EyeOff, Eye } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
 
 const TABS = [
   { key: 'reports', label: '举报审核' },
   { key: 'guestbook', label: '留言审核' },
+  { key: 'hidden', label: '隐藏内容' },
   { key: 'exams', label: '考试记录' },
   { key: 'library', label: '档案馆审核' },
   { key: 'banned', label: '违禁词管理' },
@@ -292,6 +293,9 @@ export default function AdminPage() {
           )}
         </>
       )}
+
+      {/* ====== 隐藏内容管理 ====== */}
+      {activeTab === 'hidden' && <HiddenContentTab />}
 
       {/* ====== 考试记录 ====== */}
       {activeTab === 'exams' && <ExamAttemptsTab />}
@@ -584,6 +588,113 @@ function UsersTab() {
           </div>
         ))}
       </div>
+    </div>
+  )
+}
+
+function HiddenContentTab() {
+  const [items, setItems] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  async function fetch() {
+    setLoading(true)
+    const [{ data: posts }, { data: creations }] = await Promise.all([
+      supabase.from('posts')
+        .select('id, title, author_id, hidden_reason, pending_review, created_at, author:profiles!posts_author_id_fkey(username, display_name)')
+        .eq('hidden', true).eq('is_deleted', false)
+        .order('created_at', { ascending: false }),
+      supabase.from('creations')
+        .select('id, title, author_id, hidden_reason, pending_review, created_at, author:profiles!creations_author_id_fkey(username, display_name)')
+        .eq('hidden', true).eq('is_deleted', false)
+        .order('created_at', { ascending: false }),
+    ])
+
+    const merged = [
+      ...(posts || []).map((p) => ({ ...p, type: 'post', link: `/discussion/${p.id}` })),
+      ...(creations || []).map((c) => ({ ...c, type: 'creation', link: `/creation/${c.id}` })),
+    ]
+    // 待审核的排前面
+    merged.sort((a, b) => (b.pending_review ? 1 : 0) - (a.pending_review ? 1 : 0) || new Date(b.created_at) - new Date(a.created_at))
+    setItems(merged)
+    setLoading(false)
+  }
+
+  useEffect(() => { fetch() }, [])
+
+  async function handleUnhide(item) {
+    const fn = item.type === 'post' ? 'admin_hide_post' : 'admin_hide_creation'
+    const idParam = item.type === 'post' ? '_post_id' : '_creation_id'
+    const { data: ok, error } = await supabase.rpc(fn, { [idParam]: item.id, _hidden: false })
+    if (error || !ok) { toast.error('解除隐藏失败'); return }
+    toast.success(`已解除隐藏：${item.title}`)
+    fetch()
+  }
+
+  if (loading) return <div className="flex justify-center py-16"><LoadingSpinner size="lg" /></div>
+
+  const postCount = items.filter((i) => i.type === 'post').length
+  const creationCount = items.filter((i) => i.type === 'creation').length
+
+  return (
+    <div>
+      <div className="grid grid-cols-3 gap-3 mb-6">
+        <div className="bg-surface rounded-card shadow-card p-4 text-center">
+          <p className="text-warning text-2xl font-display">{items.length}</p>
+          <p className="text-muted text-xs mt-1">隐藏总数</p>
+        </div>
+        <div className="bg-surface rounded-card shadow-card p-4 text-center">
+          <p className="text-muted text-2xl font-display">{postCount}</p>
+          <p className="text-muted text-xs mt-1">隐藏帖子</p>
+        </div>
+        <div className="bg-surface rounded-card shadow-card p-4 text-center">
+          <p className="text-muted text-2xl font-display">{creationCount}</p>
+          <p className="text-muted text-xs mt-1">隐藏创作</p>
+        </div>
+      </div>
+
+      {items.length === 0 ? (
+        <EmptyState icon={EyeOff} title="暂无隐藏内容" description="没有被隐藏的帖子或创作" />
+      ) : (
+        <div className="space-y-2">
+          {items.map((item) => (
+            <div key={`${item.type}-${item.id}`} className="bg-surface rounded-card border border-border p-4">
+              <div className="flex items-start justify-between">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className={cn('text-[10px] px-1.5 py-0.5 rounded-full',
+                      item.type === 'post' ? 'bg-info/10 text-info' : 'bg-accent/10 text-accent')}>
+                      {item.type === 'post' ? '讨论帖' : '创作'}
+                    </span>
+                    {item.pending_review && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-warning/10 text-warning flex items-center gap-1">
+                        <Eye size={10} /> 待审核
+                      </span>
+                    )}
+                    <a href={item.link} target="_blank" className="text-accent text-sm font-medium hover:underline truncate">
+                      {item.title}
+                    </a>
+                  </div>
+                  <div className="flex items-center gap-3 text-xs text-muted">
+                    <span>{item.author?.display_name || item.author?.username || '未知'}</span>
+                    <span className="flex items-center gap-1"><Clock size={11} /> {new Date(item.created_at).toLocaleString('zh-CN')}</span>
+                  </div>
+                  {item.hidden_reason && (
+                    <p className="text-warning text-xs mt-1.5 flex items-center gap-1">
+                      <EyeOff size={11} /> 隐藏原因：{item.hidden_reason}
+                    </p>
+                  )}
+                </div>
+                <button
+                  onClick={() => handleUnhide(item)}
+                  className="shrink-0 ml-3 flex items-center gap-1 bg-success/10 text-success text-xs px-3 py-1.5 rounded-button hover:bg-success/20 transition-colors"
+                >
+                  <Eye size={12} /> 解除隐藏
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

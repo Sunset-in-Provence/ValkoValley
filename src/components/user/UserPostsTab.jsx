@@ -5,21 +5,25 @@
  */
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabaseClient'
+import { useAuth } from '@/context/AuthContext'
 import PostCard from '@/components/discussion/PostCard'
 import EmptyState from '@/components/shared/EmptyState'
 import { MessageSquare } from 'lucide-react'
 
 export default function UserPostsTab({ userId }) {
+  const { user, isAdmin } = useAuth()
   const [posts, setPosts] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function fetch() {
-      const { data } = await supabase
+      let query = supabase
         .from('posts')
         .select('*, author:profiles!posts_author_id_fkey(username, display_name, avatar_url)')
         .eq('author_id', userId).eq('is_deleted', false)
-        .order('created_at', { ascending: false })
+      // 本人或管理员可以看到被隐藏的帖子
+      if (user?.id !== userId && !isAdmin) query = query.neq('hidden', true)
+      const { data } = await query.order('created_at', { ascending: false })
 
       if (data) {
         // 获取评论数

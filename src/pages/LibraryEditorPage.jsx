@@ -11,7 +11,7 @@ import { uploadImage, uploadVideo, uploadAudio } from '@/lib/upload'
 import { loadBannedWords, checkBannedWords } from '@/lib/bannedWords'
 import toast from 'react-hot-toast'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
-import { ArrowLeft, Upload, X, Loader2, Video, Music, FileText } from 'lucide-react'
+import { ArrowLeft, Upload, X, Loader2, Video, Music, FileText, Image } from 'lucide-react'
 
 const CATEGORY_GROUPS = [
   {
@@ -268,9 +268,9 @@ export default function LibraryEditorPage() {
         {/* 附图 */}
         <div className="mb-4">
           <label className="text-secondary text-sm font-medium mb-1.5 block">附图</label>
-          <label className="flex items-center gap-2 text-muted text-sm cursor-pointer hover:text-accent">
-            <Upload size={16} />
-            {imageUploading ? '上传中...' : '上传图片'}
+          <label className="flex items-center gap-1 bg-hover border border-border text-secondary px-4 py-2 rounded-button text-sm cursor-pointer hover:bg-accent hover:text-text-inverse w-fit">
+            {imageUploading ? <Loader2 size={14} className="animate-spin" /> : <Image size={14} />}
+            {imageUploading ? '上传中' : '上传图片'}
             <input type="file" accept="image/*" multiple onChange={handleImageUpload} hidden />
           </label>
           {imageUrls.length > 0 && (

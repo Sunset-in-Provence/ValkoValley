@@ -5,7 +5,8 @@ import { useAuth } from '@/context/AuthContext'
 import LibraryCard from '@/components/library/LibraryCard'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import { renderMarkdown } from '@/lib/markdown'
-import { Plus, Search, Edit3, Trash2 } from 'lucide-react'
+import { Plus, Search, Edit3, Trash2, Download } from 'lucide-react'
+import ImageViewer from '@/components/shared/ImageViewer'
 import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
 
@@ -36,6 +37,9 @@ export default function LibraryPage() {
   const [entries, setEntries] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [viewerOpen, setViewerOpen] = useState(false)
+  const [viewerIndex, setViewerIndex] = useState(0)
+  const [viewerImages, setViewerImages] = useState([])
 
   const fetch = useCallback(async () => {
     setLoading(true)
@@ -161,9 +165,19 @@ export default function LibraryPage() {
                             {e.content ? renderMarkdown(e.content) : <p className="text-muted italic">暂无内容，点击编辑补充</p>}
                           </div>
                           {e.image_urls?.length > 0 && (
-                            <div className="flex flex-wrap gap-2 mt-4">
+                            <div className="flex flex-wrap gap-3 mt-4">
                               {e.image_urls.map((url, i) => (
-                                <img key={i} src={url} alt="" className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-card border border-border" loading="lazy" />
+                                <div key={i} className="relative group/img">
+                                  <img src={url} alt={`${e.title} 附图 ${i + 1}`}
+                                    className="w-28 h-28 sm:w-36 sm:h-36 object-cover rounded-card border border-border cursor-pointer hover:opacity-90"
+                                    loading="lazy"
+                                    onClick={() => { setViewerImages(e.image_urls); setViewerOpen(true); setViewerIndex(i) }} />
+                                  <a href={url} download
+                                    className="absolute bottom-1.5 right-1.5 bg-surface/80 hover:bg-surface rounded-full p-1.5 opacity-0 group-hover/img:opacity-100 transition-opacity"
+                                    onClick={(ev) => ev.stopPropagation()} title="下载">
+                                    <Download size={14} className="text-muted" />
+                                  </a>
+                                </div>
                               ))}
                             </div>
                           )}
@@ -220,6 +234,17 @@ export default function LibraryPage() {
       )}
         </div>
       </div>
+
+      {/* 图片翻页查看器 */}
+      {viewerOpen && viewerImages.length > 0 && (
+        <ImageViewer
+          images={viewerImages}
+          current={viewerIndex}
+          onClose={() => setViewerOpen(false)}
+          onPrev={() => setViewerIndex((i) => (i - 1 + viewerImages.length) % viewerImages.length)}
+          onNext={() => setViewerIndex((i) => (i + 1) % viewerImages.length)}
+        />
+      )}
     </div>
   )
 }

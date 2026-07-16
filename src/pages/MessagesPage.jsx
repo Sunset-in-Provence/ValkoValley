@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/context/AuthContext'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
+import ImageViewer from '@/components/shared/ImageViewer'
 import { ArrowLeft, Send, User, Pin, PinOff, Image, X, Loader2 } from 'lucide-react'
 import { uploadImage } from '@/lib/upload'
 import { loadBannedWords, checkBannedWords } from '@/lib/bannedWords'
@@ -20,6 +21,9 @@ export default function MessagesPage() {
   const [msgImages, setMsgImages] = useState([])
   const [imgUploading, setImgUploading] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [viewerOpen, setViewerOpen] = useState(false)
+  const [viewerIndex, setViewerIndex] = useState(0)
+  const [viewerImages, setViewerImages] = useState([])
   const bottomRef = useRef(null)
 
   // 加载联系人 + 偏好
@@ -184,7 +188,7 @@ export default function MessagesPage() {
                     {m.image_urls?.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-1">
                         {m.image_urls.map((url, i) => (
-                          <img key={i} src={url} alt="" className="max-w-[120px] max-h-[120px] object-cover rounded cursor-pointer" onClick={() => window.open(url, '_blank')} />
+                          <img key={i} src={url} alt="" className="max-w-[120px] max-h-[120px] object-cover rounded cursor-pointer hover:opacity-90" onClick={() => { setViewerImages(m.image_urls); setViewerOpen(true); setViewerIndex(i) }} />
                         ))}
                       </div>
                     )}
@@ -220,6 +224,17 @@ export default function MessagesPage() {
               </button>
             </div>
           </form>
+
+          {/* 图片翻页查看器 */}
+          {viewerOpen && viewerImages.length > 0 && (
+            <ImageViewer
+              images={viewerImages}
+              current={viewerIndex}
+              onClose={() => setViewerOpen(false)}
+              onPrev={() => setViewerIndex((i) => (i - 1 + viewerImages.length) % viewerImages.length)}
+              onNext={() => setViewerIndex((i) => (i + 1) % viewerImages.length)}
+            />
+          )}
         </div>
       )}
     </div>

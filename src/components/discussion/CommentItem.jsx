@@ -15,6 +15,7 @@ import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabaseClient'
 import { sanitizeText } from '@/lib/sanitize'
 import CommentForm from './CommentForm'
+import ImageViewer from '@/components/shared/ImageViewer'
 import toast from 'react-hot-toast'
 import { User, Clock, Reply, Trash2 } from 'lucide-react'
 
@@ -24,6 +25,8 @@ export default function CommentItem({ comment, postId = null, creationId = null,
   const { user, isAdmin } = useAuth()
   const [showReply, setShowReply] = useState(false)
   const [collapsed, setCollapsed] = useState(false)
+  const [viewerOpen, setViewerOpen] = useState(false)
+  const [viewerIndex, setViewerIndex] = useState(0)
 
   const isOwn = user?.id === comment.author_id
   const canDelete = isOwn || user?.id === postAuthorId || isAdmin
@@ -86,7 +89,7 @@ export default function CommentItem({ comment, postId = null, creationId = null,
           {comment.image_urls?.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-2">
               {comment.image_urls.map((url, i) => (
-                <img key={i} src={url} alt="" className="w-20 h-20 object-cover rounded-card border border-border cursor-pointer hover:opacity-90" onClick={() => window.open(url, '_blank')} />
+                <img key={i} src={url} alt="" className="w-20 h-20 object-cover rounded-card border border-border cursor-pointer hover:opacity-90" onClick={() => { setViewerOpen(true); setViewerIndex(i) }} />
               ))}
             </div>
           )}
@@ -151,6 +154,17 @@ export default function CommentItem({ comment, postId = null, creationId = null,
             />
           ))}
         </div>
+      )}
+
+      {/* 图片翻页查看器 */}
+      {viewerOpen && comment.image_urls?.length > 0 && (
+        <ImageViewer
+          images={comment.image_urls}
+          current={viewerIndex}
+          onClose={() => setViewerOpen(false)}
+          onPrev={() => setViewerIndex((i) => (i - 1 + comment.image_urls.length) % comment.image_urls.length)}
+          onNext={() => setViewerIndex((i) => (i + 1) % comment.image_urls.length)}
+        />
       )}
     </div>
   )

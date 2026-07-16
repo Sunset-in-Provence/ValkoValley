@@ -28,7 +28,7 @@ export default function CreationPage() {
 
   async function fetchData() {
     setLoading(true)
-    let query = supabase.from('creations').select('*, author:profiles!creations_author_id_fkey(username, display_name, avatar_url)').eq('is_deleted', false)
+    let query = supabase.from('creations').select('*, author:profiles!creations_author_id_fkey(username, display_name, avatar_url)').eq('is_deleted', false).neq('hidden', true)
     if (contentFilter !== 'all') query = query.eq('content_type', contentFilter)
     const { data } = await query
     let enriched = data || []

@@ -20,7 +20,7 @@ export default function RecommendPage() {
     setLoading(true)
     const { data } = await supabase.from('posts')
       .select('*, author:profiles!posts_author_id_fkey(username, display_name, avatar_url)')
-      .eq('is_deleted', false).eq('category', 'recommend')
+      .eq('is_deleted', false).eq('category', 'recommend').neq('hidden', true)
 
     if (!data) { setLoading(false); return }
     const postIds = data.map((p) => p.id)

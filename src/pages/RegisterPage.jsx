@@ -15,7 +15,7 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabaseClient'
 import toast from 'react-hot-toast'
-import { ArrowLeft, CheckCircle, XCircle, AlertTriangle } from 'lucide-react'
+import { ArrowLeft, CheckCircle, XCircle, AlertTriangle, Loader2 } from 'lucide-react'
 import examQuestions from '@/lib/examQuestions'
 import ExamQuestion from '@/components/auth/ExamQuestion'
 import UserAgreement from '@/components/auth/UserAgreement'
@@ -49,6 +49,31 @@ export default function RegisterPage() {
     check()
   }, [])
   const [agreed, setAgreed] = useState(false)
+
+  // ---- 邮箱查重 ----
+  const [emailChecking, setEmailChecking] = useState(false)
+  const [emailStatus, setEmailStatus] = useState(null) // null | 'available' | 'taken'
+
+  // 防抖检测邮箱是否已注册
+  useEffect(() => {
+    if (!email.trim() || !email.includes('@')) {
+      setEmailStatus(null)
+      return
+    }
+    const timer = setTimeout(async () => {
+      setEmailChecking(true)
+      try {
+        const { data, error } = await supabase.rpc('check_email_exists', { email_to_check: email.trim().toLowerCase() })
+        if (error) { setEmailStatus(null); return }
+        setEmailStatus(data ? 'taken' : 'available')
+      } catch {
+        setEmailStatus(null)
+      } finally {
+        setEmailChecking(false)
+      }
+    }, 600)
+    return () => clearTimeout(timer)
+  }, [email])
 
   // ---- 流程状态 ----
   const [step, setStep] = useState('form') // 'form' | 'rules_exam' | 'aoyin_exam' | 'result'
@@ -100,6 +125,8 @@ export default function RegisterPage() {
     if (!email.trim() || !password.trim() || !username.trim()) {
       toast.error('请填写完整信息'); return
     }
+    if (emailStatus === 'taken') { toast.error('该邮箱已被注册，请更换邮箱'); return }
+    if (emailChecking) { toast.error('正在验证邮箱，请稍候'); return }
     if (password.length < 6) { toast.error('密码至少 6 位'); return }
     if (username.length < 2 || username.length > 30) {
       toast.error('用户名需 2-30 个字符'); return
@@ -385,11 +412,31 @@ export default function RegisterPage() {
           {/* 邮箱 */}
           <div>
             <label className="text-secondary text-sm font-medium mb-1 block">邮箱</label>
-            <input
-              type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-              placeholder="your@email.com" required
-              className="w-full bg-hover border border-border rounded-input px-4 py-2.5 text-primary text-sm placeholder:text-muted focus:outline-none focus:border-accent transition-colors"
-            />
+            <div className="relative">
+              <input
+                type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                placeholder="your@email.com" required
+                className="w-full bg-hover border border-border rounded-input px-4 py-2.5 text-primary text-sm placeholder:text-muted focus:outline-none focus:border-accent transition-colors"
+              />
+              {/* 邮箱检测指示器 */}
+              {emailChecking && (
+                <Loader2 size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted animate-spin" />
+              )}
+              {!emailChecking && emailStatus === 'available' && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-success text-xs flex items-center gap-1">
+                  <CheckCircle size={14} />
+                </span>
+              )}
+              {!emailChecking && emailStatus === 'taken' && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-danger text-xs flex items-center gap-1">
+                  <XCircle size={14} />
+                </span>
+              )}
+            </div>
+            {/* 错误提示 */}
+            {emailStatus === 'taken' && (
+              <p className="text-danger text-xs mt-1">该邮箱已被注册</p>
+            )}
           </div>
 
           {/* 用户名 */}

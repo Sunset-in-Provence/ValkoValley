@@ -15,7 +15,7 @@ import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import EmptyState from '@/components/shared/EmptyState'
 import toast from 'react-hot-toast'
 import ReportButton from '@/components/report/ReportButton'
-import { ArrowLeft, User, Clock, Eye, Edit3, Trash2, MessageSquare } from 'lucide-react'
+import { ArrowLeft, User, Clock, Eye, Edit3, Trash2, MessageSquare, EyeOff } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const contentTypeLabels = { text: '📝 文', image: '🖼️ 图', video: '🎬 视频' }
@@ -104,7 +104,21 @@ export default function CreationDetailPage() {
       </Link>
 
       <article className="bg-surface rounded-card shadow-card mb-6">
+        {creation.hidden && !isAdmin && user?.id !== creation.author_id ? (
+          <div className="p-12 text-center">
+            <EyeOff size={40} className="text-muted mx-auto mb-3" />
+            <p className="text-muted text-sm">该作品已被管理员隐藏</p>
+            {creation.hidden_reason && <p className="text-muted text-xs mt-1">原因：{creation.hidden_reason}</p>}
+          </div>
+        ) : (
         <div className="p-6 md:p-8">
+          {/* 隐藏提示横幅 */}
+          {creation.hidden && (
+            <div className="bg-warning/10 border border-warning/30 rounded-card p-3 mb-4 text-warning text-xs flex items-start gap-2">
+              <EyeOff size={14} className="shrink-0 mt-0.5" />
+              <span>此作品已被隐藏{creation.hidden_reason && `（原因：${creation.hidden_reason}）`}，仅作者和管理员可见</span>
+            </div>
+          )}
           {/* 元信息 */}
           <div className="flex flex-wrap items-center gap-2 text-xs mb-4">
             <span className={cn('px-2 py-0.5 rounded-full', contentTypeColors[creation.content_type] || 'bg-hover text-muted')}>
@@ -171,6 +185,22 @@ export default function CreationDetailPage() {
                   className="flex items-center gap-1 text-muted text-xs hover:text-accent"><Edit3 size={12} /> 编辑</button>
                 <button onClick={handleDelete}
                   className="flex items-center gap-1 text-muted text-xs hover:text-danger"><Trash2 size={12} /> 删除</button>
+                {isAdmin && (
+                  <button onClick={async () => {
+                    const reason = prompt('隐藏原因：\n1.R18未打码\n2.暴力血腥未打码\n3.引战内容\n4.其他违规\n\n输入编号或自定义：')
+                    if (!reason) return
+                    const m = {'1':'R18未打码','2':'暴力血腥未打码','3':'引战内容','4':'其他违规'}
+                    const r = m[reason] || reason
+                    const { data: ok, error } = await supabase.rpc('admin_hide_creation', { _creation_id: id, _hidden: true, _reason: r })
+                    if (error || !ok) { toast.error(error?.message || '无权限执行此操作'); return }
+                    setCreation((p) => ({ ...p, hidden: true }))
+                    supabase.rpc('notify_user', { _user_id: creation.author_id, _title: '作品被隐藏', _content: `作品「${creation.title}」因「${r}」被隐藏，请修改后联系管理员`, _link: `/creation/${id}` }).then()
+                    toast.success('已隐藏并通知作者')
+                  }}
+                    className="flex items-center gap-1 text-warning text-xs hover:text-danger transition-colors">
+                    <EyeOff size={12} /> 隐藏
+                  </button>
+                )}
               </>
             )}
             {!isOwn && (
@@ -178,6 +208,7 @@ export default function CreationDetailPage() {
             )}
           </div>
         </div>
+        )}
       </article>
       {viewerOpen && creation.image_urls?.length > 0 && (
         <ImageViewer images={creation.image_urls} current={viewerIndex}

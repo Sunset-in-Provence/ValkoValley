@@ -8,7 +8,8 @@ import { useAuth } from '@/context/AuthContext'
 import { renderMarkdown } from '@/lib/markdown'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import toast from 'react-hot-toast'
-import { ArrowLeft, Eye, Calendar, User, Edit3, Trash2, Download } from 'lucide-react'
+import { ArrowLeft, Calendar, User, Edit3, Trash2, Download } from 'lucide-react'
+import ImageViewer from '@/components/shared/ImageViewer'
 
 const catLabels = {
   lore_official: '官方设定', lore_rumor: '坊间传闻',
@@ -24,6 +25,8 @@ export default function LibraryDetailPage() {
   const navigate = useNavigate()
   const [entry, setEntry] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [viewerOpen, setViewerOpen] = useState(false)
+  const [viewerIndex, setViewerIndex] = useState(0)
   const canEdit = !!user
 
   async function handleDelete() {
@@ -99,7 +102,7 @@ export default function LibraryDetailPage() {
                   <div key={i} className="relative group">
                     <img src={url} alt={`附图 ${i + 1}`}
                       className="rounded-card w-24 h-24 md:w-32 md:h-32 object-cover cursor-pointer hover:opacity-90"
-                      loading="lazy" onClick={() => window.open(url, '_blank')} />
+                      loading="lazy" onClick={() => { setViewerOpen(true); setViewerIndex(i) }} />
                     <a href={url} download className="absolute bottom-1 right-1 bg-surface/80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity sm:opacity-100" title="下载">
                       <Download size={12} className="text-muted" />
                     </a>
@@ -195,6 +198,17 @@ export default function LibraryDetailPage() {
           </div>
         )}
       </article>
+
+      {/* 图片翻页查看器 */}
+      {viewerOpen && entry.image_urls?.length > 0 && (
+        <ImageViewer
+          images={entry.image_urls}
+          current={viewerIndex}
+          onClose={() => setViewerOpen(false)}
+          onPrev={() => setViewerIndex((i) => (i - 1 + entry.image_urls.length) % entry.image_urls.length)}
+          onNext={() => setViewerIndex((i) => (i + 1) % entry.image_urls.length)}
+        />
+      )}
     </div>
   )
 }

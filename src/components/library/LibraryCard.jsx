@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Eye, Image, ChevronUp, ChevronDown } from 'lucide-react'
+import { Image, ChevronUp, ChevronDown } from 'lucide-react'
 import { supabase } from '@/lib/supabaseClient'
 
 const catLabels = {
@@ -21,8 +21,8 @@ export default function LibraryCard({ entry, isAdmin, onReorder }) {
       <Link to={`/library/${entry.id}`}
         className="block bg-surface rounded-card shadow-card overflow-hidden no-underline hover:shadow-elevated transition-shadow group">
         <div className="aspect-[4/3] bg-hover flex items-center justify-center overflow-hidden">
-          {entry.cover_url ? (
-            <img src={entry.cover_url} alt={entry.title}
+          {(entry.cover_url || entry.image_urls?.[0]) ? (
+            <img src={entry.cover_url || entry.image_urls[0]} alt={entry.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
           ) : (<Image size={24} className="text-muted" />)}
         </div>
@@ -30,7 +30,6 @@ export default function LibraryCard({ entry, isAdmin, onReorder }) {
           {entry.is_pinned && <span className="inline-block bg-accent/10 text-accent text-[10px] px-1.5 py-0.5 rounded-full mb-1.5">置顶</span>}
           <h3 className="font-display text-accent text-xs mb-1 line-clamp-1 group-hover:underline">{entry.title}</h3>
           <span className="text-muted text-[10px]">{catLabels[entry.category] || entry.category}</span>
-          <div className="flex items-center gap-1 text-muted text-[10px] mt-2"><Eye size={10} /> {entry.view_count || 0}</div>
         </div>
       </Link>
       {isAdmin && (

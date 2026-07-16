@@ -4,21 +4,25 @@
  */
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabaseClient'
+import { useAuth } from '@/context/AuthContext'
 import CreationCard from '@/components/creation/CreationCard'
 import EmptyState from '@/components/shared/EmptyState'
 import { Palette } from 'lucide-react'
 
 export default function UserCreationsTab({ userId }) {
+  const { user, isAdmin } = useAuth()
   const [creations, setCreations] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function fetch() {
-      const { data } = await supabase
+      let query = supabase
         .from('creations')
         .select('*, author:profiles!creations_author_id_fkey(username, display_name, avatar_url)')
         .eq('author_id', userId).eq('is_deleted', false)
-        .order('created_at', { ascending: false })
+      // 本人或管理员可以看到被隐藏的作品
+      if (user?.id !== userId && !isAdmin) query = query.neq('hidden', true)
+      const { data } = await query.order('created_at', { ascending: false })
       if (data) { const ids = data.map((c) => c.id); const likeMap = {}; const { data: likes } = await supabase.from('likes').select('target_id').eq('target_type', 'creation').in('target_id', ids); likes?.forEach((l) => { likeMap[l.target_id] = (likeMap[l.target_id] || 0) + 1 }); setCreations(data.map((c) => ({ ...c, like_count: likeMap[c.id] || 0 }))) }
       setLoading(false)
     }

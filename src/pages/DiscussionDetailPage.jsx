@@ -19,7 +19,7 @@ import EmptyState from '@/components/shared/EmptyState'
 import toast from 'react-hot-toast'
 import {
   ArrowLeft, User, Clock, MessageSquare,
-  Edit3, Trash2, Pin, EyeOff
+  Edit3, Trash2, Pin, Eye, EyeOff
 } from 'lucide-react'
 
 export default function DiscussionDetailPage() {
@@ -119,7 +119,21 @@ export default function DiscussionDetailPage() {
 
       {/* ============ 帖子主体 ============ */}
       <article className="bg-surface rounded-card shadow-card mb-6">
+        {post.hidden && !isAdmin && user?.id !== post.author_id ? (
+          <div className="p-12 text-center">
+            <EyeOff size={40} className="text-muted mx-auto mb-3" />
+            <p className="text-muted text-sm">该帖子已被管理员隐藏</p>
+            {post.hidden_reason && <p className="text-muted text-xs mt-1">原因：{post.hidden_reason}</p>}
+          </div>
+        ) : (
         <div className="p-6">
+          {/* 隐藏提示横幅 */}
+          {post.hidden && (
+            <div className="bg-warning/10 border border-warning/30 rounded-card p-3 mb-4 text-warning text-xs flex items-start gap-2">
+              <EyeOff size={14} className="shrink-0 mt-0.5" />
+              <span>此帖已被隐藏{post.hidden_reason && `（原因：${post.hidden_reason}）`}，仅作者和管理员可见</span>
+            </div>
+          )}
           {/* 标题 */}
           <h1 className="font-display text-accent text-xl mb-4">{post.title}</h1>
 
@@ -176,19 +190,31 @@ export default function DiscussionDetailPage() {
                 >
                   <Trash2 size={12} /> 删除
                 </button>
-                {isAdmin && (
+                {isAdmin && !post.hidden && (
                   <button onClick={async () => {
                     const reason = prompt('隐藏原因：\n1.R18未打码\n2.暴力血腥未打码\n3.引战内容\n4.其他违规\n\n输入编号或自定义：')
                     if (!reason) return
                     const m = {'1':'R18未打码','2':'暴力血腥未打码','3':'引战内容','4':'其他违规'}
                     const r = m[reason] || reason
-                    await supabase.from('posts').update({ hidden: true, hidden_reason: r }).eq('id', id)
+                    const { data: ok, error } = await supabase.rpc('admin_hide_post', { _post_id: id, _hidden: true, _reason: r })
+                    if (error || !ok) { toast.error(error?.message || '无权限执行此操作'); return }
                     setPost((p) => ({ ...p, hidden: true }))
                     supabase.rpc('notify_user', { _user_id: post.author_id, _title: '帖子被隐藏', _content: `帖子「${post.title}」因「${r}」被隐藏，请修改后联系管理员`, _link: `/discussion/${id}` }).then()
                     toast.success('已隐藏并通知作者')
                   }}
                     className="flex items-center gap-1 text-warning text-xs hover:text-danger transition-colors">
                     <EyeOff size={12} /> 隐藏
+                  </button>
+                )}
+                {isAdmin && post.hidden && (
+                  <button onClick={async () => {
+                    const { data: ok, error } = await supabase.rpc('admin_hide_post', { _post_id: id, _hidden: false })
+                    if (error || !ok) { toast.error('解除隐藏失败'); return }
+                    setPost((p) => ({ ...p, hidden: false, pending_review: false }))
+                    toast.success('已解除隐藏')
+                  }}
+                    className="flex items-center gap-1 text-success text-xs hover:opacity-80 transition-colors">
+                    <Eye size={12} /> 解除隐藏
                   </button>
                 )}
                 {isAdmin && (
@@ -213,6 +239,7 @@ export default function DiscussionDetailPage() {
             )}
           </div>
         </div>
+        )}
       </article>
 
       {/* ============ 评论区 ============ */}

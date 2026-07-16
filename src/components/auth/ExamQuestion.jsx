@@ -7,8 +7,8 @@ export default function ExamQuestion({ question, index, selectedAnswer, onSelect
 
   return (
     <div className="border-b border-border pb-4 mb-4 last:border-0 last:mb-0 last:pb-0">
-      <p className="text-sm font-medium mb-3" style={{ color: '#111' }}>
-        <span className="font-display mr-1" style={{ color: '#1a6b3c' }}>{index + 1}.</span>
+      <p className="text-sm font-medium mb-3" style={{ color: 'var(--color-text-primary)' }}>
+        <span className="font-display mr-1" style={{ color: 'var(--color-accent)' }}>{index + 1}.</span>
         {question.question}
       </p>
 
@@ -19,17 +19,17 @@ export default function ExamQuestion({ question, index, selectedAnswer, onSelect
 
           let borderClass = 'border-border'
           let bgClass = 'bg-hover'
-          let textStyle = { color: '#333' }
+          let textStyle = { color: 'var(--color-text-primary)' }
 
           if (locked || isAnswered) {
             if (isCorrectOption) {
               borderClass = 'border-success'
               bgClass = 'bg-success/10'
-              textStyle = { color: '#166534' }
+              textStyle = { color: 'var(--color-success)' }
             } else if (isSelected && !isCorrectOption) {
               borderClass = 'border-danger'
               bgClass = 'bg-danger/10'
-              textStyle = { color: '#991b1b' }
+              textStyle = { color: 'var(--color-danger)' }
             }
           }
 
@@ -47,7 +47,7 @@ export default function ExamQuestion({ question, index, selectedAnswer, onSelect
                 !disabled && !isSelected && 'hover:border-accent hover:bg-hover/80 cursor-pointer',
                 disabled && 'cursor-default'
               )}
-              style={(!disabled && isSelected) ? { color: '#1a6b3c' } : textStyle}
+              style={(!disabled && isSelected) ? { color: 'var(--color-accent)' } : textStyle}
             >
               <span className="w-5 h-5 rounded-full border border-current flex items-center justify-center shrink-0 text-xs">
                 {String.fromCharCode(65 + oi)}

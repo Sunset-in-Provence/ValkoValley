@@ -14,7 +14,7 @@ export function useCreations() {
       const { data, error } = await supabase
         .from('creations')
         .select('*, author:profiles(username, display_name, avatar_url)')
-        .eq('is_deleted', false)
+        .eq('is_deleted', false).neq('hidden', true)
         .order('created_at', { ascending: false })
 
       if (!error && data) setCreations(data)
