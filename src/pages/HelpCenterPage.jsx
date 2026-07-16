@@ -53,7 +53,7 @@ export default function HelpCenterPage() {
               <s.icon size={24} className="text-accent shrink-0 mt-0.5" />
               <div>
                 <h3 className="text-accent text-sm font-medium mb-1">{s.title}</h3>
-                <p className="text-secondary text-sm">{s.content}</p>
+                <p className="text-secondary text-sm">{s.content}{s.link && <> — <Link to={s.link.to} className="text-accent hover:underline">{s.link.label}</Link></>}</p>
               </div>
             </div>
           ))}
