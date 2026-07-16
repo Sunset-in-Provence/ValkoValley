@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import OnboardingModal from '@/components/shared/OnboardingModal'
-import { ArrowLeft, MessageSquare, Palette, BookOpen, Megaphone, HelpCircle, Shield, UserPlus } from 'lucide-react'
+import { ArrowLeft, MessageSquare, Palette, BookOpen, Megaphone, HelpCircle, Shield } from 'lucide-react'
 
 const SECTIONS = [
   {
