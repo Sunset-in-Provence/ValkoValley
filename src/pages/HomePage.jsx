@@ -85,7 +85,7 @@ export default function HomePage() {
           <div className="bg-surface rounded-card shadow-card p-6">
             <h3 className="font-display text-accent text-lg mb-2">📝 讨论区</h3>
             <p className="text-secondary text-sm">
-              文字交流，Markdown 排版，支持楼中楼评论。
+              文字交流，支持楼中楼评论。
             </p>
           </div>
           <div className="bg-surface rounded-card shadow-card p-6">
