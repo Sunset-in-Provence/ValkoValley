@@ -11,7 +11,8 @@ import { uploadImage, uploadVideo, uploadAudio } from '@/lib/upload'
 import { loadBannedWords, checkBannedWords } from '@/lib/bannedWords'
 import toast from 'react-hot-toast'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
-import { ArrowLeft, Upload, X, Loader2, Video, Music, FileText, Image } from 'lucide-react'
+import { ArrowLeft, Upload, X, Loader2, Video, Music, FileText } from 'lucide-react'
+import MediaUploader from '@/components/creation/MediaUploader'
 
 const CATEGORY_GROUPS = [
   {
@@ -61,7 +62,6 @@ export default function LibraryEditorPage() {
   const [coverUrl, setCoverUrl] = useState('')
   const [coverUploading, setCoverUploading] = useState(false)
   const [imageUrls, setImageUrls] = useState([])
-  const [imageUploading, setImageUploading] = useState(false)
   const [videoUrls, setVideoUrls] = useState([])
   const [videoInput, setVideoInput] = useState('')
   const [videoUploading, setVideoUploading] = useState(false)
@@ -96,18 +96,6 @@ export default function LibraryEditorPage() {
     const { url, error } = await uploadImage(file, 'images')
     if (error) { toast.error(error.message) } else { setCoverUrl(url) }
     setCoverUploading(false)
-  }
-
-  // 附图上传
-  async function handleImageUpload(e) {
-    const files = Array.from(e.target.files || [])
-    if (!files.length) return
-    setImageUploading(true)
-    for (const file of files) {
-      const { url, error } = await uploadImage(file, 'images')
-      if (error) { toast.error(error.message) } else { setImageUrls((prev) => [...prev, url]) }
-    }
-    setImageUploading(false)
   }
 
   function addVideoUrl() {
@@ -267,25 +255,8 @@ export default function LibraryEditorPage() {
 
         {/* 附图 */}
         <div className="mb-4">
-          <label className="text-secondary text-sm font-medium mb-1.5 block">附图</label>
-          <label className="flex items-center gap-1 bg-hover border border-border text-secondary px-4 py-2 rounded-button text-sm cursor-pointer hover:bg-accent hover:text-text-inverse w-fit">
-            {imageUploading ? <Loader2 size={14} className="animate-spin" /> : <Image size={14} />}
-            {imageUploading ? '上传中' : '上传图片'}
-            <input type="file" accept="image/*" multiple onChange={handleImageUpload} hidden />
-          </label>
-          {imageUrls.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-2">
-              {imageUrls.map((url, i) => (
-                <div key={i} className="relative">
-                  <img src={url} alt="" className="w-16 h-16 object-cover rounded-card" />
-                  <button onClick={() => setImageUrls((prev) => prev.filter((_, j) => j !== i))}
-                    className="absolute -top-1.5 -right-1.5 bg-danger text-text-inverse rounded-full w-4 h-4 flex items-center justify-center">
-                    <X size={10} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
+          <label className="text-secondary text-sm font-medium mb-1.5 block">附图（可拖拽排序）</label>
+          <MediaUploader images={imageUrls} onImagesChange={setImageUrls} />
         </div>
 
         {/* 视频 */}
