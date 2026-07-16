@@ -83,6 +83,13 @@ export default function CommentItem({ comment, postId = null, creationId = null,
             <span className="text-muted text-xs">回复 {replyToName}：</span>
           )}
           {sanitizeText(comment.content)}
+          {comment.image_urls?.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {comment.image_urls.map((url, i) => (
+                <img key={i} src={url} alt="" className="w-20 h-20 object-cover rounded-card border border-border cursor-pointer hover:opacity-90" onClick={() => window.open(url, '_blank')} />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* 操作栏 */}
