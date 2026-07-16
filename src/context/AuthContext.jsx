@@ -24,6 +24,11 @@ export function AuthProvider({ children }) {
     // 监听认证状态变化
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
+        // 密码重置回调：强制导向重设密码页面
+        if (_event === 'PASSWORD_RECOVERY' && window.location.pathname !== '/reset-password') {
+          window.location.href = '/reset-password'
+          return
+        }
         setUser(session?.user ?? null)
         if (session?.user) {
           fetchProfile(session.user.id)

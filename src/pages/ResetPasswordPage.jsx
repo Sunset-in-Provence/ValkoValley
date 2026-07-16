@@ -24,6 +24,7 @@ export default function ResetPasswordPage() {
     if (error) { toast.error('重置失败: ' + error.message) }
     else {
       setDone(true)
+      await supabase.auth.signOut()
       toast.success('密码已重置，请使用新密码登录')
       setTimeout(() => navigate('/login'), 2000)
     }
