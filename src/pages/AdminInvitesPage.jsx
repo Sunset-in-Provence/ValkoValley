@@ -16,7 +16,7 @@ export default function AdminInvitesPage() {
 
   async function fetch() {
     setLoading(true)
-    const { data } = await supabase.from('invite_codes').select('*').order('created_at', { ascending: false })
+    const { data } = await supabase.from('invite_codes').select('*').is('bound_email', null).order('created_at', { ascending: false })
     setCodes(data || [])
     setLoading(false)
   }
