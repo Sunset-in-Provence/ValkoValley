@@ -3,7 +3,8 @@ import { useSearchParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/context/AuthContext'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
-import { ArrowLeft, Send, User, Pin, PinOff } from 'lucide-react'
+import { ArrowLeft, Send, User, Pin, PinOff, Image, X, Loader2 } from 'lucide-react'
+import { uploadImage } from '@/lib/upload'
 import { loadBannedWords, checkBannedWords } from '@/lib/bannedWords'
 import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
@@ -16,6 +17,8 @@ export default function MessagesPage() {
   const [activeChat, setActiveChat] = useState(null)
   const [messages, setMessages] = useState([])
   const [text, setText] = useState('')
+  const [msgImages, setMsgImages] = useState([])
+  const [imgUploading, setImgUploading] = useState(false)
   const [loading, setLoading] = useState(true)
   const bottomRef = useRef(null)
 
@@ -86,20 +89,32 @@ export default function MessagesPage() {
   const [shouldScroll, setShouldScroll] = useState(false)
   useEffect(() => { if (shouldScroll) { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); setShouldScroll(false) } }, [messages, shouldScroll])
 
+  async function handleMsgImage(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = ''
+    setImgUploading(true)
+    const { url, error } = await uploadImage(file, 'images')
+    setImgUploading(false)
+    if (error) toast.error('上传失败')
+    else setMsgImages((prev) => [...prev, url])
+  }
+
   async function handleSend(e) {
     e.preventDefault()
-    if (!text.trim() || !activeChat) return
+    if ((!text.trim() && !msgImages.length) || !activeChat) return
     const words = await loadBannedWords(supabase)
     const hits = checkBannedWords(text, words)
     if (hits.length > 0) { toast.error(`包含违规词：${hits.slice(0, 3).join('、')}`); return }
-    const { error } = await supabase.from('messages').insert({ sender_id: user.id, receiver_id: activeChat, content: text.trim() })
+    const { error } = await supabase.from('messages').insert({ sender_id: user.id, receiver_id: activeChat, content: text.trim() || '', image_urls: msgImages })
     if (error) toast.error('发送失败')
     else {
       const now = new Date().toISOString()
-      setText('')
-      setMessages((prev) => [...prev, { sender_id: user.id, content: text.trim(), created_at: now, sender: { username: user.email } }])
-      // 更新联系人列表
-      setContacts((prev) => prev.map((c) => c.otherId === activeChat ? { ...c, lastMsg: text.trim(), lastTime: now } : c))
+      const lastMsg = text.trim() || (msgImages.length > 0 ? '[图片]' : '')
+      setText(''); setMsgImages([])
+      setMessages((prev) => [...prev, { sender_id: user.id, content: text.trim() || '', image_urls: msgImages, created_at: now, sender: { username: user.email } }])
+      setContacts((prev) => prev.map((c) => c.otherId === activeChat ? { ...c, lastMsg, lastTime: now } : c))
+      setShouldScroll(true)
     }
   }
 
@@ -166,6 +181,13 @@ export default function MessagesPage() {
                 <div key={i} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[75%] rounded-card px-4 py-2 text-sm ${isMe ? 'bg-accent text-text-inverse' : 'bg-hover text-secondary'}`}>
                     <p>{m.content}</p>
+                    {m.image_urls?.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {m.image_urls.map((url, i) => (
+                          <img key={i} src={url} alt="" className="max-w-[120px] max-h-[120px] object-cover rounded cursor-pointer" onClick={() => window.open(url, '_blank')} />
+                        ))}
+                      </div>
+                    )}
                     <p className={`text-[10px] mt-1 ${isMe ? 'text-text-inverse/60' : 'text-muted'}`}>
                       {new Date(m.created_at).toLocaleString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
                     </p>
@@ -175,13 +197,28 @@ export default function MessagesPage() {
             })}
             <div ref={bottomRef} />
           </div>
-          <form onSubmit={handleSend} className="p-3 border-t border-border shrink-0 flex gap-2">
-            <input type="text" value={text} onChange={(e) => setText(e.target.value)}
-              placeholder="输入消息..." className="flex-1 bg-hover border border-border rounded-input px-3 py-2 text-sm text-primary dark:text-white focus:outline-none focus:border-accent" />
-            <button type="submit" disabled={!text.trim()}
-              className="bg-accent text-text-inverse px-4 py-2 rounded-button text-sm hover:opacity-90 disabled:opacity-40 flex items-center gap-1">
-              <Send size={14} /> 发送
-            </button>
+          <form onSubmit={handleSend} className="p-3 border-t border-border shrink-0">
+            {msgImages.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {msgImages.map((url, i) => (
+                  <div key={i} className="relative"><img src={url} alt="" className="w-12 h-12 object-cover rounded-card border border-border" />
+                    <button type="button" onClick={() => setMsgImages((p) => p.filter((_, j) => j !== i))}
+                      className="absolute -top-1 -right-1 bg-danger text-text-inverse rounded-full w-4 h-4 flex items-center justify-center text-[10px]"><X size={10} /></button></div>
+                ))}
+              </div>
+            )}
+            <div className="flex gap-2">
+              <input type="text" value={text} onChange={(e) => setText(e.target.value)}
+                placeholder="输入消息..." className="flex-1 bg-hover border border-border rounded-input px-3 py-2 text-sm text-primary dark:text-white focus:outline-none focus:border-accent" />
+              <label className="flex items-center text-muted hover:text-accent cursor-pointer">
+                <input type="file" accept="image/*" onChange={handleMsgImage} hidden />
+                {imgUploading ? <Loader2 size={18} className="animate-spin" /> : <Image size={18} />}
+              </label>
+              <button type="submit" disabled={!text.trim() && !msgImages.length}
+                className="bg-accent text-text-inverse px-4 py-2 rounded-button text-sm hover:opacity-90 disabled:opacity-40 flex items-center gap-1">
+                <Send size={14} />
+              </button>
+            </div>
           </form>
         </div>
       )}
