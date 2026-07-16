@@ -189,6 +189,21 @@ export default function DiscussionDetailPage() {
                     className="flex items-center gap-1 text-muted text-xs hover:text-accent transition-colors">
                     <Pin size={12} /> {post.is_pinned ? '取消置顶' : '置顶'}
                   </button>
+                  {isAdmin && (
+                    <button onClick={async () => {
+                      const reason = prompt('隐藏原因：\n1.R18未打码\n2.暴力血腥未打码\n3.引战内容\n4.其他违规\n\n输入编号或自定义：')
+                      if (!reason) return
+                      const m = {'1':'R18未打码','2':'暴力血腥未打码','3':'引战内容','4':'其他违规'}
+                      const r = m[reason] || reason
+                      await supabase.from('posts').update({ hidden: true, hidden_reason: r }).eq('id', id)
+                      setPost((p) => ({ ...p, hidden: true, hidden_reason: r }))
+                      supabase.rpc('notify_user', { _user_id: post.author_id, _title: '帖子被隐藏', _content: `帖子「${post.title}」因「${r}」被隐藏，请修改后联系管理员`, _link: `/discussion/${id}` }).then()
+                      toast.success('已隐藏并通知作者')
+                    }}
+                      className="flex items-center gap-1 text-warning text-xs hover:text-danger transition-colors">
+                      <EyeOff size={12} /> 隐藏
+                    </button>
+                  )}
                 )}
               </>
             )}
