@@ -6,13 +6,14 @@
  *   阴影：shadow-card
  */
 import { Link, useLocation } from 'react-router-dom'
-import { MessageSquare, Palette, BookOpen } from 'lucide-react'
+import { MessageSquare, Palette, BookOpen, ExternalLink } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const links = [
   { to: '/discussion', label: '讨论区', icon: MessageSquare },
   { to: '/creation', label: '创作区', icon: Palette },
   { to: '/library', label: '档案馆', icon: BookOpen },
+  { to: '/recommend', label: '外网推荐', icon: ExternalLink },
 ]
 
 export default function Sidebar() {
