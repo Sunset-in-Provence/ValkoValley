@@ -174,7 +174,8 @@ export default function Navbar() {
                             <div className="px-4 py-2 text-secondary text-xs font-medium flex items-center gap-1"><BookOpen size={13} /> 档案馆审核 ({pendingLibrary.length})</div>
                             {pendingLibrary.slice(0,5).map((e) => (
                               <div key={e.id} className="px-4 py-2 border-t border-border/50 text-xs text-secondary">
-                                <span>{e.title}</span>
+                                <Link to={`/library/${e.id}`} onClick={() => setReviewOpen(false)}
+                                  className="text-accent hover:underline">{e.title}</Link>
                                 <div className="flex gap-1.5 mt-1">
                                   <button onClick={async () => { await supabase.rpc('review_library_entry', { _id: e.id, _approve: true }); fetchPending() }}
                                     className="bg-success/10 text-success text-[10px] px-2 py-0.5 rounded-button hover:bg-success/20"><Check size={10} /> 通过</button>

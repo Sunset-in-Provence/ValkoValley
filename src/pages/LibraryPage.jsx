@@ -159,6 +159,20 @@ export default function LibraryPage() {
                           <div className="prose max-w-none text-secondary text-sm leading-relaxed">
                             {e.content ? renderMarkdown(e.content) : <p className="text-muted italic">暂无内容，点击编辑补充</p>}
                           </div>
+                          {e.image_urls?.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mt-4">
+                              {e.image_urls.map((url, i) => (
+                                <img key={i} src={url} alt="" className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-card border border-border" loading="lazy" />
+                              ))}
+                            </div>
+                          )}
+                          {e.video_urls?.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mt-4">
+                              {e.video_urls.map((url, i) => (
+                                <video key={i} src={url} controls className="w-40 h-24 object-cover rounded-card" />
+                              ))}
+                            </div>
+                          )}
                           {e.author && (
                             <p className="text-muted text-xs mt-6 pt-4 border-t border-border">
                               最后编辑：{e.author.display_name || e.author.username} · {new Date(e.updated_at || e.created_at).toLocaleString('zh-CN')}
