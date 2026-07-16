@@ -19,7 +19,7 @@ import EmptyState from '@/components/shared/EmptyState'
 import toast from 'react-hot-toast'
 import {
   ArrowLeft, User, Clock, MessageSquare,
-  Edit3, Trash2, Pin
+  Edit3, Trash2, Pin, EyeOff
 } from 'lucide-react'
 
 export default function DiscussionDetailPage() {
