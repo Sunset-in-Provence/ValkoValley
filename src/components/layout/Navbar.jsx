@@ -111,6 +111,7 @@ export default function Navbar() {
           <div className="hidden lg:flex items-center gap-1 ml-2">
             <Link to="/help" className="text-secondary hover:text-accent px-2 py-1.5 rounded-button text-sm transition-colors no-underline">帮助中心</Link>
             <Link to="/announcements" className="text-secondary hover:text-accent px-2 py-1.5 rounded-button text-sm transition-colors no-underline">公告</Link>
+            <Link to="/recommend" className="text-secondary hover:text-accent px-2 py-1.5 rounded-button text-sm transition-colors no-underline">外网推荐</Link>
           </div>
         </div>
 
