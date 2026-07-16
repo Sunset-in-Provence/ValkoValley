@@ -83,7 +83,8 @@ export default function MessagesPage() {
     return () => clearInterval(t)
   }, [activeChat, user])
 
-  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
+  const [shouldScroll, setShouldScroll] = useState(false)
+  useEffect(() => { if (shouldScroll) { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); setShouldScroll(false) } }, [messages, shouldScroll])
 
   async function handleSend(e) {
     e.preventDefault()
