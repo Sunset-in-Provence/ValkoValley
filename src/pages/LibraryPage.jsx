@@ -5,7 +5,8 @@ import { useAuth } from '@/context/AuthContext'
 import LibraryCard from '@/components/library/LibraryCard'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import { renderMarkdown } from '@/lib/markdown'
-import { Plus, Search, Edit3 } from 'lucide-react'
+import { Plus, Search, Edit3, Trash2 } from 'lucide-react'
+import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
 
 const MAIN = [
