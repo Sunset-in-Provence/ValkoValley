@@ -3,35 +3,52 @@ import { Link } from 'react-router-dom'
 import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/context/AuthContext'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
-import { ArrowLeft, Plus, Trash2, GripVertical } from 'lucide-react'
+import { ArrowLeft, Plus, Trash2, Copy, ExternalLink, User as UserIcon } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function AdminContactsPage() {
   const { user } = useAuth()
   const [contacts, setContacts] = useState([])
-  const [emails, setEmails] = useState([])
+  const [allUsers, setAllUsers] = useState([])
   const [loading, setLoading] = useState(true)
-  const [form, setForm] = useState({ display_name: '', role: '管理员', contact_info: '' })
-  const [newEmail, setNewEmail] = useState('')
+  const [searchUser, setSearchUser] = useState('')
+  const [editId, setEditId] = useState(null)
+  const [editForm, setEditForm] = useState({ display_name: '', contact_info: '', profile_url: '', user_id: '' })
 
   async function fetch() {
     setLoading(true)
-    const [{ data: c }, { data: e }] = await Promise.all([
+    const [{ data: c }, { data: u }] = await Promise.all([
       supabase.from('admin_contacts').select('*').order('sort_order'),
-      supabase.from('admin_emails').select('*').order('created_at'),
+      supabase.from('profiles').select('id, username, display_name, avatar_url').order('display_name'),
     ])
     setContacts(c || [])
-    setEmails(e || [])
+    setAllUsers(u || [])
     setLoading(false)
   }
 
   useEffect(() => { fetch() }, [])
 
-  async function handleAdd() {
-    if (!form.display_name.trim()) { toast.error('请填写昵称'); return }
-    const { error } = await supabase.from('admin_contacts').insert({ ...form, sort_order: contacts.length })
+  async function handleAddFromUser(u) {
+    const exists = contacts.find((c) => c.user_id === u.id)
+    if (exists) { toast.error('该用户已在列表中'); return }
+    const { error } = await supabase.from('admin_contacts').insert({
+      user_id: u.id, display_name: u.display_name || u.username,
+      sort_order: contacts.length,
+    })
     if (error) toast.error('添加失败')
-    else { toast.success('已添加'); setForm({ display_name: '', role: '管理员', contact_info: '' }); fetch() }
+    else { toast.success('已添加'); fetch() }
+  }
+
+  function startEdit(c) {
+    setEditId(c.id)
+    setEditForm({ display_name: c.display_name || '', contact_info: c.contact_info || '', profile_url: c.profile_url || '', user_id: c.user_id || '' })
+  }
+
+  async function handleSaveEdit() {
+    if (!editForm.display_name.trim()) { toast.error('请填写昵称'); return }
+    const { error } = await supabase.from('admin_contacts').update(editForm).eq('id', editId)
+    if (error) toast.error('保存失败')
+    else { toast.success('已保存'); setEditId(null); fetch() }
   }
 
   async function handleDelete(id) {
@@ -40,18 +57,7 @@ export default function AdminContactsPage() {
     toast.success('已删除'); fetch()
   }
 
-  async function handleAddEmail() {
-    const email = newEmail.trim()
-    if (!email) { toast.error('请输入邮箱'); return }
-    const { error } = await supabase.from('admin_emails').insert({ email })
-    if (error) toast.error(error.code === '23505' ? '该邮箱已存在' : '添加失败')
-    else { toast.success('已添加'); setNewEmail(''); fetch() }
-  }
-
-  async function handleDeleteEmail(id) {
-    await supabase.from('admin_emails').delete().eq('id', id)
-    toast.success('已删除'); fetch()
-  }
+  const filteredUsers = allUsers.filter((u) => !searchUser || (u.display_name || u.username).toLowerCase().includes(searchUser.toLowerCase()))
 
   return (
     <div>
@@ -59,45 +65,64 @@ export default function AdminContactsPage() {
         <ArrowLeft size={16} /> 返回管理后台
       </Link>
       <div className="bg-surface rounded-card shadow-card p-6">
-        <h1 className="font-display text-accent text-2xl mb-4 flex items-center gap-2"><GripVertical size={24} /> 管理员名单管理</h1>
-        <p className="text-muted text-xs mb-4">展示名单 — 添加后在 /contact 页面显示</p>
+        <h1 className="font-display text-accent text-2xl mb-4">管理员名单管理</h1>
 
-        <div className="flex gap-2 mb-4 flex-wrap">
-          <input type="text" value={form.display_name} onChange={(e) => setForm((p) => ({ ...p, display_name: e.target.value }))} placeholder="昵称" className="bg-hover border border-border rounded-input px-3 py-2 text-primary text-sm w-32" />
-          <input type="text" value={form.role} onChange={(e) => setForm((p) => ({ ...p, role: e.target.value }))} placeholder="职位" className="bg-hover border border-border rounded-input px-3 py-2 text-primary text-sm w-24" />
-          <input type="text" value={form.contact_info} onChange={(e) => setForm((p) => ({ ...p, contact_info: e.target.value }))} placeholder="联系方式" className="bg-hover border border-border rounded-input px-3 py-2 text-primary text-sm flex-1 min-w-[120px]" />
-          <button onClick={handleAdd} className="bg-accent text-text-inverse px-4 py-2 rounded-button text-sm hover:opacity-90 flex items-center gap-1"><Plus size={14} /> 添加</button>
-        </div>
-
-        {loading ? <LoadingSpinner /> : contacts.length === 0 ? <p className="text-muted text-sm py-8 text-center">暂无管理员</p> : (
-          <div className="space-y-2 mb-8">
-            {contacts.map((c, i) => (
-              <div key={c.id} className="border border-border rounded-card p-3 flex items-center justify-between">
-                <div>
-                  <span className="text-secondary text-sm font-medium">{c.display_name}</span>
-                  <span className="text-muted text-xs ml-2">{c.role}</span>
-                  {c.contact_info && <span className="text-muted text-xs ml-2">{c.contact_info}</span>}
+        {/* 从站内用户添加 */}
+        <div className="mb-6 pb-6 border-b border-border">
+          <h3 className="text-secondary text-sm font-medium mb-3 flex items-center gap-1"><UserIcon size={14} /> 添加站内用户</h3>
+          <input type="text" value={searchUser} onChange={(e) => setSearchUser(e.target.value)}
+            placeholder="搜索用户昵称..." className="w-full bg-hover border border-border rounded-input px-3 py-2 text-primary text-sm mb-3 focus:outline-none focus:border-accent" />
+          <div className="max-h-40 overflow-y-auto space-y-1">
+            {filteredUsers.slice(0, 20).map((u) => (
+              <div key={u.id} className="flex items-center justify-between bg-hover rounded-card p-2 text-sm">
+                <div className="flex items-center gap-2">
+                  {u.avatar_url ? <img src={u.avatar_url} className="w-6 h-6 rounded-full" alt="" /> : <UserIcon size={14} className="text-muted" />}
+                  <span className="text-secondary">{u.display_name || u.username}</span>
+                  <span className="text-muted text-xs">@{u.username}</span>
                 </div>
-                <button onClick={() => handleDelete(c.id)} className="text-muted hover:text-danger"><Trash2 size={14} /></button>
+                <button onClick={() => handleAddFromUser(u)}
+                  className="text-accent text-xs hover:underline flex items-center gap-0.5"><Plus size={12} /> 添加</button>
               </div>
             ))}
           </div>
-        )}
-
-        <h2 className="font-display text-accent text-lg mb-3 border-t border-border pt-6">管理员邮箱（真正赋予权限）</h2>
-        <p className="text-muted text-xs mb-4">添加邮箱后该用户刷新页面即获得管理员权限</p>
-        <div className="flex gap-2 mb-4">
-          <input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') handleAddEmail() }}
-            placeholder="user@email.com" className="flex-1 bg-hover border border-border rounded-input px-3 py-2 text-primary text-sm focus:outline-none focus:border-accent" />
-          <button onClick={handleAddEmail} className="bg-accent text-text-inverse px-4 py-2 rounded-button text-sm hover:opacity-90 flex items-center gap-1"><Plus size={14} /> 添加</button>
         </div>
-        {emails.length === 0 ? <p className="text-muted text-xs py-4">暂无额外管理员邮箱（.env 中的邮箱仍生效）</p> : (
-          <div className="space-y-1.5">
-            {emails.map((e) => (
-              <div key={e.id} className="border border-border rounded-card p-2.5 flex items-center justify-between">
-                <span className="text-secondary text-sm">{e.email}</span>
-                <button onClick={() => handleDeleteEmail(e.id)} className="text-muted hover:text-danger"><Trash2 size={14} /></button>
+
+        {/* 已有名单 */}
+        {loading ? <LoadingSpinner size="lg" /> : contacts.length === 0 ? (
+          <p className="text-muted text-sm py-8 text-center">暂无管理员</p>
+        ) : (
+          <div className="space-y-3">
+            {contacts.map((c) => (
+              <div key={c.id} className="border border-border rounded-card p-4">
+                {editId === c.id ? (
+                  <div className="space-y-2">
+                    <input type="text" value={editForm.display_name} onChange={(e) => setEditForm((p) => ({ ...p, display_name: e.target.value }))}
+                      placeholder="显示名称" className="w-full bg-hover border border-border rounded-input px-3 py-2 text-primary text-sm" />
+                    <input type="text" value={editForm.contact_info} onChange={(e) => setEditForm((p) => ({ ...p, contact_info: e.target.value }))}
+                      placeholder="联系方式（邮箱/手机等）" className="w-full bg-hover border border-border rounded-input px-3 py-2 text-primary text-sm" />
+                    <input type="url" value={editForm.profile_url} onChange={(e) => setEditForm((p) => ({ ...p, profile_url: e.target.value }))}
+                      placeholder="其他平台链接" className="w-full bg-hover border border-border rounded-input px-3 py-2 text-primary text-sm" />
+                    <div className="flex gap-2">
+                      <button onClick={handleSaveEdit} className="bg-accent text-text-inverse px-4 py-1.5 rounded-button text-xs">保存</button>
+                      <button onClick={() => setEditId(null)} className="border border-border text-secondary px-4 py-1.5 rounded-button text-xs">取消</button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-accent text-sm font-medium">{c.display_name}</span>
+                      <div className="flex items-center gap-2">
+                        <button onClick={() => startEdit(c)} className="text-accent text-xs hover:underline">编辑</button>
+                        <button onClick={() => handleDelete(c.id)} className="text-muted hover:text-danger"><Trash2 size={14} /></button>
+                      </div>
+                    </div>
+                    <div className="text-xs text-muted space-y-0.5">
+                      {c.contact_info && <p>📧 {c.contact_info}</p>}
+                      {c.profile_url && <a href={c.profile_url} target="_blank" className="text-accent hover:underline flex items-center gap-1"><ExternalLink size={10} /> 外部链接</a>}
+                      {c.user_id && <Link to={`/user/${c.user_id}`} className="text-accent hover:underline block">查看主页</Link>}
+                    </div>
+                  </>
+                )}
               </div>
             ))}
           </div>
