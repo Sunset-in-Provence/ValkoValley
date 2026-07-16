@@ -4,11 +4,14 @@
  *   文字：text-muted
  *   边框：border-border
  */
+import { Link } from 'react-router-dom'
+
 export default function Footer() {
   return (
     <footer className="bg-surface border-t border-border mt-auto">
       <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between text-muted text-xs">
         <span>© {new Date().getFullYear()} ValkoValley — 狼和铃兰的幸福归来</span>
+        <Link to="/contact" className="text-muted hover:text-accent transition-colors no-underline">联系我们</Link>
       </div>
     </footer>
   )

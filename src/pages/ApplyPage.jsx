@@ -137,7 +137,7 @@ function QueryCode() {
     e.preventDefault()
     if (!queryEmail.trim()) return
     setChecking(true)
-    const { data } = await supabase.from('registration_applications').select('*').eq('status', 'approved').eq('email', queryEmail.trim().toLowerCase()).maybeSingle()
+    const { data } = await supabase.from('registration_applications').select('*').eq('status', 'approved').ilike('email', queryEmail.trim()).order('created_at', { ascending: false }).limit(1).maybeSingle()
     setResult(data)
     setChecking(false)
   }

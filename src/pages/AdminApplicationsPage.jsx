@@ -12,10 +12,13 @@ export default function AdminApplicationsPage() {
   const [apps, setApps] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('pending')
+  const [search, setSearch] = useState('')
   const [processing, setProcessing] = useState(null)
   const [viewerOpen, setViewerOpen] = useState(false)
   const [viewerIndex, setViewerIndex] = useState(0)
   const [viewerImages, setViewerImages] = useState([])
+
+  const filteredApps = apps.filter((a) => !search || a.email?.toLowerCase().includes(search.toLowerCase()))
 
   async function fetch() {
     setLoading(true)
@@ -62,6 +65,10 @@ export default function AdminApplicationsPage() {
           <Mail size={24} /> 入站审核
         </h1>
 
+        <div className="mb-3">
+          <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
+            placeholder="搜索邮箱..." className="w-full max-w-xs bg-hover border border-border rounded-input px-3 py-2 text-primary text-sm focus:outline-none focus:border-accent" />
+        </div>
         <div className="flex gap-1 mb-4">
           {[{ key: 'pending', label: '待审核' }, { key: 'approved', label: '已通过' }, { key: 'rejected', label: '已拒绝' }].map((f) => (
             <button key={f.key} onClick={() => setFilter(f.key)}

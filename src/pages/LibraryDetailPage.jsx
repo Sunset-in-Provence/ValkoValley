@@ -40,7 +40,7 @@ export default function LibraryDetailPage() {
       const { data } = await supabase
         .from('library_entries')
         .select('*, author:profiles!library_entries_author_id_fkey(username, display_name)')
-        .eq('id', id).eq('status', 'published').single()
+        .eq('id', id).or('status.eq.published,status.eq.pending_review').single()
       setEntry(data || null)
       setLoading(false)
       if (data) {

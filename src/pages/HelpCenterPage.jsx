@@ -5,10 +5,6 @@ import { ArrowLeft, MessageSquare, Palette, BookOpen, Megaphone, HelpCircle, Shi
 
 const SECTIONS = [
   {
-    icon: UserPlus, title: '如何注册？',
-    content: '你需要管理员提供的邀请链接访问本站，通过密码门后使用邀请码注册账号，再完成入站考试即可加入。',
-  },
-  {
     icon: MessageSquare, title: '讨论区怎么用？',
     content: '点击导航栏「讨论区」进入，可以发帖、评论、点赞。支持 Markdown 排版和楼中楼回复。',
   },

@@ -135,12 +135,25 @@ export default function LibraryPage() {
                         <div key={e.id} className="bg-surface rounded-card shadow-card p-6 md:p-10 mb-4">
                           <div className="flex items-center justify-between mb-4">
                             <h4 className="font-display text-accent text-2xl">{e.title}</h4>
-                            {user && (
-                              <Link to={`/library/${e.id}/edit`}
-                                className="flex items-center gap-1 text-muted text-xs hover:text-accent no-underline">
-                                <Edit3 size={12} /> 编辑
-                              </Link>
-                            )}
+                            <div className="flex items-center gap-3">
+                              {user && (
+                                <Link to={`/library/${e.id}/edit`}
+                                  className="flex items-center gap-1 text-muted text-xs hover:text-accent no-underline">
+                                  <Edit3 size={12} /> 编辑
+                                </Link>
+                              )}
+                              {isAdmin && (
+                                <button onClick={async () => {
+                                  if (!window.confirm('删除此设定？')) return
+                                  const { error } = await supabase.rpc('delete_library_entry', { _id: e.id })
+                                  if (error) toast.error('删除失败')
+                                  else { toast.success('已删除'); fetch() }
+                                }}
+                                  className="flex items-center gap-1 text-muted text-xs hover:text-danger">
+                                  <Trash2 size={12} /> 删除
+                                </button>
+                              )}
+                            </div>
                           </div>
                           <div className="prose max-w-none text-secondary text-sm leading-relaxed">
                             {e.content ? renderMarkdown(e.content) : <p className="text-muted italic">暂无内容，点击编辑补充</p>}
