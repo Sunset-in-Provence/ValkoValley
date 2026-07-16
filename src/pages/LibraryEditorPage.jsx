@@ -395,10 +395,17 @@ export default function LibraryEditorPage() {
                 className="bg-accent text-text-inverse px-6 py-2.5 rounded-button font-medium text-sm hover:opacity-90 disabled:opacity-50">
                 {submitting ? '发布中...' : '发布'}
               </button>
-              <button onClick={() => handleSubmit('draft')} disabled={submitting}
-                className="border border-border text-secondary px-6 py-2.5 rounded-button text-sm hover:bg-hover">
-                保存草稿
-              </button>
+              {isEditing && (
+                <button onClick={async () => {
+                  if (!window.confirm('确定删除此条目？')) return
+                  const { error } = await supabase.rpc('delete_library_entry', { _id: id })
+                  if (error) toast.error('删除失败')
+                  else { toast.success('已删除'); navigate('/library') }
+                }}
+                  className="border border-border text-danger px-6 py-2.5 rounded-button text-sm hover:bg-danger/10">
+                  删除
+                </button>
+              )}
             </>
           ) : (
             <button onClick={() => handleSubmit('pending_review')} disabled={submitting}
