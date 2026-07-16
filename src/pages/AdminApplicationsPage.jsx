@@ -38,7 +38,7 @@ export default function AdminApplicationsPage() {
     if (updateErr) { toast.error('更新失败: ' + updateErr.message); setProcessing(null); return }
     toast.success(`已通过，邀请码 ${code}`)
     setProcessing(null)
-    setFilter('approved')
+    setApps((prev) => prev.filter((a) => a.id !== app.id))
   }
 
   async function handleReject(app) {
@@ -48,7 +48,7 @@ export default function AdminApplicationsPage() {
     }).eq('id', app.id)
     toast.success('已拒绝')
     setProcessing(null)
-    setFilter('rejected')
+    setApps((prev) => prev.filter((a) => a.id !== app.id))
   }
 
   return (
