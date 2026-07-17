@@ -3,9 +3,9 @@ import { supabase } from './supabaseClient'
 const ALLOWED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/heic', 'image/heif']
 const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime', 'video/x-msvideo', 'video/x-matroska']
 const ALLOWED_AUDIO_TYPES = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/flac']
-const MAX_IMAGE_SIZE = 10 * 1024 * 1024
-const MAX_VIDEO_SIZE = 50 * 1024 * 1024
-const MAX_AUDIO_SIZE = 50 * 1024 * 1024
+const MAX_IMAGE_SIZE = 50 * 1024 * 1024       // 50MB
+const MAX_VIDEO_SIZE = 500 * 1024 * 1024      // 500MB（Cloudflare 缓存上限 512MB）
+const MAX_AUDIO_SIZE = 100 * 1024 * 1024      // 100MB
 
 /** 通过 Vercel API 上传到 R2，fallback 到 Supabase Storage */
 async function uploadViaR2(file) {
@@ -59,13 +59,13 @@ async function uploadWithFallback(file, supabaseBucket) {
 
 export async function uploadImage(file, bucket = 'images') {
   if (!ALLOWED_IMAGE_TYPES.includes(file.type)) return { url: null, error: new Error('仅支持 PNG、JPG、WebP 格式的图片') }
-  if (file.size > MAX_IMAGE_SIZE) return { url: null, error: new Error('图片大小不能超过 10MB') }
+  if (file.size > MAX_IMAGE_SIZE) return { url: null, error: new Error('图片大小不能超过 50MB') }
   return uploadWithFallback(file, bucket)
 }
 
 export async function uploadVideo(file) {
   if (!ALLOWED_VIDEO_TYPES.includes(file.type)) return { url: null, error: new Error('仅支持 MP4、WebM 格式的视频') }
-  if (file.size > MAX_VIDEO_SIZE) return { url: null, error: new Error('视频大小不能超过 100MB') }
+  if (file.size > MAX_VIDEO_SIZE) return { url: null, error: new Error('视频大小不能超过 500MB') }
   return uploadWithFallback(file, 'videos')
 }
 

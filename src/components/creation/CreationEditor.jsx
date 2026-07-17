@@ -249,7 +249,7 @@ export default function CreationEditor() {
             {videoUploading ? '上传中...' : '本地上传视频'}
             <input type="file" accept="video/mp4,video/webm,video/quicktime,video/x-msvideo" onChange={handleVideoUpload} hidden />
           </label>
-          <span className="text-muted text-xs ml-2">最大 50MB</span>
+          <span className="text-muted text-xs ml-2">最大 500MB</span>
         </div>
       </div>
 
