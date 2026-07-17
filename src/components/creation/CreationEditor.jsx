@@ -91,6 +91,7 @@ export default function CreationEditor() {
   const [content, setContent] = useState('')
   const [contentType, setContentType] = useState('')
   const [type, setType] = useState('')
+  const [isAi, setIsAi] = useState(null) // null = 未选择, true = AI, false = 非AI
   const [customTags, setCustomTags] = useState([])
   const [imageUrls, setImageUrls] = useState([])
   const [videoUrls, setVideoUrls] = useState([])
@@ -112,6 +113,7 @@ export default function CreationEditor() {
         setTitle(data.title)
         setContent(data.content)
         setContentType(data.content_type || '')
+        setIsAi(data.is_ai || false)
         setImageUrls(data.image_urls || [])
         setVideoUrls(data.video_urls || [])
         const fullTags = data.tags || []
@@ -148,6 +150,7 @@ export default function CreationEditor() {
     if (!title.trim()) { toast.error('请填写标题'); return }
     if (!contentType) { toast.error('请选择内容类型'); return }
     if (!type) { toast.error('请选择原创或二创'); return }
+    if (isAi === null) { toast.error('请选择是否 AI 生成'); return }
 
     const words = await loadBannedWords(supabase)
     const hits = checkBannedWords(title + ' ' + content, words)
@@ -166,7 +169,7 @@ export default function CreationEditor() {
 
     const payload = {
       author_id: user.id, title: title.trim(), content,
-      content_type: contentType, tags: allTags, image_urls: finalImageUrls, video_urls: videoUrls,
+      content_type: contentType, tags: allTags, is_ai: isAi, image_urls: finalImageUrls, video_urls: videoUrls,
     }
 
     if (isEditing) {
@@ -205,6 +208,28 @@ export default function CreationEditor() {
         type={type} onTypeChange={setType}
         customTags={customTags} onCustomTagsChange={setCustomTags}
       />
+
+      {/* AI 标记 */}
+      <div>
+        <label className="text-secondary text-sm font-medium mb-2 block">
+          AI 标记 <span className="text-danger">*</span>
+          <span className="text-muted text-xs ml-1">是否使用 AI 生成/辅助创作</span>
+        </label>
+        <div className="flex gap-2">
+          <button type="button" onClick={() => setIsAi(false)}
+            className={`flex-1 px-3 py-2 rounded-button text-xs text-center border transition-colors ${
+              isAi === false ? 'bg-accent text-text-inverse border-accent' : 'bg-hover text-secondary border-border hover:border-accent'
+            }`}>
+            🖊️ 非 AI
+          </button>
+          <button type="button" onClick={() => setIsAi(true)}
+            className={`flex-1 px-3 py-2 rounded-button text-xs text-center border transition-colors ${
+              isAi ? 'bg-accent text-text-inverse border-accent' : 'bg-hover text-secondary border-border hover:border-accent'
+            }`}>
+            🤖 AI 生成
+          </button>
+        </div>
+      </div>
 
       {/* 图片上传 */}
       <div>

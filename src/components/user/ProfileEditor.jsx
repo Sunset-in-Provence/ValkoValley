@@ -18,6 +18,7 @@ export default function ProfileEditor({ profile, onClose }) {
 
   const [displayName, setDisplayName] = useState(profile?.display_name || profile?.username || '')
   const [bio, setBio] = useState(profile?.bio || '')
+  const [hideAi, setHideAi] = useState(profile?.hide_ai || false)
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || '')
   const [cropFile, setCropFile] = useState(null)
   const [avatarUploading, setAvatarUploading] = useState(false)
@@ -49,6 +50,7 @@ export default function ProfileEditor({ profile, onClose }) {
       display_name: displayName.trim(),
       bio: bio.trim(),
       avatar_url: avatarUrl,
+      hide_ai: hideAi,
     }).eq('id', user.id)
 
     if (error) { toast.error('保存失败: ' + error.message) }
@@ -96,6 +98,18 @@ export default function ProfileEditor({ profile, onClose }) {
           rows={4} maxLength={500} placeholder="介绍一下自己..."
           className="w-full bg-hover border border-border rounded-input px-4 py-2.5 text-primary text-sm resize-none focus:outline-none focus:border-accent" />
         <p className="text-muted text-xs mt-1">{bio.length}/500</p>
+      </div>
+
+      {/* 屏蔽 AI 内容 */}
+      <div className="flex items-center justify-between bg-hover rounded-card p-3">
+        <div>
+          <p className="text-secondary text-sm font-medium">屏蔽 AI 生成内容</p>
+          <p className="text-muted text-xs">开启后创作区将不显示 AI 标签的作品</p>
+        </div>
+        <button type="button" onClick={() => setHideAi(!hideAi)}
+          className={`relative w-10 h-6 rounded-full transition-colors ${hideAi ? 'bg-accent' : 'bg-border'}`}>
+          <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${hideAi ? 'translate-x-4' : ''}`} />
+        </button>
       </div>
 
       {/* 按钮 */}

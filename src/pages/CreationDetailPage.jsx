@@ -124,6 +124,9 @@ export default function CreationDetailPage() {
             <span className={cn('px-2 py-0.5 rounded-full', contentTypeColors[creation.content_type] || 'bg-hover text-muted')}>
               {contentTypeLabels[creation.content_type] || creation.content_type}
             </span>
+            {creation.is_ai && (
+              <span className="bg-warning/10 text-warning text-xs px-2 py-0.5 rounded-full">🤖 AI 生成</span>
+            )}
             {typeTag && (
               <span className="bg-accent/10 text-accent px-2 py-0.5 rounded-full">{typeTag}</span>
             )}

@@ -53,6 +53,9 @@ export default function CreationCard({ creation }) {
           <span className={cn('text-[10px] px-1.5 py-0.5 rounded-full', contentTypeColors[creation.content_type] || 'bg-hover text-muted')}>
             {contentTypeLabels[creation.content_type] || creation.content_type}
           </span>
+          {creation.is_ai && (
+            <span className="bg-warning/10 text-warning text-[10px] px-1.5 py-0.5 rounded-full">🤖 AI</span>
+          )}
           {typeTag && (
             <span className="bg-hover text-muted text-[10px] px-1.5 py-0.5 rounded-full">{typeTag}</span>
           )}
