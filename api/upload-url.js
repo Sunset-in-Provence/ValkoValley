@@ -29,6 +29,15 @@ export async function OPTIONS() {
   return new Response(null, { status: 204, headers: CORS_HEADERS })
 }
 
+export async function GET() {
+  return Response.json({
+    status: 'ok',
+    bucket: process.env.R2_BUCKET,
+    hasKey: !!process.env.R2_ACCESS_KEY_ID,
+    endpoint: process.env.R2_ENDPOINT,
+  }, { headers: CORS_HEADERS })
+}
+
 export async function POST(request) {
   try {
     const body = await request.json()
