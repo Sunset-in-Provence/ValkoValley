@@ -65,7 +65,7 @@ export default function MediaUploader({ images = [], onImagesChange, maxFiles = 
           </label>
         )}
       </div>
-      <p className="text-muted text-xs">支持 PNG / JPG / WebP，单张 ≤10MB</p>
+      <p className="text-muted text-xs">支持 PNG / JPG / WebP，单张 ≤50MB</p>
     </div>
   )
 }
