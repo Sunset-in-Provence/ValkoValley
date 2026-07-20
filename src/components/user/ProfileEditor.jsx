@@ -58,6 +58,7 @@ export default function ProfileEditor({ profile, onClose }) {
       toast.success('资料已更新')
       if (refreshProfile) refreshProfile()
       onClose()
+      setTimeout(() => window.location.reload(), 800)
     }
     setSaving(false)
   }
