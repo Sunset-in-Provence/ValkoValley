@@ -90,28 +90,28 @@ export default function LibraryPage() {
         </div>
       </div>
 
-      <div className="flex gap-6">
-        <div className="w-40 sm:w-44 shrink-0">
-          <div className="bg-surface rounded-card shadow-card p-3 sticky top-[5.5rem]">
-            <nav className="flex flex-col gap-1">
+      <div className="flex gap-3 sm:gap-6">
+        <div className="w-1/4 sm:w-44 shrink-0">
+          <div className="bg-surface rounded-card shadow-card p-2 sm:p-3 sticky top-[5.5rem]">
+            <nav className="flex flex-col gap-0.5 sm:gap-1">
               {MAIN.map((m) => (
                 <div key={m.key}>
                   <button onClick={() => document.getElementById('sec-' + m.key)?.scrollIntoView({ behavior: 'smooth' })}
-                    className="w-full text-left px-2 py-1.5 rounded-button text-sm font-medium text-secondary hover:text-accent hover:bg-hover transition-colors">
+                    className="w-full text-left px-1 sm:px-2 py-1 sm:py-1.5 rounded-button text-xs sm:text-sm font-medium text-secondary hover:text-accent hover:bg-hover transition-colors truncate">
                     {m.label}
                   </button>
-                  <div className="flex flex-col gap-0.5 ml-2">
+                  <div className="flex flex-col gap-0.5 ml-1 sm:ml-2">
                     {m.subs.map((s) => (
                       <div key={s.key}>
                         <button
                           onClick={() => document.getElementById('sub-' + s.key)?.scrollIntoView({ behavior: 'smooth' })}
-                          className="text-left w-full px-2 py-1 rounded-button text-xs text-muted hover:text-secondary hover:bg-hover transition-colors">
+                          className="text-left w-full px-1 sm:px-2 py-0.5 sm:py-1 rounded-button text-[10px] sm:text-xs text-muted hover:text-secondary hover:bg-hover transition-colors truncate">
                           {s.label}
                         </button>
                         {s.children && s.children.map((c) => (
                           <button key={c.key}
                             onClick={() => document.getElementById('sub-' + c.key)?.scrollIntoView({ behavior: 'smooth' })}
-                            className="text-left w-full pl-4 py-0.5 rounded-button text-[10px] text-muted hover:text-secondary hover:bg-hover transition-colors">
+                            className="text-left w-full pl-2 sm:pl-4 py-0.5 rounded-button text-[10px] text-muted hover:text-secondary hover:bg-hover transition-colors truncate">
                             {c.label}
                           </button>
                         ))}
@@ -137,10 +137,10 @@ export default function LibraryPage() {
                     <div key={sub.key} id={'sub-' + sub.key} className="mb-8 scroll-mt-20">
                       <h3 className="text-secondary text-sm font-medium mb-3">{sub.label}</h3>
                       {items.map((e) => (
-                        <div key={e.id} className="bg-surface rounded-card shadow-card p-6 md:p-10 mb-4">
-                          <div className="flex items-center justify-between mb-4">
-                            <h4 className="font-display text-accent text-2xl">{e.title}</h4>
-                            <div className="flex items-center gap-3">
+                        <div key={e.id} className="bg-surface rounded-card shadow-card p-4 sm:p-6 md:p-10 mb-4">
+                          <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+                            <h4 className="font-display text-accent text-xl sm:text-2xl">{e.title}</h4>
+                            <div className="flex items-center gap-2 sm:gap-3">
                               {user && (
                                 <Link to={`/library/${e.id}/edit`}
                                   className="flex items-center gap-1 text-muted text-xs hover:text-accent no-underline">
