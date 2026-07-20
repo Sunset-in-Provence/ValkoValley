@@ -4,7 +4,6 @@
  *   rounded-card, rounded-button, rounded-input, rounded-full, shadow-card, border-border, font-display
  */
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabaseClient'
 import { useAuth } from '@/context/AuthContext'
 import { uploadImage } from '@/lib/upload'
@@ -14,7 +13,6 @@ import { Upload, User, Loader2 } from 'lucide-react'
 
 export default function ProfileEditor({ profile, onClose }) {
   const { user, refreshProfile } = useAuth()
-  const navigate = useNavigate()
 
   const [displayName, setDisplayName] = useState(profile?.display_name || profile?.username || '')
   const [bio, setBio] = useState(profile?.bio || '')
@@ -60,7 +58,6 @@ export default function ProfileEditor({ profile, onClose }) {
       toast.success('资料已更新')
       if (refreshProfile) refreshProfile()
       onClose()
-      navigate(window.location.pathname)
     }
     setSaving(false)
   }

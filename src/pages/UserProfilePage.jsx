@@ -36,6 +36,7 @@ export default function UserProfilePage() {
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [activeTab, setActiveTab] = useState('posts')
+  const [fetchV, setFetchV] = useState(0)
 
   const isOwn = user?.id === profile?.id
   const isEditing = searchParams.get('edit') === 'true' && isOwn
@@ -57,7 +58,7 @@ export default function UserProfilePage() {
       setLoading(false)
     }
     fetch()
-  }, [username])
+  }, [username, fetchV])
 
   if (loading) {
     return <div className="flex justify-center py-24"><LoadingSpinner size="lg" /></div>
@@ -91,7 +92,7 @@ export default function UserProfilePage() {
       {isEditing ? (
         <ProfileEditor
           profile={profile}
-          onClose={() => setSearchParams({})}
+          onClose={() => { setSearchParams({}); setFetchV((v) => v + 1) }}
         />
       ) : (
         <ProfileHeader profile={profile} isOwn={isOwn} />
