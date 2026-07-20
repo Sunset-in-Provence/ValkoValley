@@ -74,7 +74,10 @@ export default function DiscussionPage() {
   }
 
   const filtered = posts.filter((p) =>
-    !search.trim() || p.title.toLowerCase().includes(search.trim().toLowerCase())
+    !search.trim() ||
+    p.title.toLowerCase().includes(search.trim().toLowerCase()) ||
+    p.author?.display_name?.toLowerCase().includes(search.trim().toLowerCase()) ||
+    p.author?.username?.toLowerCase().includes(search.trim().toLowerCase())
   )
 
   return (
@@ -98,7 +101,7 @@ export default function DiscussionPage() {
         {/* 搜索 */}
         <div className="relative">
           <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
-            placeholder="搜索帖子标题…"
+            placeholder="搜索帖子 / 作者…"
             className="w-full bg-surface border border-border rounded-input pl-4 pr-4 py-2 text-primary text-sm placeholder:text-muted focus:outline-none focus:border-accent" />
         </div>
       </div>
