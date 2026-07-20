@@ -19,6 +19,7 @@ export default function ProfileEditor({ profile, onClose }) {
   const [displayName, setDisplayName] = useState(profile?.display_name || profile?.username || '')
   const [bio, setBio] = useState(profile?.bio || '')
   const [hideAi, setHideAi] = useState(profile?.hide_ai || false)
+  const [bookmarksPublic, setBookmarksPublic] = useState(profile?.bookmarks_public || false)
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || '')
   const [cropFile, setCropFile] = useState(null)
   const [avatarUploading, setAvatarUploading] = useState(false)
@@ -51,6 +52,7 @@ export default function ProfileEditor({ profile, onClose }) {
       bio: bio.trim(),
       avatar_url: avatarUrl,
       hide_ai: hideAi,
+      bookmarks_public: bookmarksPublic,
     }).eq('id', user.id)
 
     if (error) { toast.error('保存失败: ' + error.message) }
@@ -109,6 +111,18 @@ export default function ProfileEditor({ profile, onClose }) {
         <button type="button" onClick={() => setHideAi(!hideAi)}
           className={`relative w-10 h-6 rounded-full transition-colors ${hideAi ? 'bg-accent' : 'bg-border'}`}>
           <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${hideAi ? 'translate-x-4' : ''}`} />
+        </button>
+      </div>
+
+      {/* 收藏夹公开 */}
+      <div className="flex items-center justify-between bg-hover rounded-card p-3">
+        <div>
+          <p className="text-secondary text-sm font-medium">公开收藏夹</p>
+          <p className="text-muted text-xs">开启后他人可以查看你的收藏内容</p>
+        </div>
+        <button type="button" onClick={() => setBookmarksPublic(!bookmarksPublic)}
+          className={`relative w-10 h-6 rounded-full transition-colors ${bookmarksPublic ? 'bg-accent' : 'bg-border'}`}>
+          <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${bookmarksPublic ? 'translate-x-4' : ''}`} />
         </button>
       </div>
 

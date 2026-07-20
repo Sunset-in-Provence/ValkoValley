@@ -10,6 +10,7 @@ import VideoEmbed from '@/components/creation/VideoEmbed'
 import CommentItem from '@/components/discussion/CommentItem'
 import CommentForm from '@/components/discussion/CommentForm'
 import LikeButton from '@/components/shared/LikeButton'
+import BookmarkButton from '@/components/shared/BookmarkButton'
 import ImageViewer from '@/components/shared/ImageViewer'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import EmptyState from '@/components/shared/EmptyState'
@@ -182,6 +183,7 @@ export default function CreationDetailPage() {
           {/* 操作栏 */}
           <div className="flex items-center gap-3 pt-4 border-t border-border">
             <LikeButton targetType="creation" targetId={id} size="lg" ownerId={creation.author_id} title={creation.title} />
+            <BookmarkButton targetType="creation" targetId={id} size="lg" ownerId={creation.author_id} title={creation.title} />
             {isOwn && (
               <>
                 <button onClick={() => navigate(`/creation/${id}/edit`)}

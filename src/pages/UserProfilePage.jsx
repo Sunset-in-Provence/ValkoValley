@@ -17,12 +17,14 @@ import UserCreationsTab from '@/components/user/UserCreationsTab'
 import ContributionWidget from '@/components/shared/ContributionWidget'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import EmptyState from '@/components/shared/EmptyState'
-import { ArrowLeft, MessageSquare, Palette } from 'lucide-react'
+import { ArrowLeft, MessageSquare, Palette, Bookmark } from 'lucide-react'
+import UserBookmarksTab from '@/components/user/UserBookmarksTab'
 import { cn } from '@/lib/utils'
 
 const TABS = [
   { key: 'posts', label: '讨论帖', icon: MessageSquare },
   { key: 'creations', label: '创作', icon: Palette },
+  { key: 'bookmarks', label: '收藏', icon: Bookmark },
 ]
 
 export default function UserProfilePage() {
@@ -119,6 +121,11 @@ export default function UserProfilePage() {
       {/* Tab 内容 */}
       {activeTab === 'posts' && <UserPostsTab userId={profile.id} />}
       {activeTab === 'creations' && <UserCreationsTab userId={profile.id} />}
+      {activeTab === 'bookmarks' && (
+        isOwn || profile?.bookmarks_public
+          ? <UserBookmarksTab userId={profile.id} isOwn={isOwn} />
+          : <EmptyState icon={Bookmark} title="收藏夹未公开" description="该用户已将收藏夹设为私密" />
+      )}
     </div>
   )
 }

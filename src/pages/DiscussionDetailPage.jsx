@@ -13,6 +13,7 @@ import CommentItem from '@/components/discussion/CommentItem'
 import CommentForm from '@/components/discussion/CommentForm'
 import ReportButton from '@/components/report/ReportButton'
 import LikeButton from '@/components/shared/LikeButton'
+import BookmarkButton from '@/components/shared/BookmarkButton'
 import ImageViewer from '@/components/shared/ImageViewer'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import EmptyState from '@/components/shared/EmptyState'
@@ -176,6 +177,7 @@ export default function DiscussionDetailPage() {
           {/* 操作按钮 */}
           <div className="flex items-center gap-3 mt-6 pt-4 border-t border-border">
             <LikeButton targetType="post" targetId={id} size="lg" ownerId={post.author_id} title={post.title} />
+            <BookmarkButton targetType="post" targetId={id} size="lg" ownerId={post.author_id} title={post.title} />
             {isOwn && (
               <>
                 <button
