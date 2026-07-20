@@ -2,7 +2,10 @@
 -- 收藏功能：帖子 + 创作
 -- =====================================================
 
--- 1. 收藏表
+-- 1. 用户收藏夹公开开关（先建列，后面 policy 要引用）
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS bookmarks_public BOOLEAN DEFAULT false;
+
+-- 2. 收藏表
 CREATE TABLE IF NOT EXISTS public.bookmarks (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -31,5 +34,3 @@ CREATE POLICY "bookmarks_select_public" ON public.bookmarks
     SELECT 1 FROM public.profiles WHERE id = bookmarks.user_id AND bookmarks_public = true
   ));
 
--- 2. 用户收藏夹公开开关
-ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS bookmarks_public BOOLEAN DEFAULT false;
