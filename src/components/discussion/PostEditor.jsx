@@ -15,7 +15,7 @@ import { EyeOff } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function PostEditor() {
-  const { user } = useAuth()
+  const { user, isAdmin } = useAuth()
   const navigate = useNavigate()
   const { id } = useParams()
   const isEditing = !!id
@@ -31,12 +31,9 @@ export default function PostEditor() {
   useEffect(() => {
     if (!id) return
     async function load() {
-      const { data } = await supabase
-        .from('posts')
-        .select('*')
-        .eq('id', id)
-        .eq('author_id', user.id)
-        .single()
+      let loadQuery = supabase.from('posts').select('*').eq('id', id)
+      if (!isAdmin) loadQuery = loadQuery.eq('author_id', user.id)
+      const { data } = await loadQuery.single()
       if (data) {
         setTitle(data.title)
         setContent(data.content)
@@ -67,11 +64,9 @@ export default function PostEditor() {
       // 被隐藏的帖子编辑后标记为待审核
       if (wasHidden) updateData.pending_review = true
 
-      const { error } = await supabase
-        .from('posts')
-        .update(updateData)
-        .eq('id', id)
-        .eq('author_id', user.id)
+      let updateQuery = supabase.from('posts').update(updateData).eq('id', id)
+      if (!isAdmin) updateQuery = updateQuery.eq('author_id', user.id)
+      const { error } = await updateQuery
 
       if (error) { toast.error('更新失败: ' + error.message) }
       else {

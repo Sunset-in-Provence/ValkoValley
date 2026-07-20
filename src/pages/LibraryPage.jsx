@@ -7,6 +7,7 @@ import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import { renderMarkdown } from '@/lib/markdown'
 import { Plus, Search, Edit3, Trash2, Download } from 'lucide-react'
 import ImageViewer from '@/components/shared/ImageViewer'
+import { forceDownload } from '@/lib/download'
 import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
 
@@ -15,9 +16,7 @@ const MAIN = [
     { key: 'lore_official', label: '官方设定' }, { key: 'lore_rumor', label: '坊间传闻' }
   ]},
   { key: 'gallery', label: '图鉴', subs: [
-    { key: 'gallery_promo', label: '宣图' }, { key: 'gallery_card', label: '卡面', children: [
-      { key: 'gallery_card_day', label: '日卡' }, { key: 'gallery_card_month', label: '月卡' }
-    ]}, { key: 'gallery_text', label: '文案' }
+    { key: 'gallery_promo', label: '宣图' }, { key: 'gallery_card', label: '卡面' }, { key: 'gallery_text', label: '文案' }
   ]},
   { key: 'video', label: '视频', subs: [
     { key: 'video_pv', label: '个人PV', children: [
@@ -172,11 +171,11 @@ export default function LibraryPage() {
                                     className="w-28 h-28 sm:w-36 sm:h-36 object-cover rounded-card border border-border cursor-pointer hover:opacity-90"
                                     loading="lazy"
                                     onClick={() => { setViewerImages(e.image_urls); setViewerOpen(true); setViewerIndex(i) }} />
-                                  <a href={url} download
+                                  <button
                                     className="absolute bottom-1.5 right-1.5 bg-surface/80 hover:bg-surface rounded-full p-1.5 opacity-0 group-hover/img:opacity-100 transition-opacity"
-                                    onClick={(ev) => ev.stopPropagation()} title="下载">
+                                    onClick={(ev) => { ev.stopPropagation(); ev.preventDefault(); forceDownload(url) }} title="下载">
                                     <Download size={14} className="text-muted" />
-                                  </a>
+                                  </button>
                                 </div>
                               ))}
                             </div>

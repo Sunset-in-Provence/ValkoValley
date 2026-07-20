@@ -10,10 +10,11 @@ import LoadingSpinner from '@/components/shared/LoadingSpinner'
 import toast from 'react-hot-toast'
 import { ArrowLeft, Calendar, User, Edit3, Trash2, Download } from 'lucide-react'
 import ImageViewer from '@/components/shared/ImageViewer'
+import { forceDownload } from '@/lib/download'
 
 const catLabels = {
   lore_official: '官方设定', lore_rumor: '坊间传闻',
-  gallery_promo: '宣图', gallery_card: '卡面', gallery_card_day: '日卡', gallery_card_month: '月卡', gallery_text: '文案',
+  gallery_promo: '宣图', gallery_card: '卡面', gallery_text: '文案',
   video_pv_concept: '概念短片', video_pv_game: '不驯者的游戏', video_pv_instinct: '本能沦陷法则',
   video_story: '卡面剧情', video_other: '其它',
   music_official: '官方', music_fan: '同人',
@@ -103,9 +104,11 @@ export default function LibraryDetailPage() {
                     <img src={url} alt={`附图 ${i + 1}`}
                       className="rounded-card w-24 h-24 md:w-32 md:h-32 object-cover cursor-pointer hover:opacity-90"
                       loading="lazy" onClick={() => { setViewerOpen(true); setViewerIndex(i) }} />
-                    <a href={url} download className="absolute bottom-1 right-1 bg-surface/80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity sm:opacity-100" title="下载">
+                    <button
+                      className="absolute bottom-1 right-1 bg-surface/80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity sm:opacity-100"
+                      onClick={(ev) => { ev.stopPropagation(); ev.preventDefault(); forceDownload(url) }} title="下载">
                       <Download size={12} className="text-muted" />
-                    </a>
+                    </button>
                   </div>
                 ))}
               </div>
@@ -149,9 +152,10 @@ export default function LibraryDetailPage() {
                         <video controls className="w-full rounded-card" style={{ maxHeight: 400 }}>
                           <source src={url} /> 您的浏览器不支持视频播放
                         </video>
-                        <a href={url} download className="inline-flex items-center gap-1 text-accent text-xs mt-1 hover:underline">
+                        <button onClick={() => forceDownload(url)}
+                          className="inline-flex items-center gap-1 text-accent text-xs mt-1 hover:underline">
                           <Download size={12} /> 下载视频
-                        </a>
+                        </button>
                       </div>
                     )
                   }

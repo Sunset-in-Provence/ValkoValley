@@ -82,7 +82,7 @@ function captureVideoFrames(file, count = 4) {
 }
 
 export default function CreationEditor() {
-  const { user } = useAuth()
+  const { user, isAdmin } = useAuth()
   const navigate = useNavigate()
   const { id } = useParams()
   const isEditing = !!id
@@ -105,10 +105,9 @@ export default function CreationEditor() {
   useEffect(() => {
     if (!id) return
     async function load() {
-      const { data } = await supabase
-        .from('creations')
-        .select('*')
-        .eq('id', id).eq('author_id', user.id).single()
+      let loadQuery = supabase.from('creations').select('*').eq('id', id)
+      if (!isAdmin) loadQuery = loadQuery.eq('author_id', user.id)
+      const { data } = await loadQuery.single()
       if (data) {
         setTitle(data.title)
         setContent(data.content)
@@ -173,9 +172,11 @@ export default function CreationEditor() {
     }
 
     if (isEditing) {
-      const { error } = await supabase.from('creations').update({
+      let updateQuery = supabase.from('creations').update({
         ...payload, updated_at: new Date().toISOString(),
-      }).eq('id', id).eq('author_id', user.id)
+      }).eq('id', id)
+      if (!isAdmin) updateQuery = updateQuery.eq('author_id', user.id)
+      const { error } = await updateQuery
       if (error) { toast.error('更新失败: ' + error.message) }
       else { toast.success('创作已更新'); navigate(`/creation/${id}`) }
     } else {
