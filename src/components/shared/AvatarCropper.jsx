@@ -15,7 +15,8 @@ export default function AvatarCropper({ file, onCrop, onCancel }) {
       const i = new Image()
       i.onload = () => {
         const minDim = Math.min(i.naturalWidth, i.naturalHeight)
-        const s = Math.max(areaSize / minDim, 0.5)
+        // 初始缩放：短边刚好贴齐裁切框
+        const s = areaSize / minDim
         setScale(s)
         setImg(i)
         setPos({ x: (i.naturalWidth * s - areaSize) / 2, y: (i.naturalHeight * s - areaSize) / 2 })
@@ -92,8 +93,9 @@ export default function AvatarCropper({ file, onCrop, onCancel }) {
           {/* 缩放 */}
           <div className="flex items-center gap-2 w-full max-w-[220px]">
             <ZoomOut size={14} className="text-muted shrink-0" />
-            <input type="range" min={Math.round(Math.max(areaSize / img.naturalWidth, areaSize / img.naturalHeight, 0.3) * 100)}
-              max={300} value={zoomPct} onChange={(e) => setScale(Number(e.target.value) / 100)}
+            <input type="range" min={Math.round(Math.max(areaSize / Math.min(img.naturalWidth, img.naturalHeight), 0.05) * 100)}
+              max={Math.round(Math.max(3, areaSize / Math.min(img.naturalWidth, img.naturalHeight) * 5) * 100)}
+              value={zoomPct} onChange={(e) => setScale(Number(e.target.value) / 100)}
               className="flex-1 accent-accent" />
             <ZoomIn size={14} className="text-muted shrink-0" />
             <span className="text-muted text-[10px] w-10 text-right">{zoomPct}%</span>
