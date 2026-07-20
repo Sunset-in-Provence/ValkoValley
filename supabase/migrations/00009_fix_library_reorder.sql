@@ -1,6 +1,8 @@
 -- =====================================================
 -- 修复档案馆卡片排序（限制同分类内交换 + 处理 NULL sort_order）
 -- =====================================================
+DROP FUNCTION IF EXISTS move_library_entry(UUID, INT);
+
 CREATE OR REPLACE FUNCTION move_library_entry(_id UUID, _direction INT)
 RETURNS BOOLEAN
 LANGUAGE plpgsql
