@@ -18,23 +18,25 @@ export default function AdminApplicationsPage() {
   const [viewerIndex, setViewerIndex] = useState(0)
   const [viewerImages, setViewerImages] = useState([])
 
-  const filteredApps = apps.filter((a) =>
-    !search ||
-    a.email?.toLowerCase().includes(search.toLowerCase()) ||
-    a.xhs_nickname?.toLowerCase().includes(search.toLowerCase()) ||
-    a.xhs_id?.toLowerCase().includes(search.toLowerCase())
-  )
+  const filteredApps = apps
+    .filter((a) => a.status === filter)
+    .filter((a) =>
+      !search ||
+      a.email?.toLowerCase().includes(search.toLowerCase()) ||
+      a.xhs_nickname?.toLowerCase().includes(search.toLowerCase()) ||
+      a.xhs_id?.toLowerCase().includes(search.toLowerCase())
+    )
 
   async function fetch() {
     setLoading(true)
     const { data } = await supabase.from('registration_applications')
       .select('*, used_by:profiles!registration_applications_used_by_user_id_fkey(username, display_name)')
-      .eq('status', filter).order('created_at', { ascending: false })
+      .order('created_at', { ascending: false })
     setApps(data || [])
     setLoading(false)
   }
 
-  useEffect(() => { fetch() }, [filter])
+  useEffect(() => { fetch() }, [])
 
   async function handleApprove(app) {
     setProcessing(app.id)
@@ -60,7 +62,7 @@ export default function AdminApplicationsPage() {
   }
 
   return (
-    <div>
+    <div className="px-4 md:px-6">
       <Link to="/admin" className="inline-flex items-center gap-1 bg-surface rounded-button px-3 py-1.5 text-muted text-sm mb-4 no-underline hover:text-accent shadow-card">
         <ArrowLeft size={16} /> 返回管理后台
       </Link>
@@ -75,19 +77,21 @@ export default function AdminApplicationsPage() {
             placeholder="搜索邮箱 / 小红书号 / 昵称..." className="w-full max-w-xs bg-hover border border-border rounded-input px-3 py-2 text-primary text-sm focus:outline-none focus:border-accent" />
         </div>
         <div className="flex gap-1 mb-4">
-          {[{ key: 'pending', label: '待审核' }, { key: 'approved', label: '已通过' }, { key: 'rejected', label: '已拒绝' }].map((f) => (
+          {[{ key: 'pending', label: '待审核' }, { key: 'approved', label: '已通过' }, { key: 'rejected', label: '已拒绝' }].map((f) => {
+            const count = apps.filter((a) => a.status === f.key).length
+            return (
             <button key={f.key} onClick={() => setFilter(f.key)}
               className={`px-4 py-1.5 rounded-full text-xs ${filter === f.key ? 'bg-accent text-text-inverse' : 'bg-surface text-secondary border border-border hover:bg-hover'}`}>
-              {f.label} {filter === f.key && `(${apps.length})`}
+              {f.label} ({count})
             </button>
-          ))}
+          )})}
         </div>
 
-        {loading ? <LoadingSpinner size="lg" /> : apps.length === 0 ? (
+        {loading ? <LoadingSpinner size="lg" /> : filteredApps.length === 0 ? (
           <p className="text-muted text-sm py-8 text-center">暂无记录</p>
         ) : (
           <div className="space-y-3">
-            {apps.map((app) => (
+            {filteredApps.map((app) => (
               <div key={app.id} className="border border-border rounded-card p-4">
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex-1">

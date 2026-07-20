@@ -115,18 +115,19 @@ export default function AdminPage() {
 
   return (
     <div>
+      <div className="px-4 md:px-6">
       <Link to="/discussion" className="inline-flex items-center gap-1 bg-surface rounded-button px-3 py-1.5 text-muted text-sm mb-4 no-underline hover:text-accent transition-colors shadow-card">
         <ArrowLeft size={16} /> 返回
       </Link>
       {/* 标题栏 */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
           <h1 className="font-display text-accent text-2xl flex items-center gap-2">
             <Shield size={24} /> 管理后台
           </h1>
           <p className="text-muted text-sm mt-1">举报审核 · 留言审核 · 内容管理</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Link to="/admin/exam"
             className="flex items-center gap-1 text-muted text-sm no-underline hover:text-accent px-3 py-1.5 rounded-button border border-border">
             <BookOpen size={14} /> 题库管理
@@ -155,10 +156,10 @@ export default function AdminPage() {
       </div>
 
       {/* Tab 切换 */}
-      <div className="flex gap-1 mb-6 border-b border-border">
+      <div className="flex gap-1 mb-6 border-b border-border overflow-x-auto">
         {TABS.map((tab) => (
           <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-            className={cn('px-4 py-2 text-sm rounded-t-card transition-colors',
+            className={cn('px-4 py-2 text-sm rounded-t-card transition-colors whitespace-nowrap',
               activeTab === tab.key
                 ? 'text-accent border-b-2 border-accent -mb-[2px] font-medium'
                 : 'text-muted hover:text-secondary')}>
@@ -306,6 +307,7 @@ export default function AdminPage() {
 
       {/* ====== 用户列表 ====== */}
       {activeTab === 'users' && <UsersTab />}
+      </div> {/* close px-4 wrapper */}
     </div>
   )
 }
