@@ -9,7 +9,7 @@ import { Palette, Plus, Search, Clock, Flame, ArrowDown, ArrowUp } from 'lucide-
 import { cn } from '@/lib/utils'
 
 const CONTENT_FILTERS = [
-  { key: 'all', label: '全部' }, { key: 'text', label: '文' }, { key: 'image', label: '图' }, { key: 'video', label: '视频' }, { key: 'ai', label: '🤖 AI' },
+  { key: 'all', label: '全部' }, { key: 'text', label: '文' }, { key: 'image', label: '图' }, { key: 'video', label: '视频' },
 ]
 
 export default function CreationPage() {
@@ -31,10 +31,7 @@ export default function CreationPage() {
   async function fetchData() {
     setLoading(true)
     let query = supabase.from('creations').select('*, author:profiles!creations_author_id_fkey(username, display_name, avatar_url)').eq('is_deleted', false).neq('hidden', true)
-    if (contentFilter !== 'all') {
-      if (contentFilter === 'ai') query = query.eq('is_ai', true)
-      else query = query.eq('content_type', contentFilter)
-    }
+    if (contentFilter !== 'all') query = query.eq('content_type', contentFilter)
     // 用户屏蔽 AI 时过滤 AI 作品（全部/文/图/视频视图）
     if (profile?.hide_ai && contentFilter !== 'ai') query = query.neq('is_ai', true)
     const { data } = await query
