@@ -13,7 +13,7 @@ import toast from 'react-hot-toast'
 import { Upload, User, Loader2 } from 'lucide-react'
 
 export default function ProfileEditor({ profile, onClose }) {
-  const { user } = useAuth()
+  const { user, refreshProfile } = useAuth()
   const navigate = useNavigate()
 
   const [displayName, setDisplayName] = useState(profile?.display_name || profile?.username || '')
@@ -56,7 +56,12 @@ export default function ProfileEditor({ profile, onClose }) {
     }).eq('id', user.id)
 
     if (error) { toast.error('保存失败: ' + error.message) }
-    else { toast.success('资料已更新'); onClose(); navigate(window.location.pathname) }
+    else {
+      toast.success('资料已更新')
+      if (refreshProfile) refreshProfile()
+      onClose()
+      navigate(window.location.pathname)
+    }
     setSaving(false)
   }
 
