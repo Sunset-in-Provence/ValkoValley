@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '@/lib/supabaseClient'
 import LoadingSpinner from '@/components/shared/LoadingSpinner'
-import { ArrowLeft, Plus, Trash2, Rocket, Wrench, Sparkles } from 'lucide-react'
+import { ArrowLeft, Plus, Trash2, Rocket, Wrench, Sparkles, MinusCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function AdminChangelogPage() {
@@ -37,12 +37,14 @@ export default function AdminChangelogPage() {
     const unreleased = entries.filter((e) => !e.released)
     if (unreleased.length === 0) { toast.error('没有待发布的更新'); return }
 
-    const fixes = unreleased.filter((e) => e.type === 'fix')
     const feats = unreleased.filter((e) => e.type === 'feat')
+    const fixes = unreleased.filter((e) => e.type === 'fix')
+    const removes = unreleased.filter((e) => e.type === 'remove')
 
     let markdown = ''
     if (feats.length > 0) markdown += feats.map((e) => `- 添加了${e.content}`).join('\n') + '\n'
-    if (fixes.length > 0) markdown += fixes.map((e) => `- 修复了${e.content}`).join('\n')
+    if (fixes.length > 0) markdown += fixes.map((e) => `- 修复了${e.content}`).join('\n') + '\n'
+    if (removes.length > 0) markdown += removes.map((e) => `- 移除了${e.content}`).join('\n') + '\n'
 
     // 标记为已发布
     await supabase.from('changelog').update({ released: true }).in('id', unreleased.map((e) => e.id))
@@ -71,8 +73,9 @@ export default function AdminChangelogPage() {
         <div className="flex gap-2 mb-4">
           <select value={newType} onChange={(e) => setNewType(e.target.value)}
             className="bg-hover border border-border rounded-input px-3 py-2 text-primary text-sm">
-            <option value="fix">修复</option>
             <option value="feat">添加</option>
+            <option value="fix">修复</option>
+            <option value="remove">移除</option>
           </select>
           <input type="text" value={newContent} onChange={(e) => setNewContent(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') handleAdd() }}
@@ -94,9 +97,15 @@ export default function AdminChangelogPage() {
               entries.map((e) => (
                 <div key={e.id} className={`flex items-center justify-between p-2.5 rounded-card ${e.released ? 'bg-hover/50' : 'bg-hover'}`}>
                   <div className="flex items-center gap-2">
-                    <span className={`text-xs px-1.5 py-0.5 rounded-full ${e.type === 'fix' ? 'bg-warning/10 text-warning' : 'bg-success/10 text-success'}`}>
-                      {e.type === 'fix' ? <Wrench size={10} className="inline mr-0.5" /> : <Sparkles size={10} className="inline mr-0.5" />}
-                      {e.type === 'fix' ? '修复' : '添加'}
+                    <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+                      e.type === 'feat' ? 'bg-success/10 text-success' :
+                      e.type === 'fix' ? 'bg-warning/10 text-warning' :
+                      'bg-danger/10 text-danger'
+                    }`}>
+                      {e.type === 'feat' ? <Sparkles size={10} className="inline mr-0.5" /> :
+                       e.type === 'fix' ? <Wrench size={10} className="inline mr-0.5" /> :
+                       <MinusCircle size={10} className="inline mr-0.5" />}
+                      {e.type === 'feat' ? '添加' : e.type === 'fix' ? '修复' : '移除'}
                     </span>
                     <span className={`text-sm ${e.released ? 'text-muted' : 'text-secondary'}`}>{e.content}</span>
                   </div>
