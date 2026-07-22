@@ -10,7 +10,7 @@
  * 运行：node scripts/migrate-to-r2.mjs
  */
 import { createClient } from '@supabase/supabase-js'
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
+import { S3Client, PutObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3'
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
 
@@ -84,15 +84,24 @@ async function migrateBucket(bucket) {
   const keys = await listAll(bucket)
   console.log(`${bucket}: 共 ${keys.length} 个文件`)
 
-  let ok = 0
+  let ok = 0, skip = 0
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i]
-    process.stdout.write(`  [${i + 1}/${keys.length}] ${key} `)
+    const r2Key = `${bucket}/${key}`
+
+    // 已存在则跳过
+    try { await r2.send(new HeadObjectCommand({ Bucket: BUCKET, Key: r2Key })); skip++; continue } catch {}
+
+    // 先拿文件大小
+    const sizeStr = key
+    process.stdout.write(`  [${i + 1}/${keys.length}] ${sizeStr} `)
 
     const { data, error: dlErr } = await supabase.storage.from(bucket).download(key)
     if (dlErr || !data) { console.log(`❌ ${dlErr?.message}`); continue }
 
-    const r2Key = `${bucket}/${key}`
+    const sizeMB = (data.size / 1024 / 1024).toFixed(1)
+    process.stdout.write(`(${sizeMB}MB) `)
+
     try {
       const buf = Buffer.from(await data.arrayBuffer())
       await r2.send(new PutObjectCommand({
@@ -105,7 +114,7 @@ async function migrateBucket(bucket) {
       console.log(`❌ ${err.message}`)
     }
   }
-  console.log(`${bucket}: ${ok}/${keys.length} 成功`)
+  console.log(`${bucket}: ${ok} 新增 / ${skip} 已存在 / ${keys.length} 总计`)
   return ok
 }
 
