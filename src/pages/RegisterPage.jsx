@@ -458,6 +458,12 @@ export default function RegisterPage() {
                 placeholder="输入邀请码" required
                 className="w-full bg-hover border border-border rounded-input px-4 py-2.5 text-primary text-sm placeholder:text-muted focus:outline-none focus:border-accent transition-colors"
               />
+              <p className="text-muted text-xs mt-1">
+                还没有邀请码？{' '}
+                <Link to="/apply" className="text-accent no-underline hover:underline">
+                  申请加入
+                </Link>
+              </p>
             </div>
           )}
 
