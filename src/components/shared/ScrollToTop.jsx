@@ -20,7 +20,7 @@ export default function ScrollToTop() {
   return (
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      className="fixed bottom-24 right-6 z-50 w-11 h-11 bg-white border border-border rounded-full shadow-lg flex items-center justify-center hover:bg-accent hover:text-white hover:border-accent transition-all"
+      className="fixed bottom-24 right-6 z-50 w-11 h-11 bg-surface border border-border rounded-button flex items-center justify-center hover:bg-accent hover:text-text-inverse hover:border-accent transition-colors"
       title="返回顶部"
     >
       <ArrowUp size={20} />

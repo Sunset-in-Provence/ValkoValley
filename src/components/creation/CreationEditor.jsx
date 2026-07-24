@@ -22,15 +22,19 @@ async function generateTextCover(title, content) {
   const canvas = document.createElement('canvas')
   canvas.width = 800; canvas.height = 450
   const ctx = canvas.getContext('2d')
-  // 渐变背景
+  // 渐变背景 — 读取主题色
+  const style = getComputedStyle(document.documentElement)
+  const accentColor = style.getPropertyValue('--color-accent').trim() || '#5DAF7C'
+  const textPrimaryColor = style.getPropertyValue('--color-text-primary').trim() || '#1F2937'
   const grad = ctx.createLinearGradient(0, 0, 800, 450)
-  grad.addColorStop(0, '#5DAF7C'); grad.addColorStop(1, '#2D5A3A')
+  grad.addColorStop(0, accentColor); grad.addColorStop(1, textPrimaryColor)
   ctx.fillStyle = grad; ctx.fillRect(0, 0, 800, 450)
   // 标题
-  ctx.fillStyle = '#fff'; ctx.font = 'bold 36px serif'
+  const inverseColor = style.getPropertyValue('--color-text-inverse').trim() || '#FFFFFF'
+  ctx.fillStyle = inverseColor; ctx.font = 'bold 36px serif'
   ctx.fillText(title.slice(0, 20), 40, 140)
   // 正文预览
-  ctx.font = '18px serif'; ctx.fillStyle = 'rgba(255,255,255,0.8)'
+  ctx.font = '18px serif'; ctx.fillStyle = inverseColor + 'CC'  // 80% opacity
   const lines = content.replace(/\s+/g, ' ').slice(0, 200).match(/.{1,35}/g) || []
   lines.slice(0, 6).forEach((line, i) => ctx.fillText(line, 40, 200 + i * 30))
   return new Promise((resolve) => {

@@ -4,18 +4,18 @@
  *   rounded-card, rounded-button, rounded-input, rounded-full, border-border
  */
 import { useState } from 'react'
-import { X } from 'lucide-react'
+import { X, FileText, Image, Film, Pen, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const CONTENT_TYPE_OPTIONS = [
-  { key: 'text', label: '📝 文' },
-  { key: 'image', label: '🖼️ 图' },
-  { key: 'video', label: '🎬 视频' },
+  { key: 'text', label: '文', icon: FileText },
+  { key: 'image', label: '图', icon: Image },
+  { key: 'video', label: '视频', icon: Film },
 ]
 
 const TYPE_OPTIONS = [
-  { key: '原创', label: '🖊️ 原创' },
-  { key: '二创', label: '✨ 二创' },
+  { key: '原创', label: '原创', icon: Pen },
+  { key: '二创', label: '二创', icon: Sparkles },
 ]
 
 export default function TagSelector({ rating, onRatingChange, type, onTypeChange, customTags = [], onCustomTagsChange }) {
@@ -40,21 +40,24 @@ export default function TagSelector({ rating, onRatingChange, type, onTypeChange
           类型 <span className="text-danger">*</span>
         </label>
         <div className="flex gap-2">
-          {CONTENT_TYPE_OPTIONS.map((opt) => (
+          {CONTENT_TYPE_OPTIONS.map((opt) => {
+            const Icon = opt.icon
+            return (
             <button
               key={opt.key}
               type="button"
               onClick={() => onRatingChange(opt.key)}
               className={cn(
-                'flex-1 px-3 py-2 rounded-button text-xs text-center border transition-colors',
+                'flex-1 px-3 py-2 rounded-button text-xs text-center border transition-colors flex items-center justify-center gap-1.5',
                 rating === opt.key
                   ? 'bg-accent text-text-inverse border-accent'
                   : 'bg-hover text-secondary border-border hover:border-accent'
               )}
             >
-              {opt.label}
+              <Icon size={14} />{opt.label}
             </button>
-          ))}
+            )
+          })}
         </div>
       </div>
 
@@ -64,21 +67,24 @@ export default function TagSelector({ rating, onRatingChange, type, onTypeChange
           创作类型 <span className="text-danger">*</span>
         </label>
         <div className="flex gap-2">
-          {TYPE_OPTIONS.map((opt) => (
+          {TYPE_OPTIONS.map((opt) => {
+            const Icon = opt.icon
+            return (
             <button
               key={opt.key}
               type="button"
               onClick={() => onTypeChange(opt.key)}
               className={cn(
-                'flex-1 px-3 py-2 rounded-button text-xs text-center border transition-colors',
+                'flex-1 px-3 py-2 rounded-button text-xs text-center border transition-colors flex items-center justify-center gap-1.5',
                 type === opt.key
                   ? 'bg-accent text-text-inverse border-accent'
                   : 'bg-hover text-secondary border-border hover:border-accent'
               )}
             >
-              {opt.label}
+              <Icon size={14} />{opt.label}
             </button>
-          ))}
+            )
+          })}
         </div>
       </div>
 
@@ -104,7 +110,7 @@ export default function TagSelector({ rating, onRatingChange, type, onTypeChange
           <div className="flex flex-wrap gap-1.5">
             {customTags.map((tag) => (
               <span key={tag}
-                className="inline-flex items-center gap-1 bg-accent/10 text-accent text-xs px-2 py-1 rounded-full">
+                className="inline-flex items-center gap-1 bg-accent/10 text-accent text-xs px-2 py-1 rounded-button">
                 {tag}
                 <button type="button" onClick={() => removeTag(tag)} className="hover:text-danger">
                   <X size={12} />

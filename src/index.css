@@ -20,12 +20,12 @@
   --color-warning: #F59E0B;
   --color-info: #3B82F6;
   --color-border: #E5E7EB;
-  --radius-card: 12px;
-  --radius-button: 8px;
-  --radius-input: 6px;
-  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.08);
-  --shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.12);
-  --font-display: 'ZCOOL KuaiLe', cursive;
+  --radius-card: 4px;
+  --radius-button: 4px;
+  --radius-input: 2px;
+  --shadow-card: none;
+  --shadow-elevated: 0 1px 4px rgba(0, 0, 0, 0.04);
+  --font-display: 'Noto Serif SC', serif;
   --font-body: 'Noto Sans SC', sans-serif;
 }
 
@@ -74,14 +74,14 @@
 }
 
 /* === 首页hero文字颜色 === */
-.hero-title { color: #2D5A3A; }
-.dark .hero-title { color: #FDE68A; }
+.hero-title { color: var(--color-text-accent); }
+.dark .hero-title { color: var(--color-secondary); }
 
 body {
   margin: 0;
   font-family: var(--font-body);
-  background-color: light-dark(#F0F8F3, #1A2A20);
-  color: light-dark(#1F2937, #E8F5ED);
+  background-color: var(--color-primary);
+  color: var(--color-text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -90,8 +90,7 @@ body {
 .dark { color-scheme: dark; }
 
 /* === 全局输入框文字颜色 === */
-input, textarea, select { color: #222; }
-.dark input, .dark textarea, .dark select { color: #eee; }
+input, textarea, select { color: var(--color-text-primary); }
 
 /* === 全局placeholder颜色 — 覆盖浏览器默认半透明 === */
 ::placeholder { opacity: 1; color: inherit; }
@@ -102,8 +101,8 @@ input::placeholder, textarea::placeholder { opacity: 1; }
 .prose img { border-radius: var(--radius-card); }
 
 /* === 弹幕墙颜色 === */
-.danmaku-text { color: #2D5A3A; }
-.dark .danmaku-text { color: #FDE68A; }
+.danmaku-text { color: var(--color-text-accent); }
+.dark .danmaku-text { color: var(--color-secondary); }
 
 /* === 弹幕墙动画 === */
 @keyframes danmaku-scroll { to { transform: translateX(-100%); } }

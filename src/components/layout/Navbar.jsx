@@ -102,7 +102,7 @@ export default function Navbar() {
   )
 
   return (
-    <nav className="bg-surface border-b border-border shadow-elevated sticky top-0 z-50">
+    <nav className="bg-surface border-b border-border sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 h-14 flex items-center justify-between">
         {/* 左侧：汉堡 + Logo + 桌面链接 */}
         <div className="flex items-center gap-1 sm:gap-2">

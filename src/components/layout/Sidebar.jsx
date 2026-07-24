@@ -3,7 +3,7 @@
  *   背景：bg-surface
  *   文字：text-primary, text-secondary, text-muted
  *   圆角：rounded-card
- *   阴影：shadow-card
+ *   边框：border-border
  */
 import { Link, useLocation } from 'react-router-dom'
 import { MessageSquare, Palette, BookOpen, ExternalLink } from 'lucide-react'
@@ -20,7 +20,7 @@ export default function Sidebar() {
 
   return (
     <aside className="w-48 shrink-0 hidden lg:block">
-      <div className="bg-surface rounded-card shadow-card p-3 sticky top-20">
+      <div className="bg-surface rounded-card border border-border p-3 sticky top-20">
         <nav className="flex flex-col gap-1">
           {links.map(({ to, label, icon: Icon }) => {
             const isActive = location.pathname.startsWith(to)

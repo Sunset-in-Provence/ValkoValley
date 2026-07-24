@@ -2,7 +2,7 @@
  * UI 变量映射 — Badge 骨架
  *   背景：bg-accent, bg-success, bg-danger, bg-warning, bg-info
  *   文字：text-text-inverse
- *   圆角：rounded-full
+ *   圆角：rounded-button
  */
 import { cn } from '@/lib/utils'
 
@@ -19,7 +19,7 @@ export default function Badge({ variant = 'default', className, children, ...pro
   return (
     <span
       className={cn(
-        'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-body font-medium',
+        'inline-flex items-center px-2.5 py-0.5 rounded-button text-xs font-body font-medium',
         variants[variant],
         className
       )}

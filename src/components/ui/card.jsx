@@ -1,13 +1,13 @@
 /**
  * UI 变量映射 — shadcn/ui Card 骨架
  *   背景：bg-surface  文字：text-primary, text-secondary, text-muted
- *   圆角：rounded-card  阴影：shadow-card
+ *   圆角：rounded-card  阴影：shadow-card  边框：border-border
  */
 import { cn } from '@/lib/utils'
 
 export function Card({ className, children, ...props }) {
   return (
-    <div className={cn('bg-surface rounded-card shadow-card', className)} {...props}>
+    <div className={cn('bg-surface rounded-card shadow-card border border-border', className)} {...props}>
       {children}
     </div>
   )
