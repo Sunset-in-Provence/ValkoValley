@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
-import { X, MessageSquare, Palette, BookOpen, Megaphone, HelpCircle, ArrowRight, Menu, MessageCircle, Flower, ExternalLink } from 'lucide-react'
+import { X, MessageSquare, Palette, BookOpen, Megaphone, HelpCircle, ArrowRight, Menu, MessageCircle, Flower, ExternalLink, Globe } from 'lucide-react'
 
 const STORAGE_KEY = 'vv-onboarding-done'
 
@@ -41,6 +41,10 @@ const STEPS = [
   {
     icon: ExternalLink, title: '外网推荐',
     desc: '在导航栏「外网推荐」分区，你可以分享和浏览海外创作者的推荐信息。这不是一个发布R18内容的地方，而是指路牌。',
+  },
+  {
+    icon: Globe, title: '共创宇宙',
+    desc: '敖尹宇宙共创企划！每个星纪围绕不同主题展开，你可以参与主题投票、投稿建设剧情（正剧构史或IF线自由建设），邀请其他用户共创，共同谱写敖尹的万千宇宙。',
   },
   {
     icon: HelpCircle, title: '需要更多帮助？',

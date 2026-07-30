@@ -40,6 +40,8 @@ const MessagesPage = lazy(() => import('@/pages/MessagesPage'))
 const LilyGardenPage = lazy(() => import('@/pages/LilyGardenPage'))
 const LilyValleyPage = lazy(() => import('@/pages/LilyValleyPage'))
 const RecommendPage = lazy(() => import('@/pages/RecommendPage'))
+const UniversePage = lazy(() => import('@/pages/UniversePage'))
+const UniverseSeasonPage = lazy(() => import('@/pages/UniverseSeasonPage'))
 const ContactPage = lazy(() => import('@/pages/ContactPage'))
 
 function Lazy({ children }) {
@@ -91,6 +93,8 @@ export default function App() {
         <Route path="/lily-garden" element={<Lazy><ProtectedRoute><AppLayout><LilyGardenPage /></AppLayout></ProtectedRoute></Lazy>} />
         <Route path="/lily-valley" element={<Lazy><ProtectedRoute><AppLayout><LilyValleyPage /></AppLayout></ProtectedRoute></Lazy>} />
         <Route path="/messages" element={<Lazy><ProtectedRoute><AppLayout><MessagesPage /></AppLayout></ProtectedRoute></Lazy>} />
+        <Route path="/universe" element={<Lazy><ProtectedRoute><UniversePage /></ProtectedRoute></Lazy>} />
+        <Route path="/universe/:seasonId" element={<Lazy><ProtectedRoute><UniverseSeasonPage /></ProtectedRoute></Lazy>} />
         <Route path="/contact" element={<Lazy><ProtectedRoute><AppLayout><ContactPage /></AppLayout></ProtectedRoute></Lazy>} />
 
         {/* 个人主页 */}

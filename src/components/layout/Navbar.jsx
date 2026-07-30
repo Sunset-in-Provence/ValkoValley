@@ -80,6 +80,7 @@ export default function Navbar() {
     { to: '/creation', label: '创作区' },
     { to: '/library', label: '档案馆' },
     { to: '/recommend', label: '外网推荐' },
+    { to: '/universe', label: '共创宇宙' },
   ]
 
   const HamburgerMenu = () => (
@@ -112,6 +113,7 @@ export default function Navbar() {
             <Link to="/help" className="text-secondary hover:text-accent px-2 py-1.5 rounded-button text-sm transition-colors no-underline">帮助中心</Link>
             <Link to="/announcements" className="text-secondary hover:text-accent px-2 py-1.5 rounded-button text-sm transition-colors no-underline">公告</Link>
             <Link to="/recommend" className="text-secondary hover:text-accent px-2 py-1.5 rounded-button text-sm transition-colors no-underline">外网推荐</Link>
+            <Link to="/universe" className="text-secondary hover:text-accent px-2 py-1.5 rounded-button text-sm transition-colors no-underline">共创宇宙</Link>
           </div>
         </div>
 
