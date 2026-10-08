@@ -19,7 +19,7 @@ async function uploadViaR2(file) {
     const res = await fetch('/api/upload-url', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ fileName: file.name, contentType: file.type }),
+      body: JSON.stringify({ fileName: file.name, contentType: file.type, fileSize: file.size }),
     })
     const body = await res.json()
     if (!res.ok || !body.uploadUrl) throw new Error(body.error || '获取上传地址失败')
