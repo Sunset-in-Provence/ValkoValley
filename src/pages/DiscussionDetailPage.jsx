@@ -23,6 +23,8 @@ import {
   Edit3, Trash2, Pin, Eye, EyeOff
 } from 'lucide-react'
 
+const COMMENTS_PAGE = 20 // 每页一级评论条数
+
 export default function DiscussionDetailPage() {
   const { id } = useParams()
   const { user, isAdmin, profile } = useAuth()
@@ -33,6 +35,54 @@ export default function DiscussionDetailPage() {
   const [loading, setLoading] = useState(true)
   const [viewerOpen, setViewerOpen] = useState(false)
   const [viewerIndex, setViewerIndex] = useState(0)
+  // 评论分页：一级评论按 20 条一页加载（最新页优先，可向前翻更早）
+  const [commentTotal, setCommentTotal] = useState(0)
+  const [hasMoreOlder, setHasMoreOlder] = useState(false)
+  const [loadingOlder, setLoadingOlder] = useState(false)
+  const [oldestCursor, setOldestCursor] = useState(null)
+
+  /** 合并一批评论（去重 + 按时间升序展示），并补充"回复xxx"指向 */
+  const mergeComments = (newItems) => {
+    setComments((prev) => {
+      const map = new Map(prev.map((c) => [c.id, c]))
+      newItems.forEach((c) => map.set(c.id, c))
+      const list = [...map.values()].sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+      list.forEach((c) => { if (c.reply_to_id) c.reply_to = map.get(c.reply_to_id)?.author || c.reply_to })
+      return list
+    })
+  }
+
+  /** 加载已载入一级评论的两层楼中楼回复（有界：仅当前页一级评论的子树） */
+  async function fetchReplies(topIds) {
+    if (!topIds.length) return []
+    const { data: depth1 } = await supabase.from('comments')
+      .select('*, author:profiles!comments_author_id_fkey(username, display_name, avatar_url)')
+      .in('parent_id', topIds).eq('is_deleted', false)
+    const depth1Ids = (depth1 || []).map((c) => c.id)
+    let depth2 = []
+    if (depth1Ids.length) {
+      const { data } = await supabase.from('comments')
+        .select('*, author:profiles!comments_author_id_fkey(username, display_name, avatar_url)')
+        .in('parent_id', depth1Ids).eq('is_deleted', false)
+      depth2 = data || []
+    }
+    return [...(depth1 || []), ...depth2]
+  }
+
+  /** 加载一页一级评论（按时间倒序取最新一页）+ 其楼中楼回复 */
+  async function loadCommentsPage(cursor = null) {
+    let query = supabase.from('comments')
+      .select('*, author:profiles!comments_author_id_fkey(username, display_name, avatar_url)')
+      .eq('post_id', id).eq('is_deleted', false).is('parent_id', null)
+      .order('created_at', { ascending: false })
+      .limit(COMMENTS_PAGE)
+    if (cursor) query = query.lt('created_at', cursor)
+    const { data } = await query
+    const page = data || []
+    const replies = await fetchReplies(page.map((c) => c.id))
+    mergeComments([...page, ...replies])
+    return page
+  }
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -52,26 +102,29 @@ export default function DiscussionDetailPage() {
     }
     setPost(postData)
 
-    // 获取评论（含作者信息）
-    const { data: commentData } = await supabase
-      .from('comments')
-      .select('*, author:profiles!comments_author_id_fkey(username, display_name, avatar_url)')
-      .eq('post_id', id)
-      .eq('is_deleted', false)
-      .order('created_at', { ascending: true })
+    // 评论总数（精确计数，head 请求不拉行）
+    const { count } = await supabase
+      .from('comments').select('id', { count: 'exact', head: true })
+      .eq('post_id', id).eq('is_deleted', false)
+    setCommentTotal(count || 0)
 
-    // 为回复型评论找到被回复者的用户名
-    const enriched = (commentData || []).map((c) => {
-      if (c.reply_to_id) {
-        const target = commentData?.find((x) => x.id === c.reply_to_id)
-        c.reply_to = target?.author || null
-      }
-      return c
-    })
-
-    setComments(enriched)
+    // 第一页评论：最新 20 条一级 + 楼中楼
+    setComments([])
+    const page = await loadCommentsPage()
+    setHasMoreOlder(page.length === COMMENTS_PAGE)
+    setOldestCursor(page.length ? page[page.length - 1].created_at : null)
     setLoading(false)
   }, [id])
+
+  /** 向前翻更早的一页一级评论 */
+  async function loadOlderComments() {
+    if (!oldestCursor || loadingOlder) return
+    setLoadingOlder(true)
+    const page = await loadCommentsPage(oldestCursor)
+    setHasMoreOlder(page.length === COMMENTS_PAGE)
+    setOldestCursor(page.length ? page[page.length - 1].created_at : null)
+    setLoadingOlder(false)
+  }
 
   useEffect(() => { fetchData() }, [fetchData])
 
@@ -247,7 +300,7 @@ export default function DiscussionDetailPage() {
       {/* ============ 评论区 ============ */}
       <section className="bg-surface rounded-card shadow-card p-6">
         <h2 className="font-display text-accent text-lg mb-4">
-          评论 ({comments.length})
+          评论 ({commentTotal})
         </h2>
 
         {/* 发评表单 */}
@@ -263,6 +316,16 @@ export default function DiscussionDetailPage() {
             }}
           />
         </div>
+
+        {/* 更早的评论（分页向前翻） */}
+        {hasMoreOlder && (
+          <div className="flex justify-center mb-3">
+            <button onClick={loadOlderComments} disabled={loadingOlder}
+              className="bg-hover border border-border text-muted text-xs px-5 py-1.5 rounded-full hover:text-accent transition-colors disabled:opacity-50">
+              {loadingOlder ? '加载中...' : '查看更早的评论'}
+            </button>
+          </div>
+        )}
 
         {/* 评论列表（楼中楼） */}
         {topLevelComments.length === 0 ? (
